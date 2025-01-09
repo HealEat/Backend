@@ -1,6 +1,7 @@
 package healeat.server.domain.mapping;
 
 import healeat.server.domain.Keyword;
+import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.SearchType;
@@ -25,6 +26,10 @@ public class RecentSearch extends BaseEntity {
     // 검색 기록 타입
     @Enumerated(EnumType.STRING)
     private SearchType searchType; // KEYWORD, STORE
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = true)

@@ -27,9 +27,9 @@ public class Member extends BaseEntity {
 
 
 
-    @OneToMany(mappedBy = "membmer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<RecentSearch> recentSearchList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "membmer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Bookmark> bookmarkList = new ArrayList<>();
 }
