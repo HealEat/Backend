@@ -1,18 +1,21 @@
 package healeat.server.domain.mapping;
 
-import healeat.server.domain.MealNeeded;
 import healeat.server.domain.Member;
+import healeat.server.domain.Store;
 import healeat.server.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
-@Table(name = "member_meal_needed")
 @Getter
+@Builder
+@DynamicUpdate
+@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-public class MemberMealNeeded extends BaseEntity {
+public class Bookmark extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +26,6 @@ public class MemberMealNeeded extends BaseEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "meal_needed_id", nullable = false)
-    private MealNeeded mealNeeded;
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 }
