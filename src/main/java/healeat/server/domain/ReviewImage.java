@@ -1,25 +1,28 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
+import healeat.server.domain.mapping.Review;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
-@Table(name = "memo_image")
 @Getter
+@Builder
+@DynamicUpdate
+@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-public class MemoImage extends BaseEntity {
+public class ReviewImage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "health_plan_id", nullable = false)
-    private HealthPlan healthPlan;
+    @JoinColumn(name = "review_id", nullable = false)
+    private Review review;
 
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl; // 이미지 URL
+    private String image_url;
 }

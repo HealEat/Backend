@@ -7,9 +7,12 @@ import healeat.server.domain.mapping.MemberFoodToAvoid;
 import healeat.server.domain.mapping.MemberMealNeeded;
 import healeat.server.domain.mapping.MemberNutrientNeeded;
 import healeat.server.domain.mapping.MemberTerm;
+import healeat.server.domain.mapping.Bookmark;
+import healeat.server.domain.mapping.RecentSearch;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,6 +43,8 @@ public class Member extends BaseEntity {
     // 연관관계 매핑
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTerm> memberTerms;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<RecentSearch> recentSearchList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberMealNeeded> memberMealNeeded;
@@ -55,4 +60,7 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarks;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Bookmark> bookmarkList = new ArrayList<>();
 }
