@@ -2,6 +2,8 @@ package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.mapping.Bookmark;
+import healeat.server.domain.mapping.Review;
+import healeat.server.domain.mapping.StoreKeyword;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -35,4 +37,10 @@ public class Store extends BaseEntity {
     private Float freshScore; // 신선도
 
     private Float nutrBalanceScore; // 영양 균형
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    private List<Review> reviewList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    private List<StoreKeyword> storeKeywordList = new ArrayList<>();
 }

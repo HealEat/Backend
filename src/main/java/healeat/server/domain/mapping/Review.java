@@ -1,12 +1,16 @@
 package healeat.server.domain.mapping;
 
 import healeat.server.domain.Member;
+import healeat.server.domain.ReviewImage;
 import healeat.server.domain.Store;
 import healeat.server.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -45,4 +49,7 @@ public class Review extends BaseEntity {
     private Float freshScore; // 신선도
 
     private Float nutrBalanceScore; // 영양 균형
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    private List<ReviewImage> reviewImageList = new ArrayList<>();
 }
