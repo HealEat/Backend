@@ -30,6 +30,9 @@ public class HealthPlan extends BaseEntity {
     @Column(nullable = false)
     private Integer number;
 
+    @Builder.Default
+    private Integer count = 0;
+
     @Column(length = 50)
     private String goal;
 

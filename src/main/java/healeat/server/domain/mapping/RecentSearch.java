@@ -13,8 +13,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @Getter
 @Builder
-@DynamicUpdate
-@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RecentSearch extends BaseEntity {
