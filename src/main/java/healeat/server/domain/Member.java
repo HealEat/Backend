@@ -3,12 +3,7 @@ package healeat.server.domain;
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.DietAns;
 import healeat.server.domain.enums.Vegeterian;
-import healeat.server.domain.mapping.MemberFoodToAvoid;
-import healeat.server.domain.mapping.MemberMealNeeded;
-import healeat.server.domain.mapping.MemberNutrientNeeded;
-import healeat.server.domain.mapping.MemberTerm;
-import healeat.server.domain.mapping.Bookmark;
-import healeat.server.domain.mapping.RecentSearch;
+import healeat.server.domain.mapping.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,6 +38,7 @@ public class Member extends BaseEntity {
     // 연관관계 매핑
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTerm> memberTerms;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<RecentSearch> recentSearchList = new ArrayList<>();
 
@@ -54,6 +50,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberFoodToAvoid> memberFoodToAvoid;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberDisease> memberDiseases;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HealthPlan> healthPlans;
