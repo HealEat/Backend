@@ -30,6 +30,10 @@ public class Member extends BaseEntity {
     /**
      * 건강 정보 설정
      */
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "current_health_goal")
+    private List<String> currentHealthGoal = new ArrayList<>();  // 현재 건강 목표
+
     @Enumerated(EnumType.STRING)
     @Column(name = "diet_answer", nullable = false)
     private DietAns dietAnswer; // 다이어트 답변 ( ENUM : YES, NONE )
@@ -38,13 +42,13 @@ public class Member extends BaseEntity {
     @Column(name = "veget_answer", nullable = false)
     private Vegeterian vegetAnswer; // 채식 답변 ( ENUM )
 
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HealthInfoQuestion> healthInfoQuestions = new ArrayList<>();
     // 건강 정보 설정 끝
+
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTerm> memberTerms = new ArrayList<>();
