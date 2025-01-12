@@ -88,7 +88,7 @@ public class MemberHealthInfoService {
                 .orElseThrow(() -> new IllegalArgumentException("Question not found"));
 
         // 기존 답변 삭제
-        answerRepository.deleteByMemberHealthInfoQuestion(question);
+        answerRepository.deleteByMemberHealQuestion(question);
 
         // 새로운 답변 저장
         List<HealthInfoAnswer> answers = request.getSelectedAnswers().stream()
