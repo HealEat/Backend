@@ -32,5 +32,4 @@ public enum Answer {
     CAFFEINE,
     ALCOHOL,
     FIBER_BOOST_FATIGUE
-
 }
