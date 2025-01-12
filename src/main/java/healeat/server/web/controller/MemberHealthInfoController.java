@@ -36,7 +36,10 @@ public class MemberHealthInfoController {
 
     // 회원 건강 정보 답변 수정 기능 api
     @PutMapping("/{memberId}/questions/questionId}")
-    public ResponseEntity<AnswerResponseDto> updateAnswer(@PathVariable Long memberId, @PathVariable Long questionId, @RequestBody AnswerRequestDto request) {
+    public ResponseEntity<AnswerResponseDto> updateAnswer(
+            @PathVariable Long memberId,
+            @PathVariable Long questionId,
+            @RequestBody AnswerRequestDto request) {
         return ResponseEntity.ok(memberHealthInfoService.updateAnswer(memberId, questionId, request));
     }
 }
