@@ -46,7 +46,7 @@ public class Member extends BaseEntity {
     private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberHealthInfoQuestion> memberHealthInfoQuestions = new ArrayList<>();
+    private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();
     // 건강 정보 설정 끝
 
 
