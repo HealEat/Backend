@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: /*카톡 방에 공유함*/
+    url: /*카톡 방에 공유 함*/
     username: root
-    password: /*카톡 방에 공유함*/
+    password: /*카톡 방에 공유 함*/
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
