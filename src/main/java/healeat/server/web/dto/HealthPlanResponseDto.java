@@ -1,5 +1,6 @@
 package healeat.server.web.dto;
 
+import healeat.server.domain.enums.Duration;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class HealthPlanResponseDto {
     public static class HealthPlanOneDto{
 
         private Long name;
-        private String duration;
+        private Duration duration;
         private Integer goalNumber;
         private Integer count;
         private String goal;
