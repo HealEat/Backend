@@ -16,8 +16,8 @@ public class HealthInfoAnswer extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "health_info_question_id", nullable = false)
-    private MemberHealthInfoQuestion memberHealthInfoQuestion;
+    @JoinColumn(name = "member_heal_question_id", nullable = false)
+    private MemberHealQuestion memberHealQuestion;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
