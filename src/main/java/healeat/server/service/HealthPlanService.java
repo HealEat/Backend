@@ -2,7 +2,7 @@ package healeat.server.service;
 
 import healeat.server.domain.HealthPlan;
 import healeat.server.repository.HealthPlanRepository;
-import healeat.server.web.dto.HealthPlanUpdateRequestDto;
+import healeat.server.web.dto.HealthPlanRequestDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class HealthPlanService {
         return healthPlanRepository.save(healthPlan);
     }
 
-    public HealthPlan updateHealthPlanPartial(Long id, HealthPlanUpdateRequestDto updateRequest) {
+    public HealthPlan updateHealthPlanPartial(Long id, HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest) {
         HealthPlan existingHealthPlan = getHealthPlanById(id);
         return existingHealthPlan.updateHealthPlan(
                 updateRequest.getDuration(),

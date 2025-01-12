@@ -41,16 +41,11 @@ public class HealthPlan extends BaseEntity {
     @OneToMany(mappedBy = "healthPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemoImage> memoImages;
 
-    public HealthPlan updateHealthPlan(Duration duration, Integer number, String goal) {
-        return HealthPlan.builder()
-                .id(this.id)
-                .member(this.member)
-                .duration(duration)
-                .number(number)
-                .count(0)
-                .goal(goal)
-                .memo(this.memo)
-                .memoImages(this.memoImages)
-                .build();
+    public HealthPlan updateHealthPlan(Duration duration, Integer goalNumber, String goal) {
+        this.duration = duration;
+        this.goalNumber = goalNumber;
+        this.goal = goal;
+
+        return this;
     }
 }
