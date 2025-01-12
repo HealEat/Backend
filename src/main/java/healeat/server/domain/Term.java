@@ -21,7 +21,8 @@ public class Term extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String title;
 
-    @Column(nullable = false)
+    @Lob
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String body;
 
     //연관관계 매핑

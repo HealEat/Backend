@@ -19,6 +19,9 @@ public class MemoImage extends BaseEntity {
     @JoinColumn(name = "health_plan_id", nullable = false)
     private HealthPlan healthPlan;
 
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl; // 이미지 URL
+    @Column(nullable = false)
+    private String filePath; // 이미지 파일 경로
+
+    @Column(nullable = false)
+    private String fileName; // 원본 파일 이름
 }
