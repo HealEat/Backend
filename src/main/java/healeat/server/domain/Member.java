@@ -24,35 +24,33 @@ public class Member extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(name = "profile_image_url")
+    @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
+    /**
+     * 건강 정보 설정
+     */
     @Enumerated(EnumType.STRING)
-    @Column(name = "diet_answer", length = 3)
-    private DietAns dietAnswer; // 다이어트 답변 ( ENUM : YES, NO )
+    @Column(name = "diet_answer", nullable = false)
+    private DietAns dietAnswer; // 다이어트 답변 ( ENUM : YES, NONE )
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "veget_answer")
+    @Column(name = "veget_answer", nullable = false)
     private Vegeterian vegetAnswer; // 채식 답변 ( ENUM )
 
-    // 연관관계 매핑
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberMealNeeded> memberMealNeededList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberNutrientNeeded> memberNutrientNeededList = new ArrayList<>();
+    private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberFoodToAvoid> memberFoodToAvoidList = new ArrayList<>();
+    private List<HealthInfoQuestion> healthInfoQuestions = new ArrayList<>();
+    // 건강 정보 설정 끝
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTerm> memberTerms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecentSearch> recentSearches = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HealthPlan> healthPlans = new ArrayList<>();
