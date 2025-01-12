@@ -4,7 +4,7 @@ import healeat.server.domain.HealthPlan;
 import healeat.server.service.HealthPlanService;
 import healeat.server.converter.HealthPlanConverter;
 import healeat.server.web.dto.HealthPlanResponseDto;
-import healeat.server.web.dto.HealthPlanUpdateRequestDto;
+import healeat.server.web.dto.HealthPlanRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,38 +16,45 @@ import java.util.stream.Collectors;
 public class HealthPlanController {
 
     private final HealthPlanService healthPlanService;
+    private final HealthPlanConverter healthPlanConverter;
 
-    public HealthPlanController(HealthPlanService healthPlanService) {
+    public HealthPlanController(HealthPlanService healthPlanService, HealthPlanConverter healthPlanConverter) {
         this.healthPlanService = healthPlanService;
+        this.healthPlanConverter = healthPlanConverter;
     }
 
+    // GET /plan
     @GetMapping
-    public ResponseEntity<List<HealthPlanResponseDto>> getAllHealthPlans() {
+    public ResponseEntity<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans() {
         List<HealthPlan> healthPlans = healthPlanService.getAllHealthPlans();
-        List<HealthPlanResponseDto> response = healthPlans.stream()
-                .map(HealthPlanConverter::toDto)
+        List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtos = healthPlans.stream()
+                .map(healthPlanConverter::toHealthPlanOneDto)
                 .collect(Collectors.toList());
+        HealthPlanResponseDto.HealthPlanListDto response = HealthPlanResponseDto.HealthPlanListDto.builder()
+                .HealthPlanList(healthPlanDtos)
+                .build();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{planId}")
-    public ResponseEntity<HealthPlanResponseDto> getHealthPlanById(@PathVariable Long planId) {
-        HealthPlan healthPlan = healthPlanService.getHealthPlanById(planId);
-        return ResponseEntity.ok(HealthPlanConverter.toDto(healthPlan));
-    }
-
+    // POST /plan
     @PostMapping
-    public ResponseEntity<HealthPlanResponseDto> createHealthPlan(@RequestBody HealthPlan healthPlan) {
-        HealthPlan savedHealthPlan = healthPlanService.createHealthPlan(healthPlan);
-        return ResponseEntity.ok(HealthPlanConverter.toDto(savedHealthPlan));
+    public ResponseEntity<HealthPlanResponseDto.HealthPlanOneDto> createHealthPlan(@RequestBody HealthPlan healthPlan) {
+        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(healthPlan);
+        HealthPlanResponseDto.HealthPlanOneDto response = healthPlanConverter.toHealthPlanOneDto(createdHealthPlan);
+        return ResponseEntity.ok(response);
     }
 
+    // PATCH /plan/{planId}
     @PatchMapping("/{planId}")
-    public ResponseEntity<HealthPlanResponseDto> updateHealthPlan(@PathVariable Long planId, @RequestBody HealthPlanUpdateRequestDto updateRequest) {
+    public ResponseEntity<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlanPartial(
+            @PathVariable Long planId,
+            @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest) {
         HealthPlan updatedHealthPlan = healthPlanService.updateHealthPlanPartial(planId, updateRequest);
-        return ResponseEntity.ok(HealthPlanConverter.toDto(updatedHealthPlan));
+        HealthPlanResponseDto.HealthPlanOneDto response = healthPlanConverter.toHealthPlanOneDto(updatedHealthPlan);
+        return ResponseEntity.ok(response);
     }
 
+    // DELETE /plan/{planId}
     @DeleteMapping("/{planId}")
     public ResponseEntity<Void> deleteHealthPlan(@PathVariable Long planId) {
         healthPlanService.deleteHealthPlan(planId);
