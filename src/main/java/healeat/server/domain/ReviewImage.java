@@ -22,5 +22,9 @@ public class ReviewImage extends BaseEntity {
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    private String image_url;
+    @Column(nullable = false)
+    private String filePath; // 이미지 파일 경로
+
+    @Column(nullable = false)
+    private String fileName; // 원본 파일 이름
 }
