@@ -19,7 +19,7 @@ import java.util.List;
 public class MemberHealthInfoService {
 
     private final MemberRepository memberRepository;
-    private final HealthInfoQuestionRepository questionRepository;
+    private final MemberHealQuestionRepository questionRepository;
     private final HealthInfoAnswerRepository answerRepository;
 
     @Transactional(readOnly = true)
