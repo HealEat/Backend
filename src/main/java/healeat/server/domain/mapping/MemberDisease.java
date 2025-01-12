@@ -24,5 +24,6 @@ public class MemberDisease {
     private Disease disease;*/ // Disease 테이블이 있어야되는지에 대해서는,
                                 // 질환 API 등 담당자가 검토
 
+    @Column(nullable = false)
     private String diseaseName;
 }

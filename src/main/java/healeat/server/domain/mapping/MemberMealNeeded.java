@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "member_meal_needed")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

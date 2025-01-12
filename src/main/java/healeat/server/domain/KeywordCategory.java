@@ -28,5 +28,5 @@ public class KeywordCategory extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "keywordCategory", cascade = CascadeType.ALL)
-    private List<Keyword> keywordList = new ArrayList<>();
+    private List<Keyword> keywords = new ArrayList<>();
 }

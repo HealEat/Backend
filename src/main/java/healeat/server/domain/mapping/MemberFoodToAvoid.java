@@ -3,11 +3,11 @@ package healeat.server.domain.mapping;
 import healeat.server.domain.FoodToAvoid;
 import healeat.server.domain.Member;
 import healeat.server.domain.common.BaseEntity;
+import healeat.server.domain.enums.FoodToAvoidAns;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "member_food_to_avoid")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

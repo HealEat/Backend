@@ -8,7 +8,6 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "term")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -22,11 +21,9 @@ public class Term extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String title;
 
-    @Column(nullable = false)
+    @Lob
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String body;
-
-    @Column(nullable = false)
-    private Boolean agree;
 
     //연관관계 매핑
     @OneToMany(mappedBy = "term", cascade = CascadeType.ALL, orphanRemoval = true)
