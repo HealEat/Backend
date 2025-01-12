@@ -6,13 +6,9 @@ import lombok.*;
 public class HealthPlanRequestDto {
 
     @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class HealthPlanUpdateRequestDto{
+    public static class HealthPlanUpdateRequestDto {
         private Duration duration;
         private Integer number;
         private String goal;
     }
-
 }

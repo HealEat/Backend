@@ -1,20 +1,22 @@
 package healeat.server.service;
 
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
 import healeat.server.domain.HealthPlan;
 import healeat.server.repository.HealthPlanRepository;
 import healeat.server.web.dto.HealthPlanRequestDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class HealthPlanService {
 
     private final HealthPlanRepository healthPlanRepository;
-
-    public HealthPlanService(HealthPlanRepository healthPlanRepository) {
-        this.healthPlanRepository = healthPlanRepository;
-    }
 
     public List<HealthPlan> getAllHealthPlans() {
         return healthPlanRepository.findAll();
@@ -22,13 +24,23 @@ public class HealthPlanService {
 
     //혹시나 필요하면 쓸 getById
     public HealthPlan getHealthPlanById(Long id) {
-        return healthPlanRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("HealthPlan not found with id: " + id));
+        return healthPlanRepository.findById(id).orElseThrow(() ->
+                new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
     }
 
-    public HealthPlan createHealthPlan(HealthPlan healthPlan) {
+    @Transactional
+    public HealthPlan createHealthPlan(HealthPlanRequestDto.HealthPlanUpdateRequestDto request) {
+
+        HealthPlan healthPlan = HealthPlan.builder()
+                .duration(request.getDuration())
+                .goalNumber(request.getNumber())
+                .goal(request.getGoal())
+                .build();
+
         return healthPlanRepository.save(healthPlan);
     }
 
+    @Transactional
     public HealthPlan updateHealthPlanPartial(Long id, HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest) {
         HealthPlan existingHealthPlan = getHealthPlanById(id);
         return existingHealthPlan.updateHealthPlan(
@@ -38,6 +50,7 @@ public class HealthPlanService {
         );
     }
 
+    @Transactional
     public void deleteHealthPlan(Long id) {
         healthPlanRepository.deleteById(id);
     }

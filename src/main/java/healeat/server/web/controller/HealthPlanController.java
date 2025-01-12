@@ -1,10 +1,12 @@
 package healeat.server.web.controller;
 
+import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.HealthPlan;
 import healeat.server.service.HealthPlanService;
 import healeat.server.converter.HealthPlanConverter;
 import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,11 +39,14 @@ public class HealthPlanController {
     }
 
     // POST /plan
+    @Operation(summary = "건강 관리 목표 추가", description = "건강 관리 목표를 추가합니다." +
+            "(이미지와 메모는 아직 추가되지 않았음)")
     @PostMapping
-    public ResponseEntity<HealthPlanResponseDto.HealthPlanOneDto> createHealthPlan(@RequestBody HealthPlan healthPlan) {
-        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(healthPlan);
-        HealthPlanResponseDto.HealthPlanOneDto response = healthPlanConverter.toHealthPlanOneDto(createdHealthPlan);
-        return ResponseEntity.ok(response);
+    public ApiResponse<HealthPlanResponseDto.setReusltDto> createHealthPlan(
+            @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request) {
+        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request);
+
+        return ApiResponse.onSuccess(healthPlanConverter.toSetResultDto(createdHealthPlan));
     }
 
     // PATCH /plan/{planId}
