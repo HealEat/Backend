@@ -3,12 +3,7 @@ package healeat.server.domain;
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.DietAns;
 import healeat.server.domain.enums.Vegeterian;
-import healeat.server.domain.mapping.MemberFoodToAvoid;
-import healeat.server.domain.mapping.MemberMealNeeded;
-import healeat.server.domain.mapping.MemberNutrientNeeded;
-import healeat.server.domain.mapping.MemberTerm;
-import healeat.server.domain.mapping.Bookmark;
-import healeat.server.domain.mapping.RecentSearch;
+import healeat.server.domain.mapping.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,38 +24,37 @@ public class Member extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(name = "profile_image_url")
+    @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
+    /**
+     * 건강 정보 설정
+     */
     @Enumerated(EnumType.STRING)
-    @Column(name = "diet_answer", length = 3)
-    private DietAns dietAns; // 다이어트 답변 ( ENUM : YES, NO )
+    @Column(name = "diet_answer", nullable = false)
+    private DietAns dietAnswer; // 다이어트 답변 ( ENUM : YES, NONE )
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "veget_answer")
+    @Column(name = "veget_answer", nullable = false)
     private Vegeterian vegetAnswer; // 채식 답변 ( ENUM )
 
-    // 연관관계 매핑
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberTerm> memberTerms;
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<RecentSearch> recentSearchList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberMealNeeded> memberMealNeeded;
+    private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberNutrientNeeded> memberNutrientNeeded;
+    private List<HealthInfoQuestion> healthInfoQuestions = new ArrayList<>();
+    // 건강 정보 설정 끝
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberFoodToAvoid> memberFoodToAvoid;
+    private List<MemberTerm> memberTerms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HealthPlan> healthPlans;
+    private List<RecentSearch> recentSearches = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Bookmark> bookmarks;
+    private List<HealthPlan> healthPlans = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Bookmark> bookmarkList = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bookmark> bookmarks = new ArrayList<>();
 }

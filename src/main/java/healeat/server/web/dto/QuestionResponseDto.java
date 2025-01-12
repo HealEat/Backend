@@ -14,6 +14,7 @@ import java.util.List;
 public class QuestionResponseDto {
     private Long questionId;
     private String questionText;
-    private String answerType;
-    private List<String> options;
+//    private String answerType;
+//    private List<String> options;
+    private List<String> answers;
 }
