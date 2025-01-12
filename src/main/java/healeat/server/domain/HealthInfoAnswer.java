@@ -11,14 +11,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class HealthInfoAnswer extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "health_info_question_id", nullable = false)
-    private HealthInfoQuestion healthInfoQuestion;
+    private MemberHealthInfoQuestion memberHealthInfoQuestion;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
