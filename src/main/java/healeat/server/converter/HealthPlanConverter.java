@@ -22,7 +22,7 @@ public class HealthPlanConverter {
 
         return HealthPlanResponseDto.HealthPlanOneDto.builder()
                 .name(memberName) // 로그인한 사용자의 이름 설정
-                .duration(healthPlan.getDuration().name())
+                .duration(healthPlan.getDuration())
                 .goalNumber(healthPlan.getGoalNumber())
                 .count(healthPlan.getCount())
                 .goal(healthPlan.getGoal())
