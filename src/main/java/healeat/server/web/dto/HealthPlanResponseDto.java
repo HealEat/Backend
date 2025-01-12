@@ -13,11 +13,19 @@ public class HealthPlanResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class setReusltDto {
+    public static class setResultDto {
 
         private String memberName;
         private Long healthPlanId;
         private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class deleteResultDto {
+        private Long healthPlanId;
     }
 
     @Getter
@@ -48,6 +56,7 @@ public class HealthPlanResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemoImageResponseDto {
+        private Long id;
         private String imageUrl;
     }
 
