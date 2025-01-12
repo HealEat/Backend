@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "member_food_to_avoid")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
