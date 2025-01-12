@@ -18,6 +18,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 리뷰 관련 응답
     REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW4001", "리뷰가 없습니다."),
+
+    // 건강 목표 관련 응답
+    HEALTH_PLAN_NOT_FOUND(HttpStatus.BAD_REQUEST, "HEALTH_PLAN4001", "건강 목표가 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
