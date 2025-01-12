@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: /*카톡 방에 공유 함*/
+    username: root
+    password: /*카톡 방에 공유 함*/
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
+  jpa:
+    properties:
+      hibernate:
+        ddl-auto: none
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        hbm2ddl:
+          auto: update
+        default_batch_fetch_size: 1000
