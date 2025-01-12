@@ -1,9 +1,6 @@
 package healeat.server.domain.mapping;
 
-import healeat.server.domain.FoodToAvoid;
 import healeat.server.domain.Member;
-import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.FoodToAvoidAns;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class MemberFoodToAvoid extends BaseEntity {
+public class MemberDisease {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +19,11 @@ public class MemberFoodToAvoid extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "food_to_avoid_id", nullable = false)
-    private FoodToAvoid foodToAvoid;
+    /*@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "disease_id", nullable = false)
+    private Disease disease;*/ // Disease 테이블이 있어야되는지에 대해서는,
+                                // 질환 API 등 담당자가 검토
+
+    @Column(nullable = false)
+    private String diseaseName;
 }
