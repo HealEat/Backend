@@ -29,7 +29,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @Column(length = 300)
+    @Column(length = 300, nullable = false)
     private String body; // 리뷰 내용
 
     /**
@@ -49,7 +49,7 @@ public class Review extends BaseEntity {
     @Builder.Default
     private Float nutrBalanceScore = 1.0f; // 영양 균형
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImageList = new ArrayList<>();
 
 
