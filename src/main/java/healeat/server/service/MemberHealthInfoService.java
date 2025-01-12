@@ -2,7 +2,7 @@ package healeat.server.service;
 
 import healeat.server.domain.HealthInfoAnswer;
 import healeat.server.domain.Member;
-import healeat.server.domain.HealthInfoQuestion;
+import healeat.server.domain.MemberHealthInfoQuestion;
 import healeat.server.repository.*;
 import healeat.server.web.dto.AnswerRequestDto;
 import healeat.server.web.dto.AnswerResponseDto;
@@ -28,7 +28,7 @@ public class MemberHealthInfoService {
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
         // 회원의 관련 데이터 조회
-        List<QuestionResponseDto> questions = member.getHealthInfoQuestions().stream()
+        List<QuestionResponseDto> questions = member.getMemberHealthInfoQuestions().stream()
                 .map(question -> QuestionResponseDto.builder()
                         .questionId(question.getId())
                         .questionText(question.getQuestion().name())
@@ -46,7 +46,7 @@ public class MemberHealthInfoService {
 
     @Transactional
     public QuestionResponseDto getQuestion(Long questionId) {
-        HealthInfoQuestion question = questionRepository.findById(questionId)
+        MemberHealthInfoQuestion question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found"));
 
         // Mock 데이터
@@ -58,12 +58,12 @@ public class MemberHealthInfoService {
     @Transactional
     public AnswerResponseDto saveAnswer(Long questionId, AnswerRequestDto request) {
 
-        HealthInfoQuestion question = questionRepository.findById(questionId)
+        MemberHealthInfoQuestion question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found"));
 
         List<HealthInfoAnswer> answers = request.getSelectedAnswers().stream()
                 .map(answer -> HealthInfoAnswer.builder()
-                        .healthInfoQuestion(question)
+                        .memberHealthInfoQuestion(question)
                         .answer(answer)
                         .build())
                 .toList();
@@ -84,16 +84,16 @@ public class MemberHealthInfoService {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-        HealthInfoQuestion question = questionRepository.findById(questionId)
+        MemberHealthInfoQuestion question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found"));
 
         // 기존 답변 삭제
-        answerRepository.deleteByHealthInfoQuestion(question);
+        answerRepository.deleteByMemberHealthInfoQuestion(question);
 
         // 새로운 답변 저장
         List<HealthInfoAnswer> answers = request.getSelectedAnswers().stream()
                 .map(answer -> HealthInfoAnswer.builder()
-                        .healthInfoQuestion(question)
+                        .memberHealthInfoQuestion(question)
                         .answer(answer)
                         .build())
                 .toList();
