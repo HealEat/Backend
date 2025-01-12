@@ -8,10 +8,18 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class HealthPlanConverter {
 
-    public HealthPlanResponseDto.HealthPlanOneDto toHealthPlanOneDto(HealthPlan healthPlan) {
+    public HealthPlanResponseDto.setReusltDto toSetResultDto(HealthPlan healthPlan) {
+
+        return HealthPlanResponseDto.setReusltDto.builder()
+                .healthPlanId(healthPlan.getId())
+                .memberName(healthPlan.getMember().getName())
+                .createdAt(healthPlan.getCreatedAt())
+                .build();
+    }
+
+/*    public HealthPlanResponseDto.HealthPlanOneDto toHealthPlanOneDto(HealthPlan healthPlan) {
         List<HealthPlanResponseDto.MemoImageResponseDto> memoImages = healthPlan.getMemoImages()
                 .stream()
                 .map(this::toMemoImageResponseDto)
@@ -29,9 +37,9 @@ public class HealthPlanConverter {
                 .memo(healthPlan.getMemo())
                 .memoImages(memoImages)
                 .build();
-    }
+    }*/
 
-    public HealthPlanResponseDto.MemoImageResponseDto toMemoImageResponseDto(MemoImage memoImage) {
+    /*public HealthPlanResponseDto.MemoImageResponseDto toMemoImageResponseDto(MemoImage memoImage) {
         return HealthPlanResponseDto.MemoImageResponseDto.builder()
                 .imageUrl(memoImage.getFilePath())
                 .build();
@@ -52,5 +60,5 @@ public class HealthPlanConverter {
         }
 
         return "Unknown User";
-    }
+    }*/
 }

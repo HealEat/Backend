@@ -3,6 +3,7 @@ package healeat.server.web.dto;
 import healeat.server.domain.enums.Duration;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +13,19 @@ public class HealthPlanResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class setReusltDto {
+
+        private String memberName;
+        private Long healthPlanId;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class HealthPlanListDto{
-       private List<HealthPlanOneDto> HealthPlanList = new ArrayList<>();
+       private List<HealthPlanOneDto> HealthPlanList;
     }
 
     @Getter
@@ -22,7 +34,7 @@ public class HealthPlanResponseDto {
     @AllArgsConstructor
     public static class HealthPlanOneDto{
 
-        private Long name;
+        private String name;
         private Duration duration;
         private Integer goalNumber;
         private Integer count;
