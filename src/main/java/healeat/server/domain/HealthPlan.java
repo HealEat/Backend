@@ -8,7 +8,6 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "health_plan")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -28,10 +27,10 @@ public class HealthPlan extends BaseEntity {
     private Duration duration;
 
     @Column(nullable = false)
-    private Integer number;
+    private Integer goalNumber; // 목표 횟수
 
     @Builder.Default
-    private Integer count = 0;
+    private Integer count = 0; // 목표까지 카운트
 
     @Column(length = 50)
     private String goal;
@@ -40,5 +39,13 @@ public class HealthPlan extends BaseEntity {
     private String memo;
 
     @OneToMany(mappedBy = "healthPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemoImage> memoImages;
+    private List<HealthPlanImage> healthPlanImages;
+
+    public HealthPlan updateHealthPlan(Duration duration, Integer goalNumber, String goal) {
+        this.duration = duration;
+        this.goalNumber = goalNumber;
+        this.goal = goal;
+
+        return this;
+    }
 }
