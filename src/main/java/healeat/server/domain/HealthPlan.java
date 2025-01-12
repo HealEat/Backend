@@ -27,10 +27,10 @@ public class HealthPlan extends BaseEntity {
     private Duration duration;
 
     @Column(nullable = false)
-    private Integer number;
+    private Integer goalNumber; // 목표 횟수
 
     @Builder.Default
-    private Integer count = 0;
+    private Integer count = 0; // 목표까지 카운트
 
     @Column(length = 50)
     private String goal;

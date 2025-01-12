@@ -1,6 +1,5 @@
 package healeat.server.domain.enums;
 
-// 피할 음식 정보
 public enum FoodToAvoidAns {
 
     DAIRY,

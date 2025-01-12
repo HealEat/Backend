@@ -41,10 +41,10 @@ public class Store extends BaseEntity {
     private Integer reviewCount; // 리뷰 수
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
-    private List<Review> reviewList = new ArrayList<>();
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
-    private List<StoreKeyword> storeKeywordList = new ArrayList<>();
+    private List<StoreKeyword> storeKeywords = new ArrayList<>();
 
 
     //==비즈니스 로직==//
