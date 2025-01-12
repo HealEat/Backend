@@ -5,6 +5,7 @@ import healeat.server.domain.mapping.MemberHealthIssue;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,6 @@ public class HealthIssue {
     @Column(nullable = false, length = 50)
     private HealthIssueAns answer; // ENUM 필드
 
-    // 연관관계 매핑 (MemberHealthIssue 와 1:N 관계)
-    @OneToMany(mappedBy = "healthIssueAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberHealthIssue> memberHealthIssues;
+    @OneToMany(mappedBy = "healthIssue", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberHealthIssue> memberHealthIssues = new ArrayList<>();
 }
