@@ -1,6 +1,7 @@
 package healeat.server.domain.mapping;
 
 import healeat.server.domain.Member;
+import healeat.server.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class MemberDisease {
+public class MemberDisease extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

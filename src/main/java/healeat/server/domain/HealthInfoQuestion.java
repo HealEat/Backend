@@ -1,5 +1,6 @@
 package healeat.server.domain;
 
+import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.Question;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class HealthInfoQuestion {
+public class HealthInfoQuestion extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
