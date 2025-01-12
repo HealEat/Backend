@@ -1,7 +1,6 @@
 package healeat.server.domain.enums;
 
 public enum Answer {
-
     // (질병 보유) 사용자 건강 이슈 답변
     WEAKENED_PHYSIC,
     WEIGHT_LOSS,
