@@ -9,6 +9,8 @@ import healeat.server.domain.mapping.Review;
 import healeat.server.domain.mapping.StoreKeyword;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +34,22 @@ public class Store extends BaseEntity {
      * 평점
      */
     private Float totalScore; // 전체 평점
+    private Integer reviewCount; // 전체 리뷰 수
 
-    private Float tastyScore; // 맛
-    private Float cleanScore; // 청결도
-    private Float freshScore; // 신선도
-    private Float nutrBalanceScore; // 영양 균형
+    private Float diseaseCareScore; // 질병 관리 평점
+    private Integer diseaseCareCount; // 질병 관리 리뷰 수
 
-    private Integer reviewCount; // 리뷰 수
+    private Float vegetScore; // 베지테리언 평점
+    private Integer vegetCount; // 베지테리언 리뷰 수
+
+    private Float dietScore; // 다이어터 평점
+    private Integer dietCount; // 다이어터 리뷰 수
+
+    private Float tastyScore; // 평점(맛)
+    private Float cleanScore; // 평점(청결도)
+    private Float freshScore; // 평점(신선도)
+    private Float nutrBalanceScore; // 평점(영양 균형)
+
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
@@ -68,6 +79,8 @@ public class Store extends BaseEntity {
         nutrBalanceScore = updateScore(nutrBalanceScore, newReview.getNutrBalanceScore());
 
         reviewCount++; // 리뷰 수 증가
+
+        // 건강 목표 관련 로직 추가 해야
 
         calcTotalByAll();
     }
