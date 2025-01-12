@@ -1,14 +1,14 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.DietAns;
-import healeat.server.domain.enums.Vegeterian;
+import healeat.server.domain.enums.*;
 import healeat.server.domain.mapping.*;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -29,7 +29,7 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "diet_answer", length = 3)
-    private DietAns dietAns; // 다이어트 답변 ( ENUM : YES, NO )
+    private DietAns dietAnswer; // 다이어트 답변 ( ENUM : YES, NO )
 
     @Enumerated(EnumType.STRING)
     @Column(name = "veget_answer")
@@ -37,28 +37,29 @@ public class Member extends BaseEntity {
 
     // 연관관계 매핑
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberTerm> memberTerms;
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<RecentSearch> recentSearchList = new ArrayList<>();
+    private List<MemberMealNeeded> memberMealNeededList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberMealNeeded> memberMealNeeded;
+    private List<MemberNutrientNeeded> memberNutrientNeededList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberNutrientNeeded> memberNutrientNeeded;
+    private List<MemberFoodToAvoid> memberFoodToAvoidList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberFoodToAvoid> memberFoodToAvoid;
+    private List<MemberTerm> memberTerms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecentSearch> recentSearches = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberHealthIssue> memberHealthIssue = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HealthPlan> healthPlans;
+    private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Bookmark> bookmarks;
+    private List<HealthPlan> healthPlans = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Bookmark> bookmarkList = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bookmark> bookmarks = new ArrayList<>();
 }
