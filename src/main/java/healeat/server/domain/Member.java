@@ -39,26 +39,26 @@ public class Member extends BaseEntity {
      * 멤버의 건강 정보 필드
      */
     // toString() 출력 test 결과
-    // {MEAL_NEEDED=[NONE], NUTRIENT_NEEDED=[NONE], FOOD_TO_AVOID=[NONE], HEALTH_ISSUE=[NONE]}
+    // {HEALTH_ISSUE=[], MEAL_NEEDED=[], NUTRIENT_NEEDED=[], FOOD_TO_AVOID=[DAIRY, MEAT, CAFFEINE, ALCOHOL]}
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "health_info_by_category")
-    private Map<HealthInfo.Category, Set<HealthInfo>> healthInfoByCategories;
+    @Column(name = "health_info")
+    private Map<Answer.Question, Set<Answer>> healthInfoMap;
 
     // Set 중복 허용하지 않음
     @PrePersist
     public void prePersist() {
-        healthInfoByCategories = initializeHealthInfoMap();
+        healthInfoMap = initializeHealthInfoMap();
     }
 
-    private static Map<HealthInfo.Category, Set<HealthInfo>> initializeHealthInfoMap() {
-        Map<HealthInfo.Category, Set<HealthInfo>> map = new HashMap<>();
+    private static Map<Answer.Question, Set<Answer>> initializeHealthInfoMap() {
+        Map<Answer.Question, Set<Answer>> map = new EnumMap<>(Answer.Question.class);
 
-        Set<HealthInfo> defaultHealthInfo = EnumSet.of(HealthInfo.NONE);
+        Set<Answer> defaultAnswer = EnumSet.noneOf(Answer.class);
 
-        map.put(HealthInfo.Category.HEALTH_ISSUE, defaultHealthInfo);
-        map.put(HealthInfo.Category.MEAL_NEEDED, defaultHealthInfo);
-        map.put(HealthInfo.Category.NUTRIENT_NEEDED, defaultHealthInfo);
-        map.put(HealthInfo.Category.FOOD_TO_AVOID, defaultHealthInfo);
+        map.put(Answer.Question.HEALTH_ISSUE, defaultAnswer);
+        map.put(Answer.Question.MEAL_NEEDED, defaultAnswer);
+        map.put(Answer.Question.NUTRIENT_NEEDED, defaultAnswer);
+        map.put(Answer.Question.FOOD_TO_AVOID, defaultAnswer);
 
         return map;
     }
