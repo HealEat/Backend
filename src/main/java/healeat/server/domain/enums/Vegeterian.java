@@ -4,6 +4,7 @@ package healeat.server.domain.enums;
 public enum Vegeterian {
 
     NONE,
+
     VEGAN,
     LACTO,
     OVO,

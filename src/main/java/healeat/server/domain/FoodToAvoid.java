@@ -8,7 +8,6 @@ import lombok.*;
 import javax.swing.table.TableCellEditor;
 
 @Entity
-@Table(name = "food_to_avoid")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

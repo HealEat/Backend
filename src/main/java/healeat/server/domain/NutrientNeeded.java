@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "nutrient_needed")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
