@@ -7,6 +7,7 @@ import healeat.server.converter.HealthPlanConverter;
 import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,34 +16,32 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/plan")
+@RequiredArgsConstructor
 public class HealthPlanController {
 
     private final HealthPlanService healthPlanService;
     private final HealthPlanConverter healthPlanConverter;
 
-    public HealthPlanController(HealthPlanService healthPlanService, HealthPlanConverter healthPlanConverter) {
-        this.healthPlanService = healthPlanService;
-        this.healthPlanConverter = healthPlanConverter;
-    }
 
     // GET /plan
+    @Operation(summary = "건강 관리 목표 조회", description = "건강 관리 목표를 전체 조회합니다.")
     @GetMapping
-    public ResponseEntity<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans() {
+    public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans() {
         List<HealthPlan> healthPlans = healthPlanService.getAllHealthPlans();
-        List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtos = healthPlans.stream()
+        List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
                 .map(healthPlanConverter::toHealthPlanOneDto)
                 .collect(Collectors.toList());
         HealthPlanResponseDto.HealthPlanListDto response = HealthPlanResponseDto.HealthPlanListDto.builder()
-                .HealthPlanList(healthPlanDtos)
+                .HealthPlanList(healthPlanDtoList)
                 .build();
-        return ResponseEntity.ok(response);
+        return ApiResponse.onSuccess(response);
     }
 
     // POST /plan
     @Operation(summary = "건강 관리 목표 추가", description = "건강 관리 목표를 추가합니다." +
             "(이미지와 메모는 아직 추가되지 않았음)")
     @PostMapping
-    public ApiResponse<HealthPlanResponseDto.setReusltDto> createHealthPlan(
+    public ApiResponse<HealthPlanResponseDto.setResultDto> createHealthPlan(
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request) {
         HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request);
 
@@ -50,20 +49,26 @@ public class HealthPlanController {
     }
 
     // PATCH /plan/{planId}
+    @Operation(summary = "건강 관리 목표 수정", description = "건강 관리 목표를 수정합니다." +
+            "(이미지와 메모는 아직 추가되지 않았음)")
     @PatchMapping("/{planId}")
-    public ResponseEntity<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlanPartial(
+    public ApiResponse<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlanPartial(
             @PathVariable Long planId,
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest) {
         HealthPlan updatedHealthPlan = healthPlanService.updateHealthPlanPartial(planId, updateRequest);
         HealthPlanResponseDto.HealthPlanOneDto response = healthPlanConverter.toHealthPlanOneDto(updatedHealthPlan);
-        return ResponseEntity.ok(response);
+        return ApiResponse.onSuccess(response);
     }
 
     // DELETE /plan/{planId}
+    @Operation(summary = "건강 관리 목표 삭제", description = "건강 관리 목표를 삭제합니다.")
     @DeleteMapping("/{planId}")
-    public ResponseEntity<Void> deleteHealthPlan(@PathVariable Long planId) {
+    public ApiResponse<HealthPlanResponseDto.deleteResultDto> deleteHealthPlan(@PathVariable Long planId) {
+        HealthPlan deleteHealthPlan = healthPlanService.getHealthPlanById(planId);
+        HealthPlanResponseDto.deleteResultDto response = healthPlanConverter.toDeleteResultDto(deleteHealthPlan);
+
         healthPlanService.deleteHealthPlan(planId);
-        return ResponseEntity.noContent().build();
+        return ApiResponse.onSuccess(response);
     }
 }
 
