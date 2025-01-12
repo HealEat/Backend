@@ -9,5 +9,4 @@ class HealEatServerApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

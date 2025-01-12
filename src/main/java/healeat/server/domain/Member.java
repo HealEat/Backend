@@ -27,6 +27,9 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
+    /**
+     * 건강 정보 설정
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "diet_answer", nullable = false)
     private DietAns dietAnswer; // 다이어트 답변 ( ENUM : YES, NONE )
@@ -35,37 +38,16 @@ public class Member extends BaseEntity {
     @Column(name = "veget_answer", nullable = false)
     private Vegeterian vegetAnswer; // 채식 답변 ( ENUM )
 
-    /**
-     * 멤버의 건강 정보 필드
-     */
-    // toString() 출력 test 결과
-    // {HEALTH_ISSUE=[], MEAL_NEEDED=[], NUTRIENT_NEEDED=[], FOOD_TO_AVOID=[DAIRY, MEAT, CAFFEINE, ALCOHOL]}
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "health_info")
-    private Map<Answer.Question, Set<Answer>> healthInfoMap;
-
-    // Set 중복 허용하지 않음
-    @PrePersist
-    public void prePersist() {
-        healthInfoMap = initializeHealthInfoMap();
-    }
-
-    private static Map<Answer.Question, Set<Answer>> initializeHealthInfoMap() {
-        Map<Answer.Question, Set<Answer>> map = new EnumMap<>(Answer.Question.class);
-
-        Set<Answer> defaultAnswer = EnumSet.noneOf(Answer.class);
-
-        map.put(Answer.Question.HEALTH_ISSUE, defaultAnswer);
-        map.put(Answer.Question.MEAL_NEEDED, defaultAnswer);
-        map.put(Answer.Question.NUTRIENT_NEEDED, defaultAnswer);
-        map.put(Answer.Question.FOOD_TO_AVOID, defaultAnswer);
-
-        return map;
-    }
-    // 멤버의 건강 정보 필드 끝
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberTerm> memberTerms;
+    private List<MemberDisease> memberDiseases = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HealthInfoQuestion> healthInfoQuestions = new ArrayList<>();
+    // 건강 정보 설정 끝
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberTerm> memberTerms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecentSearch> recentSearches = new ArrayList<>();
