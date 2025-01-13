@@ -13,6 +13,20 @@ public class StoreResonseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class StorePreviewListDto {
+
+        List<StorePreviewDto> storeList;
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Boolean isFirst;
+        Boolean isLast;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class StorePreviewDto {
 
         Long storeId;
