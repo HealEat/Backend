@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface HealthInfoAnswerRepository extends JpaRepository<HealthInfoAnswer, Long> {
 
-    void deleteByMemberHealQuestion(MemberHealQuestion memberHealQuestion);
+    void deleteByMemberHealQuestion(MemberHealQuestion question);
 }
