@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class AnswerResponseDto {
-    private Long questionId;
     private Long memberId;
+    private Long questionId;
     private List<String> selectedOptions;
 }

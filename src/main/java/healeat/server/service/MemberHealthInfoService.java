@@ -27,7 +27,7 @@ public class MemberHealthInfoService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
-        // 회원의 관련 데이터 조회
+        // 회원의 건강 정보 질문 및 답변 데이터 전체 조회
         List<QuestionResponseDto> questions = member.getMemberHealQuestions().stream()
                 .map(question -> QuestionResponseDto.builder()
                         .questionId(question.getId())
@@ -44,46 +44,25 @@ public class MemberHealthInfoService {
                 .build();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public QuestionResponseDto getQuestion(Long questionId) {
         MemberHealQuestion question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found"));
 
-        // Mock 데이터
+        // 특정 질문 조회하기
         return QuestionResponseDto.builder()
-                //
-                .build();
-    }
-
-    @Transactional
-    public AnswerResponseDto saveAnswer(Long questionId, AnswerRequestDto request) {
-
-        MemberHealQuestion question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
-
-        List<HealthInfoAnswer> answers = request.getSelectedAnswers().stream()
-                .map(answer -> HealthInfoAnswer.builder()
-                        .memberHealQuestion(question)
-                        .answer(answer)
-                        .build())
-                .toList();
-
-        answerRepository.saveAll(answers);
-
-        return AnswerResponseDto.builder()
-                .questionId(questionId)
-                .memberId(Long.valueOf(request.getMemberId()))
-                .selectedOptions(request.getSelectedAnswers().stream()
-                        .map(Enum::name)
+                .questionId(question.getId())
+                .questionText(question.getQuestion().name())
+                .answers(question.getHealthInfoAnswers().stream()
+                        .map(answer -> answer.getAnswer().name())
                         .toList())
                 .build();
     }
 
+    // 특정 질문에 대한 회원의 답변 저장
     @Transactional
-    public AnswerResponseDto updateAnswer(Long memberId, Long questionId, AnswerRequestDto request) {
+    public AnswerResponseDto saveAnswer(Long memberId, Long questionId, AnswerRequestDto request) {
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
         MemberHealQuestion question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found"));
 
@@ -108,4 +87,5 @@ public class MemberHealthInfoService {
                         .toList())
                 .build();
     }
+
 }
