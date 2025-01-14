@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class MemberHealthInfoQuestion extends BaseEntity {
+public class MemberHealQuestion extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +26,6 @@ public class MemberHealthInfoQuestion extends BaseEntity {
     @Column(nullable = false)
     private Question question;
 
-    @OneToMany(mappedBy = "healthInfoQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HealthInfoAnswer> answers = new ArrayList<>();
+    @OneToMany(mappedBy = "memberHealQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HealthInfoAnswer> healthInfoAnswers = new ArrayList<>();
 }
