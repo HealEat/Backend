@@ -31,19 +31,17 @@ public class StoreResonseDto {
 
         Long storeId;
         String storeName;
-        String kindName; // 음식 종류
-
-        Boolean isBookMarked;
+        String category; // 음식 종류
+        List<String> features; // 음식 특징
 
         Integer reviewCount; // 리뷰 수
 
         Float totalScore;
-        Float sickCareScore; // 질병 보유자 점수
+        Float sickScore; // 환자 점수
         Float vegetScore; // 베지테리언 점수
         Float dietScore; // 다이어터 점수
 
-        List<String> allFeatureNames; // 음식 특징
-
+        Boolean isBookMarked;
         String kakaoMapUrl; // 카카오맵으로 열기
     }
 }
