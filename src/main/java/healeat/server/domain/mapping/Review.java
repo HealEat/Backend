@@ -53,7 +53,7 @@ public class Review extends BaseEntity {
     private Float freshScore = 1.0f; // 신선도
 
     @Builder.Default
-    private Float nutrBalanceScore = 1.0f; // 영양 균형
+    private Float nutrScore = 1.0f; // 영양 균형
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImageList = new ArrayList<>();
@@ -64,13 +64,15 @@ public class Review extends BaseEntity {
 
         // 현재 멤버의 건강 목표를 리뷰에 저장
         currentHealthGoal = member.getCurrentHealthGoal();
+
         // 리뷰 생성 시 전체 평점 계산
         calcTotalByAll();
+
         // 가게에 업데이트
         store.updateScoresByReview(this);
     }
 
     private void calcTotalByAll() {
-        totalScore = (tastyScore + cleanScore + freshScore + nutrBalanceScore) / 4;
+        totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
     }
 }
