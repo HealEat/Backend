@@ -28,6 +28,5 @@ public class MemberPurpose extends BaseEntity {
     private Purpose purpose;
 
     @OneToMany(mappedBy = "memberPurpose", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     private List<PurposeAnswer> purposeAnswers = new ArrayList<>();
 }
