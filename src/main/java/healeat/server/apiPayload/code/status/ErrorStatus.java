@@ -23,7 +23,7 @@ public enum ErrorStatus implements BaseErrorCode {
     HEALTH_PLAN_NOT_FOUND(HttpStatus.BAD_REQUEST, "HEALTH_PLAN4001", "건강 목표가 없습니다."),
 
     // 회원 관련 응답
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER40001", "사용자가 없습니다."),
+    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다."),
 
     // 질문 관련 응답
     QUESTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "QUESTION4001", "질문이 없습니다.")
