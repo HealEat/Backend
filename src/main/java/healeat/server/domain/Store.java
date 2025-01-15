@@ -2,7 +2,7 @@ package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.DietAns;
-import healeat.server.domain.enums.Vegeterian;
+import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.domain.mapping.StoreKeyword;
 import jakarta.persistence.*;
@@ -78,7 +78,7 @@ public class Store extends BaseEntity {
                     dietScore * dietCount + newReviewTotal) / (dietCount + 1);
             dietCount++;
         }
-        if (member.getVegetAnswer() != Vegeterian.NONE) {
+        if (member.getVegetAnswer() != Vegetarian.NONE) {
             vegetScore = (
                     vegetScore * vegetCount + newReviewTotal) / (vegetCount + 1);
             vegetCount++;
