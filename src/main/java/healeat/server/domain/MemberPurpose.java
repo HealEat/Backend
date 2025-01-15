@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class MemberPurpose extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,7 +22,8 @@ public class MemberPurpose extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "purpose", nullable = false)
     private Purpose purpose;
 
     @OneToMany(mappedBy = "memberPurpose", cascade = CascadeType.ALL, orphanRemoval = true)

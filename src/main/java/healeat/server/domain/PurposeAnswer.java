@@ -17,7 +17,7 @@ public class PurposeAnswer extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purpose_id", nullable = false)
-    private MemberPurpose purpose;
+    private MemberPurpose memberPurpose;
 
     @Column(nullable = false)
     private String answer;

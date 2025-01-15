@@ -2,6 +2,7 @@ package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.DietAns;
+import healeat.server.domain.enums.Purpose;
 import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.domain.mapping.StoreKeyword;
@@ -10,6 +11,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -66,19 +68,19 @@ public class Store extends BaseEntity {
 
     public void updateScoresByReview(Review newReview) {
 
-        Member member = newReview.getMember();
+        Map<Purpose, List<String>> currentPurposes = newReview.getCurrentPurposes();
         Float newReviewTotal = newReview.getTotalScore();
-        if (member.getMemberDiseases() != null) {
+        if (currentPurposes.get(Purpose.SICK) != null) {
             sickScore = (
                     sickScore * sickCount + newReviewTotal) / (sickCount + 1);
             sickCount++;
         }
-        if (member.getDietAnswer() != DietAns.NONE) {
+        if (currentPurposes.get(Purpose.DIET) != null) {
             dietScore = (
                     dietScore * dietCount + newReviewTotal) / (dietCount + 1);
             dietCount++;
         }
-        if (member.getVegetAnswer() != Vegetarian.NONE) {
+        if (currentPurposes.get(Purpose.VEGET) != null) {
             vegetScore = (
                     vegetScore * vegetCount + newReviewTotal) / (vegetCount + 1);
             vegetCount++;
