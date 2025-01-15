@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class StoreResonseDto {
@@ -43,5 +44,35 @@ public class StoreResonseDto {
 
         Boolean isBookMarked;
         String kakaoMapUrl; // 카카오맵으로 열기
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReviewPreviewListDto {
+
+        List<ReviewPreviewDto> reviewList;
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Boolean isFirst;
+        Boolean isLast;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReviewPreviewDto {
+
+        String name;
+        List<String> currentPurposes;
+
+        Long reviewId;
+        Float totalScore;
+        List<String> images;
+        String body;
+        LocalDateTime createdAt;
     }
 }

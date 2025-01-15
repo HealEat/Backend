@@ -1,7 +1,7 @@
 package healeat.server.service;
 
-import healeat.server.web.dto.DaumImageResponse;
-import healeat.server.web.dto.KakaoPlaceResponse;
+import healeat.server.web.dto.DaumImageResponseDto;
+import healeat.server.web.dto.KakaoPlaceResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ public class StoreApiClientTest {
     @Test
     public void 쿼리_없이_가게_검색() throws Exception {
 
-        KakaoPlaceResponse response = storeApiClient.getStoresSimply("126.951399056142", "37.5580680839066",
+        KakaoPlaceResponseDto response = storeApiClient.getStoresSimply("126.951399056142", "37.5580680839066",
                 1, "distance");
 
         if (response != null && response.getDocuments() != null && response.getMeta() != null) {
@@ -28,7 +28,7 @@ public class StoreApiClientTest {
     @Test
     public void 쿼리로_가게_검색() throws Exception {
 
-        KakaoPlaceResponse response = storeApiClient.getStoresByQuery("왕십리 맛집", "126.951399056142", "37.5580680839066",
+        KakaoPlaceResponseDto response = storeApiClient.getStoresByQuery("왕십리 맛집", "126.951399056142", "37.5580680839066",
                 1, "accuracy");
 
         if (response != null && response.getDocuments() != null && response.getMeta() != null) {
@@ -40,7 +40,7 @@ public class StoreApiClientTest {
 
     @Test
     public void 가게_이미지_검색() throws Exception {
-        DaumImageResponse response = storeApiClient.getImagesByQuery("수성동4가 허대구대구통닭 본점", 1, 10);
+        DaumImageResponseDto response = storeApiClient.getImagesByQuery("수성동4가 허대구대구통닭 본점", 1, 10);
 
         if (response != null && response.getDocuments() != null && response.getMeta() != null) {
             System.out.println(response);

@@ -1,7 +1,7 @@
 package healeat.server.domain.enums;
 
 // 베지테리언 종류
-public enum Vegeterian {
+public enum Vegetarian {
 
     NONE,
 
