@@ -1,5 +1,7 @@
 package healeat.server.service;
 
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHealthInfoHandler;
 import healeat.server.converter.MemberHealthInfoConverter;
 import healeat.server.domain.HealthInfoAnswer;
 import healeat.server.domain.Member;
@@ -28,7 +30,7 @@ public class MemberHealthInfoService {
     @Transactional(readOnly = true)
     public MemberHealthInfoResponseDto getMemberHealthInfo(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+                .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         List<QuestionResponseDto> questions = member.getMemberHealQuestions().stream()
                 .map(converter::toQuestionResponseDto)
@@ -41,7 +43,7 @@ public class MemberHealthInfoService {
     @Transactional(readOnly = true)
     public QuestionResponseDto getQuestion(Long questionId) {
         MemberHealQuestion question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+                .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
 
         return converter.toQuestionResponseDto(question);
     }
@@ -50,23 +52,14 @@ public class MemberHealthInfoService {
     @Transactional
     public AnswerResponseDto saveAnswer(Long memberId, Long questionId, AnswerRequestDto request) {
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-
         MemberHealQuestion question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found"));
+                .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
 
         // 기존 답변 삭제
         answerRepository.deleteByMemberHealQuestion(question);
 
         // 새로운 답변 저장
-        List<HealthInfoAnswer> answers = request.getSelectedAnswers().stream()
-                .map(answer -> HealthInfoAnswer.builder()
-                        .memberHealQuestion(question)
-                        .answer(answer)
-                        .build())
-                .toList();
-
+        List<HealthInfoAnswer> answers = converter.toHealthInfoAnswers(request.getSelectedAnswers(), question);
         answerRepository.saveAll(answers);
 
         return converter.toAnswerResponseDto(memberId, questionId, request.getSelectedAnswers());

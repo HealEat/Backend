@@ -1,5 +1,6 @@
 package healeat.server.converter;
 
+import healeat.server.domain.HealthInfoAnswer;
 import healeat.server.domain.Member;
 import healeat.server.domain.MemberHealQuestion;
 import healeat.server.domain.enums.Answer;
@@ -25,7 +26,7 @@ public class MemberHealthInfoConverter {
                 .questionId(question.getId())
                 .questionText(question.getQuestion().name())
                 .answers(question.getHealthInfoAnswers().stream()
-                        .map(answer -> answer.getAnswer().name())
+                        .map(HealthInfoAnswer::getAnswer)
                         .toList())
                 .build();
     }
@@ -34,9 +35,16 @@ public class MemberHealthInfoConverter {
         return AnswerResponseDto.builder()
                 .memberId(memberId)
                 .questionId(questionId)
-                .selectedOptions(selectedAnswers.stream()
-                        .map(Enum::name)
-                        .toList())
+                .selectedOptions(selectedAnswers)
                 .build();
+    }
+
+    public List<HealthInfoAnswer> toHealthInfoAnswers(List<Answer> answers, MemberHealQuestion question) {
+        return answers.stream()
+                .map(answer -> HealthInfoAnswer.builder()
+                        .memberHealQuestion(question)
+                        .answer(answer)
+                        .build())
+                .toList();
     }
 }
