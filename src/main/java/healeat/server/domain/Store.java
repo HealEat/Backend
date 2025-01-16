@@ -1,7 +1,8 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Purpose;
+import healeat.server.domain.enums.Diet;
+import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.domain.mapping.StoreKeyword;
 import jakarta.persistence.*;
@@ -66,22 +67,22 @@ public class Store extends BaseEntity {
 
     public void updateScoresByReview(Review newReview) {
 
-        Map<Purpose, List<String>> currentPurposes = newReview.getCurrentPurposes();
+        Member member = newReview.getMember();
         Float newReviewTotal = newReview.getTotalScore();
-        if (currentPurposes.get(Purpose.SICK) != null) {
+        if (!member.getDiseases().isEmpty()) {
             sickScore = (
                     sickScore * sickCount + newReviewTotal) / (sickCount + 1);
             sickCount++;
         }
-        if (currentPurposes.get(Purpose.DIET) != null) {
-            dietScore = (
-                    dietScore * dietCount + newReviewTotal) / (dietCount + 1);
-            dietCount++;
-        }
-        if (currentPurposes.get(Purpose.VEGET) != null) {
+        if (member.getVegetarian() != Vegetarian.NONE) {
             vegetScore = (
                     vegetScore * vegetCount + newReviewTotal) / (vegetCount + 1);
             vegetCount++;
+        }
+        if (member.getDiet() != Diet.NONE) {
+            dietScore = (
+                    dietScore * dietCount + newReviewTotal) / (dietCount + 1);
+            dietCount++;
         }
 
         tastyScore = updateScore(tastyScore, newReview.getTastyScore());
