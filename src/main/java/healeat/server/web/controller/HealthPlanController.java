@@ -23,7 +23,9 @@ public class HealthPlanController {
     private final HealthPlanConverter healthPlanConverter;
 
 
-    // GET /plan
+    /*
+     GET/plan - 건강 관리 목표 전체 조회
+     */
     @Operation(summary = "건강 관리 목표 조회", description = "건강 관리 목표를 전체 조회합니다.")
     @GetMapping
     public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans() {
@@ -37,7 +39,9 @@ public class HealthPlanController {
         return ApiResponse.onSuccess(response);
     }
 
-    // POST /plan
+    /*
+     POST/plan - 건강 관리 목표 등록
+     */
     @Operation(summary = "건강 관리 목표 추가", description = "건강 관리 목표를 추가합니다." +
             "(이미지와 메모는 아직 추가되지 않았음)")
     @PostMapping
@@ -48,7 +52,9 @@ public class HealthPlanController {
         return ApiResponse.onSuccess(healthPlanConverter.toSetResultDto(createdHealthPlan));
     }
 
-    // PATCH /plan/{planId}
+    /*
+     PATCH/plan/{planId} - 건강 관리 목표 수정
+     */
     @Operation(summary = "건강 관리 목표 수정", description = "건강 관리 목표를 수정합니다." +
             "(이미지와 메모는 아직 추가되지 않았음)")
     @PatchMapping("/{planId}")
@@ -60,7 +66,9 @@ public class HealthPlanController {
         return ApiResponse.onSuccess(response);
     }
 
-    // DELETE /plan/{planId}
+    /*
+     DELETE/plan/{planId} - 건강 관리 목표 삭제
+     */
     @Operation(summary = "건강 관리 목표 삭제", description = "건강 관리 목표를 삭제합니다.")
     @DeleteMapping("/{planId}")
     public ApiResponse<HealthPlanResponseDto.deleteResultDto> deleteHealthPlan(@PathVariable Long planId) {
