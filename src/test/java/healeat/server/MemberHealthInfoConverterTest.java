@@ -4,7 +4,6 @@ import healeat.server.converter.MemberHealthInfoConverter;
 import healeat.server.domain.HealthInfoAnswer;
 import healeat.server.domain.MemberHealQuestion;
 import healeat.server.domain.enums.Answer;
-import healeat.server.domain.enums.Question;
 import healeat.server.web.dto.AnswerResponseDto;
 import healeat.server.web.dto.QuestionResponseDto;
 import org.junit.jupiter.api.Test;
