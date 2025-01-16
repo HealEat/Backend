@@ -1,7 +1,8 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Purpose;
+import healeat.server.domain.enums.Diet;
+import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.*;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,26 +28,20 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
-    // SICK, VEGET, DIET
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Builder.Default
-    private List<Purpose> purposes = new ArrayList<>();
-    // [SICK, VEGET, DIET]
-    // [VEGET, DIET]
-    // [SICK]
-
     @JdbcTypeCode(SqlTypes.ARRAY)
     @Builder.Default
     private List<String> diseases = new ArrayList<>();
-    /**
-     * 건강 정보 설정
-     */
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<MemberPurpose> memberPurposes = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Vegetarian vegetarian = Vegetarian.NONE;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Diet diet = Diet.NONE;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();
-    // 건강 정보 설정 끝
+    private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();  // 건강 정보 설정
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberTerm> memberTerms = new ArrayList<>();

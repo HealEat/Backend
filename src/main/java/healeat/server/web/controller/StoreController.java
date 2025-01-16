@@ -2,7 +2,7 @@ package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ReviewConverter;
-import healeat.server.domain.enums.Purpose;
+import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.mapping.Review;
 import healeat.server.service.StoreQueryService;
 import healeat.server.validation.annotation.CheckPage;
@@ -26,7 +26,7 @@ public class StoreController {
     public ApiResponse<StoreResonseDto.ReviewPreviewListDto> getReviewList(
             @PathVariable Long storeId,
             @CheckPage @RequestParam Integer page,
-            @RequestParam Purpose sort,
+            @RequestParam SortBy sort,
             @RequestParam String sortOrder) {
         Page<Review> reviewPage = storeQueryService.getReviewList(storeId, page, sort, sortOrder);
         return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
