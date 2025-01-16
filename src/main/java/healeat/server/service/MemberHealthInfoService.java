@@ -41,7 +41,7 @@ public class MemberHealthInfoService {
 
     // 특정 질문 조회하기
     @Transactional(readOnly = true)
-    public QuestionResponseDto getQuestion(Long questionId) {
+    public QuestionResponseDto getQuestion(Integer questionId) {
         MemberHealQuestion question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
 
@@ -50,7 +50,7 @@ public class MemberHealthInfoService {
 
     // 특정 질문에 대한 회원의 답변 저장
     @Transactional
-    public AnswerResponseDto saveAnswer(Long memberId, Long questionId, AnswerRequestDto request) {
+    public AnswerResponseDto saveAnswer(Long memberId, Integer questionId, AnswerRequestDto request) {
 
         MemberHealQuestion question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));

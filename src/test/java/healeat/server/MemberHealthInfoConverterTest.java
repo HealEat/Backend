@@ -23,7 +23,7 @@ class MemberHealthInfoConverterTest {
     @Test
     void testToQuestionResponseDto() {
         MemberHealQuestion question = MemberHealQuestion.builder()
-                .id(1L)
+                .id(1)
                 .question(Question.HEALTH_ISSUE)
                 .healthInfoAnswers(List.of(
                         HealthInfoAnswer.builder().answer(Answer.WEIGHT_LOSS).build(),
@@ -33,17 +33,17 @@ class MemberHealthInfoConverterTest {
 
         QuestionResponseDto dto = converter.toQuestionResponseDto(question);
 
-        assertEquals(1L, dto.getQuestionId());
+        assertEquals(1, dto.getQuestionId());
         assertEquals("HEALTH_ISSUE", dto.getQuestionText());
         assertEquals(List.of(Answer.WEIGHT_LOSS, Answer.INDIGESTION), dto.getAnswers());
     }
 
     @Test
     void testToAnswerResponseDto() {
-        AnswerResponseDto dto = converter.toAnswerResponseDto(1L, 2L, List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE));
+        AnswerResponseDto dto = converter.toAnswerResponseDto(1L, 2, List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE));
 
         assertEquals(1L, dto.getMemberId());
-        assertEquals(2L, dto.getQuestionId());
-        assertEquals(List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE), dto.getSelectedOptions());
+        assertEquals(2, dto.getQuestionId());
+        assertEquals(List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE), dto.getSelectedAnswers());
     }
 }
