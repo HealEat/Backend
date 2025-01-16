@@ -24,7 +24,6 @@ public class MemberService {
 
         // Feign Client 호출
         List<String> diseases = diseaseFeignClient.getDiseases(
-                "u7rQovT2e0Bmb3Vyf7n%2BhQxvUsrCAuyeTVjkSMac8crHWDOpGqur0jlZ5PuUOBl86gfMEY85HVLp%2F%2FrpU2H2AQ%3D%3D",
                 10,
                 1,
                 1,
