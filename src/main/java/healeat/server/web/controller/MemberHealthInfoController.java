@@ -25,7 +25,7 @@ public class MemberHealthInfoController {
 
     @Operation(summary = "특정 질문 조회하기 API")
     @GetMapping("/questions/{questionId}")
-    public ApiResponse<QuestionResponseDto> getQuestion(@PathVariable Long questionId) {
+    public ApiResponse<QuestionResponseDto> getQuestion(@PathVariable Integer questionId) {
         return ApiResponse.onSuccess(memberHealthInfoService.getQuestion(questionId));
     }
 
