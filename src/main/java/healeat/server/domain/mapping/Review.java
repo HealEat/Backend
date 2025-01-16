@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -63,13 +64,13 @@ public class Review extends BaseEntity {
     public void initializeReviewAndStore() {
 
         // 현재 멤버의 건강 목적을 리뷰에 저장
-        List<MemberPurpose> memberPurposes = member.getMemberPurposes();
-        for (MemberPurpose mp : memberPurposes) {
-            List<String> purposeAnswerList = mp.getPurposeAnswers().stream()
-                    .map(PurposeAnswer::getAnswer)
-                    .toList();
-            currentPurposes.put(mp.getPurpose(), purposeAnswerList);
-        }
+        currentPurposes = member.getMemberPurposes().stream()
+                .collect(Collectors.toMap(
+                        MemberPurpose::getPurpose,
+                        mp -> mp.getPurposeAnswers().stream()
+                                .map(PurposeAnswer::getAnswer)
+                                .collect(Collectors.toList())
+                ));
 
         // 리뷰 생성 시 전체 평점 계산
         calcTotalByAll();
