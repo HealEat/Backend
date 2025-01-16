@@ -26,18 +26,21 @@ public enum Answer {
     FIBRE,
 
     // 피할 음식 답변
-    DAIRY,
+    MEAT,
     WHEAT_BASED,
     RAW_MEAT_FISH,
-    MEAT,
-    CAFFEINE,
-    ALCOHOL,
+    FISH,
+    MOLLUSK,
+    SPICY,
 
     // 베지테리언 답변
     FLEXI,
-    POLO_PESCET,
-    PESCET,
+    POLO_PESCO,
+    PESCO,
     POLO,
+    LACTO_OVO,
+    LACTO,
+    OVO,
     VEGAN,
 
     // 다이어트 답변
