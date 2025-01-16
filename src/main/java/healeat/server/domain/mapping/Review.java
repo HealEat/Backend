@@ -2,17 +2,12 @@ package healeat.server.domain.mapping;
 
 import healeat.server.domain.*;
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Purpose;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Entity
 @Getter
@@ -33,8 +28,12 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    private Map<Purpose, List<String>> currentPurposes = new HashMap<>();  // 현재 건강 목적
+//    @JdbcTypeCode(SqlTypes.JSON)
+//    private Map<Purpose, List<String>> currentPurposes = new HashMap<>();  // 현재 건강 목적
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Builder.Default
+    private List<String> currentPurposes = new ArrayList<>();
 
     @Column(length = 300, nullable = false)
     private String body; // 리뷰 내용
@@ -59,18 +58,13 @@ public class Review extends BaseEntity {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImageList = new ArrayList<>();
 
-
     @PrePersist
     public void initializeReviewAndStore() {
 
         // 현재 멤버의 건강 목적을 리뷰에 저장
-        currentPurposes = member.getMemberPurposes().stream()
-                .collect(Collectors.toMap(
-                        MemberPurpose::getPurpose,
-                        mp -> mp.getPurposeAnswers().stream()
-                                .map(PurposeAnswer::getAnswer)
-                                .collect(Collectors.toList())
-                ));
+        currentPurposes.addAll(member.getDiseases());
+        currentPurposes.add(member.getVegetarian().toString());
+        currentPurposes.add(member.getDiet().toString());
 
         // 리뷰 생성 시 전체 평점 계산
         calcTotalByAll();

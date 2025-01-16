@@ -1,6 +1,5 @@
 package healeat.server.converter;
 
-import healeat.server.domain.enums.Purpose;
 import healeat.server.domain.mapping.Review;
 import healeat.server.web.dto.StoreResonseDto;
 import org.springframework.data.domain.Page;

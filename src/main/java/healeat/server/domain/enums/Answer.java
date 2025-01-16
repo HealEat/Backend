@@ -32,15 +32,4 @@ public enum Answer {
     MEAT,
     CAFFEINE,
     ALCOHOL,
-
-    // 베지테리언 답변
-    FLEXI,
-    POLO_PESCET,
-    PESCET,
-    POLO,
-    VEGAN,
-
-    // 다이어트 답변
-    LOSE_WEIGHT,
-    MAINTAIN
 }
