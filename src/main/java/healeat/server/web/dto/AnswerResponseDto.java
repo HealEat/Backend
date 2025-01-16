@@ -14,6 +14,6 @@ import java.util.List;
 @Builder
 public class AnswerResponseDto {
     private Long memberId;
-    private Long questionId;
-    private List<Answer> selectedOptions;
+    private Integer questionId;
+    private List<Long> selectedOptions;
 }

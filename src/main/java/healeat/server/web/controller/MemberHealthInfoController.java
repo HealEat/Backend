@@ -33,7 +33,7 @@ public class MemberHealthInfoController {
     @PutMapping("/{memberId}/questions/{questionId}/answers")
     public ApiResponse<AnswerResponseDto> saveAnswer(
             @PathVariable Long memberId,
-            @PathVariable Long questionId,
+            @PathVariable Integer questionId,
             @RequestBody AnswerRequestDto request) {
         return ApiResponse.onSuccess(memberHealthInfoService.saveAnswer(memberId, questionId, request));
     }
