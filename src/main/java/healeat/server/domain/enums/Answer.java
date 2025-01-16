@@ -26,10 +26,10 @@ public enum Answer {
     FIBRE,
 
     // 피할 음식 답변
-    DAIRY,
+    MEAT,
     WHEAT_BASED,
     RAW_MEAT_FISH,
-    MEAT,
-    CAFFEINE,
-    ALCOHOL,
+    FISH,
+    MOLLUSK,
+    SPICY
 }
