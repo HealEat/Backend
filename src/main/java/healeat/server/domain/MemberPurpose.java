@@ -1,6 +1,5 @@
-package healeat.server.domain.mapping;
+package healeat.server.domain;
 
-import healeat.server.domain.Member;
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.Purpose;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package healeat.server.domain.mapping;
+package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
 import jakarta.persistence.*;
@@ -10,12 +10,13 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PurposeAnswer extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_purpose_id", nullable = false)
+    @JoinColumn(name = "purpose_id", nullable = false)
     private MemberPurpose memberPurpose;
 
     @Column(nullable = false)
