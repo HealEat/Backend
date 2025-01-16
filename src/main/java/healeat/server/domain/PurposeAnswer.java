@@ -1,7 +1,6 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Answer;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,16 +9,16 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class HealthInfoAnswer extends BaseEntity {
+public class PurposeAnswer extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_heal_question_id", nullable = false)
-    private MemberHealQuestion memberHealQuestion;
+    @JoinColumn(name = "purpose_id", nullable = false)
+    private MemberPurpose memberPurpose;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Answer answer;
+    private String answer;
 }
