@@ -17,8 +17,8 @@ public interface StoreApiClient {
     @GetMapping("/v2/local/search/category.json")
     KakaoPlaceResponseDto getStoresSimply(   // 홈 화면 추천 알고리즘에 사용
                                                 /* 쿼리가 없다 */
-                                             @RequestParam String member_x,
-                                             @RequestParam String member_y,
+                                             @RequestParam String x,
+                                             @RequestParam String y,
                                              @RequestParam(defaultValue = "1") Integer page,
                                              @RequestParam(defaultValue = "distance") String sort);
 
