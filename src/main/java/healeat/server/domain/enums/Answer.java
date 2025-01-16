@@ -31,19 +31,5 @@ public enum Answer {
     RAW_MEAT_FISH,
     FISH,
     MOLLUSK,
-    SPICY,
-
-    // 베지테리언 답변
-    FLEXI,
-    POLO_PESCO,
-    PESCO,
-    POLO,
-    LACTO_OVO,
-    LACTO,
-    OVO,
-    VEGAN,
-
-    // 다이어트 답변
-    LOSE_WEIGHT,
-    MAINTAIN
+    SPICY
 }

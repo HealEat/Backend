@@ -19,6 +19,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 페이징 관련 응답
     PAGE_NUM_NOT_NATURAL(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),
 
+    // 정렬 쿼리 스트링 관련 응답
+    SORT_NOT_FOUND(HttpStatus.BAD_REQUEST, "SORT4001", "정렬 쿼리 스트링이 적절하지 않습니다."),
+
     // 가게 관련 응답
     STORE_NOT_FOUND(HttpStatus.BAD_REQUEST, "STORE4001", "가게가 없습니다."),
 
@@ -30,6 +33,9 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 회원 관련 응답
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다."),
+
+    // 회원 건강 정보 설정 관련 응답
+    VEGET_ANS_NOT_FOUND(HttpStatus.BAD_REQUEST, "HEALTH_INFO_ANS4001", "사용자의 베지테리언 답변이 없습니다."),
 
     // 질문 관련 응답
     QUESTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "QUESTION4001", "질문이 없습니다.")
