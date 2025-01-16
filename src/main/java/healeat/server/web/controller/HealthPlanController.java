@@ -79,4 +79,3 @@ public class HealthPlanController {
         return ApiResponse.onSuccess(response);
     }
 }
-

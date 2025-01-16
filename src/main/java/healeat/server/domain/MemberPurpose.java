@@ -1,7 +1,7 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Question;
+import healeat.server.domain.enums.Purpose;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,8 +13,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class HealthInfoQuestion extends BaseEntity {
-
+public class MemberPurpose extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,9 +23,9 @@ public class HealthInfoQuestion extends BaseEntity {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Question question;
+    @Column(name = "purpose", nullable = false)
+    private Purpose purpose;
 
-    @OneToMany(mappedBy = "healthInfoQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HealthInfoAnswer> answers = new ArrayList<>();
+    @OneToMany(mappedBy = "memberPurpose", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurposeAnswer> purposeAnswers = new ArrayList<>();
 }

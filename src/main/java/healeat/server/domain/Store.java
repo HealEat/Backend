@@ -1,19 +1,15 @@
 package healeat.server.domain;
 
-import healeat.server.apiPayload.code.status.ErrorStatus;
-import healeat.server.apiPayload.exception.handler.ReviewHandler;
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.DietAns;
-import healeat.server.domain.enums.Vegeterian;
+import healeat.server.domain.enums.Purpose;
 import healeat.server.domain.mapping.Review;
 import healeat.server.domain.mapping.StoreKeyword;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -36,8 +32,8 @@ public class Store extends BaseEntity {
     private Float totalScore; // 전체 평점
     private Integer reviewCount; // 전체 리뷰 수
 
-    private Float diseaseCareScore; // 질병 관리 평점
-    private Integer diseaseCareCount; // 질병 관리 리뷰 수
+    private Float sickScore; // 환자 평점
+    private Integer sickCount; // 환자 리뷰 수
 
     private Float vegetScore; // 베지테리언 평점
     private Integer vegetCount; // 베지테리언 리뷰 수
@@ -48,7 +44,7 @@ public class Store extends BaseEntity {
     private Float tastyScore; // 평점(맛)
     private Float cleanScore; // 평점(청결도)
     private Float freshScore; // 평점(신선도)
-    private Float nutrBalanceScore; // 평점(영양 균형)
+    private Float nutrScore; // 평점(영양 균형)
 
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
@@ -69,23 +65,36 @@ public class Store extends BaseEntity {
     }
 
     public void updateScoresByReview(Review newReview) {
-        if (newReview == null) {
-            throw new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND);
+
+        Map<Purpose, List<String>> currentPurposes = newReview.getCurrentPurposes();
+        Float newReviewTotal = newReview.getTotalScore();
+        if (currentPurposes.get(Purpose.SICK) != null) {
+            sickScore = (
+                    sickScore * sickCount + newReviewTotal) / (sickCount + 1);
+            sickCount++;
+        }
+        if (currentPurposes.get(Purpose.DIET) != null) {
+            dietScore = (
+                    dietScore * dietCount + newReviewTotal) / (dietCount + 1);
+            dietCount++;
+        }
+        if (currentPurposes.get(Purpose.VEGET) != null) {
+            vegetScore = (
+                    vegetScore * vegetCount + newReviewTotal) / (vegetCount + 1);
+            vegetCount++;
         }
 
         tastyScore = updateScore(tastyScore, newReview.getTastyScore());
         cleanScore = updateScore(cleanScore, newReview.getCleanScore());
         freshScore = updateScore(freshScore, newReview.getFreshScore());
-        nutrBalanceScore = updateScore(nutrBalanceScore, newReview.getNutrBalanceScore());
+        nutrScore = updateScore(nutrScore, newReview.getNutrScore());
 
         reviewCount++; // 리뷰 수 증가
-
-        // 건강 목표 관련 로직 추가 해야
 
         calcTotalByAll();
     }
 
     private void calcTotalByAll() {
-        totalScore = (tastyScore + cleanScore + freshScore + nutrBalanceScore) / 4;
+        totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
     }
 }
