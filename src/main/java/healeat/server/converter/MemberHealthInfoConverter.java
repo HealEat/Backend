@@ -31,11 +31,11 @@ public class MemberHealthInfoConverter {
                 .build();
     }
 
-    public AnswerResponseDto toAnswerResponseDto(Long memberId, Long questionId, List<Answer> selectedAnswers) {
+    public AnswerResponseDto toAnswerResponseDto(Long memberId, Integer questionId, List<Answer> selectedAnswers) {
         return AnswerResponseDto.builder()
                 .memberId(memberId)
                 .questionId(questionId)
-                .selectedOptions(selectedAnswers)
+                .selectedAnswers(selectedAnswers)
                 .build();
     }
 
