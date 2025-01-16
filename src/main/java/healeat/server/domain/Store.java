@@ -1,9 +1,7 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.DietAns;
 import healeat.server.domain.enums.Purpose;
-import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.domain.mapping.StoreKeyword;
 import jakarta.persistence.*;
