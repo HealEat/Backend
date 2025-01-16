@@ -21,5 +21,6 @@ spring:
 
 # 스프링 시큐리티 설정 필요함.
 
+
 kakao:
   api-key: # 공유 예정

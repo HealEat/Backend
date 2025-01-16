@@ -13,7 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AnswerRequestDto {
-//    private String memberId;
-//    private String questionId;
     private List<Answer> selectedAnswers;
 }
