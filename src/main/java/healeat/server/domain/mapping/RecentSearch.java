@@ -1,14 +1,11 @@
 package healeat.server.domain.mapping;
 
-import healeat.server.domain.Keyword;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.SearchType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter

@@ -4,13 +4,11 @@ import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
-import healeat.server.domain.mapping.StoreKeyword;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Getter
