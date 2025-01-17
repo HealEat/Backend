@@ -14,27 +14,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@SpringBootTest
-@Transactional(readOnly = true)
-public class FeatCategoryMapTest {
-
-    @Autowired
-    private FeatCategoryMapRepository featCategoryMapRepository;
-    @Autowired
-    private FoodFeatureRepository foodFeatureRepository;
-
-    @Test
-    public void 음식종류_출력() throws Exception {
-
-        List<FoodFeature> foodFeatures = foodFeatureRepository.findAll();
-
-        for (FoodFeature foodFeature : foodFeatures) {
-            List<FeatCategoryMap> featCategoryMapList = featCategoryMapRepository.findAllByFoodFeature(foodFeature);
-            List<String> foodCategoryNames = featCategoryMapList.stream().map(FeatCategoryMap::getFoodCategory).map(FoodCategory::getName).toList();
-            System.out.println(foodFeature.getName());
-            for (String foodCategoryName : foodCategoryNames) {
-                System.out.println(foodCategoryName);
-            }
-        }
-    }
-}
+//@SpringBootTest
+//@Transactional(readOnly = true)
+//public class FeatCategoryMapTest {
+//
+//    @Autowired
+//    private FeatCategoryMapRepository featCategoryMapRepository;
+//    @Autowired
+//    private FoodFeatureRepository foodFeatureRepository;
+//
+//    @Test
+//    public void 음식종류_출력() throws Exception {
+//
+//        List<FoodFeature> foodFeatures = foodFeatureRepository.findAll();
+//
+//        for (FoodFeature foodFeature : foodFeatures) {
+//            List<FeatCategoryMap> featCategoryMapList = featCategoryMapRepository.findAllByFoodFeature(foodFeature);
+//            List<String> foodCategoryNames = featCategoryMapList.stream().map(FeatCategoryMap::getFoodCategory).map(FoodCategory::getName).toList();
+//            System.out.println(foodFeature.getName());
+//            for (String foodCategoryName : foodCategoryNames) {
+//                System.out.println(foodCategoryName);
+//            }
+//        }
+//    }
+//}

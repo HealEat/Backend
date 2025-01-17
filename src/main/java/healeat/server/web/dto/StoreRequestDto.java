@@ -1,5 +1,6 @@
 package healeat.server.web.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -7,9 +8,10 @@ import java.util.List;
 public class StoreRequestDto {
 
     @Getter
+    @Builder
     public static class SearchFilterDto {
 
-        Integer page = 1; // 기본값은 1페이지
+        Integer page/* = 1*/; // 기본값은 1페이지
 
         String query; // 검색어
 
@@ -20,6 +22,6 @@ public class StoreRequestDto {
 
         List<Long> featureIdList;
 
-        Double minRating;
+        Float minRating;
     }
 }
