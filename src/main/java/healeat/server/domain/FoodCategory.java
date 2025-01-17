@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class FoodCategory extends BaseEntity {
+public class FoodCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
