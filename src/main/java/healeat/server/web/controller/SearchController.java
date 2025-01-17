@@ -4,6 +4,7 @@ import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Store;
 import healeat.server.service.StoreQueryService;
+import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.StoreResonseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,9 +25,9 @@ public class SearchController {
     public ApiResponse<StoreResonseDto.StorePreviewListDto> getSearchResults(
             @ModelAttribute StoreRequestDto.SearchFilterDto request) {
 
-        Page<Store> searchPage = storeQueryService.searchByFilter(request);
+//        Page<Store> searchPage = storeQueryService.searchByFilter(request);
 
-        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(searchPage));
+        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(/*searchPage*/null));
     }
 
 }

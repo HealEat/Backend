@@ -16,7 +16,6 @@ public class FeignConfig {
         return requestTemplate -> {
             requestTemplate.header("Authorization", apiKey);
             requestTemplate.query("category_group_code", "FD6");
-            requestTemplate.query("size", "15");
         };
     }
 }
