@@ -4,19 +4,13 @@ import healeat.server.config.FoodMappingConfig;
 import healeat.server.domain.enums.Answer;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Service
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
-public class FoodRecommendationService {
+public class FoodRecommendation {
 
     public static List<String> getRecommendedFoods (Set<Answer> answers, Set<Vegetarian> vegetarians, Set<Diet> diets) {
         Set<String> recommendedFoods = new HashSet<>();

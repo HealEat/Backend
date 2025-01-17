@@ -40,6 +40,11 @@ public class Member extends BaseEntity {
     @Builder.Default
     private Diet diet = Diet.NONE;
 
+    // 건강 정보 로직 반영 결과 저장 (음식 카테고리 리스트)
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Builder.Default
+    private List<String> healEatFoods = new ArrayList<>();
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();  // 건강 정보 설정
 
