@@ -22,6 +22,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 정렬 쿼리 스트링 관련 응답
     SORT_NOT_FOUND(HttpStatus.BAD_REQUEST, "SORT4001", "정렬 쿼리 스트링이 적절하지 않습니다."),
 
+    // 가게 음식 카테고리 관련 응답
+    FOOD_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOOD_CATEGORY4001", "없는 음식 카테고리입니다."),
+
     // 가게 관련 응답
     STORE_NOT_FOUND(HttpStatus.BAD_REQUEST, "STORE4001", "가게가 없습니다."),
 
