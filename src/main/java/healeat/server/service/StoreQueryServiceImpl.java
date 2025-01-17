@@ -1,15 +1,18 @@
 package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.FoodCategoryHandler;
 import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
+import healeat.server.domain.FoodCategory;
+import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Store;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.enums.Vegetarian;
+import healeat.server.domain.mapping.FeatCategoryMap;
 import healeat.server.domain.mapping.Review;
-import healeat.server.repository.ReviewRepository;
-import healeat.server.repository.StoreRepository;
+import healeat.server.repository.*;
 import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,25 +32,72 @@ public class StoreQueryServiceImpl implements StoreQueryService {
     private final StoreRepository storeRepository;
     private final ReviewRepository reviewRepository;
     private final StoreApiClient storeApiClient;
+    private final FoodFeatureRepository foodFeatureRepository;
+    private final FeatCategoryMapRepository featCategoryMapRepository;
+    private final FoodCategoryRepository foodCategoryRepository;
 
     @Override
     public Page<Store> searchByFilter(StoreRequestDto.SearchFilterDto request) {
 
+        List<Long> featureIdList = request.getFeatureIdList();
+
+        Set<Long> categoryIdSet = new HashSet<>(
+                request.getCategoryIdList().stream().map(foodCategoryRepository::findById)
+                        .map(op_c ->
+                                op_c.orElseThrow(() -> new FoodCategoryHandler(ErrorStatus.FOOD_CATEGORY_NOT_FOUND))
+                                        .getId())
+                        .toList()
+        );
+
+        if (!featureIdList.isEmpty()) { // 선택한 음식 특징 필터가 존재할 때
+
+            for (Long featureId : featureIdList) {
+                List<FeatCategoryMap> featCategoryMaps = featCategoryMapRepository.findAllByFoodFeature_Id(featureId);
+                List<Long> categoryIdList = featCategoryMaps.stream()
+                        .map(f_c -> f_c.getFoodCategory().getId())
+                        .toList();
+                categoryIdSet.addAll(categoryIdList);
+            }
+        }
+
+        // 질의어 조사
+        String query = request.getQuery();
+        // 동일한 이름의 음식 특징
+        Optional<FoodFeature> sameNameFeature = foodFeatureRepository.findAll().stream()
+                .filter(f -> f.getName().equals(query))
+                .findFirst();
+        // 동일한 이름의 음식 종류
+        Optional<FoodCategory> sameNameCategory = foodCategoryRepository.findAll().stream()
+                .filter(c -> c.getName().equals(query))
+                .findFirst();
+
+        // 질의어와 동일한 이름의 음식 특징이 있을 때
+        if (sameNameFeature.isPresent()) {
+            FoodFeature foodFeature = sameNameFeature.get();
+            List<Long> categoryIdList = featCategoryMapRepository.findAllByFoodFeature(foodFeature).stream()
+                    .map(f_c -> f_c.getFoodCategory().getId())
+                    .toList();
+            categoryIdSet.addAll(categoryIdList);
+        }
+        // 질의어와 동일한 이름의 음식 종류가 있을 때
+        sameNameCategory.ifPresent(foodCategory -> categoryIdSet.add(foodCategory.getId()));
+
+        List<String> categoryIdList = categoryIdSet.stream()
+                .map(id -> foodCategoryRepository.findById(id).get().getName())
+                .toList();
+
+        /// ////
+
         int adjustedPage = Math.max(0, request.getPage() - 1);
 
-        KakaoPlaceResponseDto kakaoResponse = storeApiClient.getStoresByQuery(
-                request.getUserInput(),
-                request.getX(),
-                request.getY(),
-                adjustedPage,
-                "accuracy");
+//        KakaoPlaceResponseDto kakaoResponse = storeApiClient.getStoresByQuery(
+//                request.getUserInput(),
+//                request.getX(),
+//                request.getY(),
+//                adjustedPage,
+//                "accuracy");
 
-        if (request.getFeature() != null) {
-            return null; // 구현 필요
-        } else {
 
-            return null; // 구현 필요
-        }
     }
 
     @Override
