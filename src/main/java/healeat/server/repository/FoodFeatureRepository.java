@@ -8,5 +8,4 @@ import java.util.List;
 
 @Repository
 public interface FoodFeatureRepository extends JpaRepository<FoodFeature, Long> {
-    List<FoodFeature> findAll();
 }
