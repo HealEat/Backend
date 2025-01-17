@@ -23,7 +23,7 @@ public class RecentSearch extends BaseEntity {
 
     // 검색 기록 타입
     @Enumerated(EnumType.STRING)
-    private SearchType searchType; // KEYWORD, STORE
+    private SearchType searchType; // QUERY, STORE
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -33,7 +33,5 @@ public class RecentSearch extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = true)
     private Store store;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "keyword_id", nullable = true)
-    private Keyword keyword;
+    private String query;
 }
