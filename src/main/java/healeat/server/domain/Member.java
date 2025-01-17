@@ -59,4 +59,15 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarks = new ArrayList<>();
+
+
+    // 프로필을 위한 업데이트 메서드
+    public void updateProfile(String name, String profileImageUrl) {
+        if(name != null) this.name = name;
+        if(profileImageUrl != null) this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }
