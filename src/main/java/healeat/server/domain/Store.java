@@ -49,10 +49,6 @@ public class Store extends BaseEntity {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
-    private List<StoreKeyword> storeKeywords = new ArrayList<>();
-
-
     //==비즈니스 로직==//
 
     /**

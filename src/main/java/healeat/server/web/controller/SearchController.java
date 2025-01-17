@@ -29,7 +29,6 @@ public class SearchController {
         return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(searchPage));
     }
 
-
 }
 
 
