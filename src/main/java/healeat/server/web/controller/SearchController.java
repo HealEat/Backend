@@ -6,7 +6,6 @@ import healeat.server.domain.Store;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.SearchPageService;
-import healeat.server.service.StoreQueryService;
 import healeat.server.web.dto.SearchPageResponseDto;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.web.dto.KakaoPlaceResponseDto;
@@ -25,17 +24,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final StoreQueryService storeQueryService;
+    private final StoreQueryServiceImpl storeQueryServiceImpl;
     private final SearchPageService searchPageService;
     private final RecentSearchService recentSearchService;
     private final CategoryFeatureService categoryFeatureService;
 
-    @Operation(summary = "검색 화면", description = "쿼리 스트링으로 검색어와 필터 조건" +
-            "(사용자 위치, 음식 종류/특징 키워드, 최소 별점)을 받아서 가게 목록을 조회합니다.")
-    @GetMapping
-    public ApiResponse<StoreResonseDto.StorePreviewListDto> getSearchResults(
-            @ModelAttribute StoreRequestDto.SearchFilterDto request) {
-    private final StoreQueryServiceImpl storeQueryServiceImpl;
 
     @Operation(summary = "힐릿 검색 로직 테스트용", description = "1. 쿼리 있든 없든 사용 가능" +
             "\n2. x, y 좌표값 String - 빈칸 또는 지정(nullable)" +
@@ -64,13 +57,13 @@ public class SearchController {
 //
 //        storeQueryServiceImpl.combineResults(docPage);
 //
-//        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(docPage));
-//    }
+//        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(docPage))
+//  }
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
     @GetMapping("/searchPage")
-    public ApiResponse<SearchPageResponseDto.AllSearchPageResponseDto> getAllRecentSearches() {
+    public ApiResponse<SearchPageResponseDto> getAllRecentSearches() {
 
-        SearchPageResponseDto.AllSearchPageResponseDto response = searchPageService.getAllSearchPage();
+        SearchPageResponseDto response = searchPageService.getAllSearchPage();
 
         return ApiResponse.onSuccess(response);
     }

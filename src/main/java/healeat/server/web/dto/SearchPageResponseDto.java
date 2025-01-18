@@ -12,19 +12,13 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Builder
 public class SearchPageResponseDto {
 
-    //검색창 - 음식 특징, 음식 종류, 최근 검색 리스트 DTO
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class AllSearchPageResponseDto {
-
-        private List<FoodFeatureResponseDto> foodFeatureList;
-        private List<FoodCategoryResponseDto> foodCategoryList;
-        private List<RecentSearchResponseDto> recentSearchList;
-    }
+        List<FoodFeatureResponseDto> foodFeatureList;
+        List<FoodCategoryResponseDto> foodCategoryList;
+        List<RecentSearchResponseDto> recentSearchList;
 
     //검색창 - 최근 검색 기록 삭제 DTO
     @Getter
@@ -33,11 +27,11 @@ public class SearchPageResponseDto {
     @AllArgsConstructor
     public static class toDeleteResultDto {
 
-        private Long memberId;
-        private Long recentSearchId;
-        private SearchType searchType;
-        private Long storeId;
-        private String query;
+        Long memberId;
+        Long recentSearchId;
+        SearchType searchType;
+        Long storeId;
+        String query;
     }
 
     //검색 키워드 보기 - 음식 종류 리스트 DTO
@@ -47,7 +41,7 @@ public class SearchPageResponseDto {
     @AllArgsConstructor
     public static class FoodCategoryListResponseDto {
 
-        private List<FoodCategoryResponseDto> FoodCategoryList;
+        List<FoodCategoryResponseDto> FoodCategoryList;
     }
     //검색 키워드 보기 - 음식 종류 한 개 DTO
     @Getter
@@ -56,8 +50,8 @@ public class SearchPageResponseDto {
     @AllArgsConstructor
     public static class FoodCategoryResponseDto {
 
-        private Long categoryId;
-        private String name;
+        Long categoryId;
+        String name;
     }
 
     //검색 키워드 보기 - 음식 종류 리스트 DTO
@@ -67,7 +61,7 @@ public class SearchPageResponseDto {
     @AllArgsConstructor
     public static class FoodFeatureListResponseDto {
 
-        private List<FoodFeatureResponseDto> FoodFeatureList;
+        List<FoodFeatureResponseDto> FoodFeatureList;
     }
 
     //검색 키워드 보기 - 음식 특징 DTO
@@ -77,19 +71,19 @@ public class SearchPageResponseDto {
     @AllArgsConstructor
     public static class FoodFeatureResponseDto {
 
-        private Long featureId;
-        private String name;
+        Long featureId;
+        String name;
     }
 
-    //검색창 - 최근 검색 리스트 DTO
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RecentSearchListResponseDto {
-
-        private List<RecentSearchResponseDto> recentSearchList;
-    }
+//    //검색창 - 최근 검색 리스트 DTO - 나중에 따로 필요하면 쓸듯
+//    @Getter
+//    @Builder
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class RecentSearchListResponseDto {
+//
+//        private List<RecentSearchResponseDto> recentSearchList;
+//    }
 
     //검색창 - 최근 검색
     @Getter
@@ -98,10 +92,10 @@ public class SearchPageResponseDto {
     @AllArgsConstructor
     public static class RecentSearchResponseDto {
 
-        private Long recentSearchId;
-        private SearchType searchType;
-        private Long storeId;
-        private String query;
+        Long recentSearchId;
+        SearchType searchType;
+        Long storeId;
+        String query;
     }
 
 
