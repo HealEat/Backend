@@ -25,6 +25,12 @@ public class Member extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
+    @Column(nullable = true)
+    private String provider; // 소셜 로그인 제공자 ( KAKAO, NAVER, APPLE)
+
+    @Column(nullable = true, unique = true)
+    private String providerId; // 소셜 로그인 제공자로부터 받은 사용자 ID
+
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
