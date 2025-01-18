@@ -3,6 +3,8 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.SearchPageConverter;
 import healeat.server.converter.StoreConverter;
+import healeat.server.domain.FoodCategory;
+import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Store;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
@@ -64,38 +66,32 @@ public class SearchController {
     @GetMapping("/recent")
     public ApiResponse<SearchPageResponseDto> getAllRecentSearches() {
 
-        SearchPageResponseDto response = searchPageService.getAllSearchPage();
-
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(searchPageService.getAllSearchPage());
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")
     @GetMapping("/categories")
     public ApiResponse<SearchPageResponseDto.FoodCategoryListResponseDto> getFoodCategoryLists(){
 
-        SearchPageResponseDto.FoodCategoryListResponseDto response = SearchPageConverter
-                .toFoodCategoryListResponseDto(categoryFeatureService.getAllFoodCategories());
+        List<FoodCategory> foodCategoryList = categoryFeatureService.getAllFoodCategories();
 
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(SearchPageConverter.toFoodCategoryListResponseDto(foodCategoryList));
     }
 
     @Operation(summary = "음식 특징 조회", description = "음식 특징을 전체 조회합니다.")
     @GetMapping("/features")
     public ApiResponse<SearchPageResponseDto.FoodFeatureListResponseDto> getFoodFeatureLists(){
 
-        SearchPageResponseDto.FoodFeatureListResponseDto response = SearchPageConverter
-                .toFoodFeatureListResponseDto(categoryFeatureService.getAllFoodFeatures());
+        List<FoodFeature> foodFeatureList = categoryFeatureService.getAllFoodFeatures();
 
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(SearchPageConverter.toFoodFeatureListResponseDto(foodFeatureList));
     }
 
     @Operation(summary = "최근 검색 기록 삭제", description = "최근 검색 기록을 삭제합니다.")
     @DeleteMapping("/recent/{recentId}")
     public ApiResponse<SearchPageResponseDto.toDeleteResultDto> deleteRecentSearch(@PathVariable Long recentId) {
 
-        SearchPageResponseDto.toDeleteResultDto response = recentSearchService.toDeleteRecentSearch(recentId);
-
-        return ApiResponse.onSuccess(response);
+        return ApiResponse.onSuccess(recentSearchService.toDeleteRecentSearch(recentId));
     }
 
 }
