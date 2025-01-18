@@ -9,11 +9,13 @@ import healeat.server.domain.Store;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.enums.Vegetarian;
+import healeat.server.domain.mapping.FeatCategoryMap;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.*;
 import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.StoreRequestDto;
+import healeat.server.web.dto.StoreResonseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,10 +49,57 @@ public class StoreQueryServiceImpl {
      * 정렬 및 페이징 적용
      *  -> 이후 컨트롤러에 위임
      */
-    public Page<Document> getSortedDocuments(Integer page, StoreRequestDto.SearchKeywordDto request, Float minRating) {
+    // 리뷰가 존재 -> DB와 매핑된 데이터 먼저 표시
+    // distance가 존재 -> distance로 정렬
+    public Page<StoreResonseDto.StorePreviewDto> getSortedDocuments(
+            Integer page, StoreRequestDto.SearchKeywordDto request, Float minRating) {
 
         List<Document> documents = getDocumentsByKeywords(request);
         int adjustedPage = Math.max(0, page - 1); // 페이징에 쓸 adjustedPage
+
+        List<StoreResonseDto.StorePreviewDto> storePreviewDtoList = documents.stream()
+                .map(document -> {
+
+            List<String> features;
+            List<FeatCategoryMap> featCategoryMapList = featCategoryMapRepository.findByFoodCategory_Name(document.getCategory_name());
+            if (featCategoryMapList.isEmpty()) {
+                features = new ArrayList<>();
+            } else {
+                features = featCategoryMapList.stream()
+                        .map(fc -> fc.getFoodFeature().getName()).toList();
+            }
+
+            StoreResonseDto.StorePreviewDto.StorePreviewDtoBuilder builder = StoreResonseDto.StorePreviewDto.builder()
+                    .id(Long.parseLong(document.getId()))
+                    .place_name(document.getPlace_name())
+                    .category_name(document.getCategory_name())
+                    .phone(document.getPlace_url())
+                    .address_name(document.getAddress_name())
+                    .road_address_name(document.getRoad_address_name())
+                    .x(document.getX())
+                    .y(document.getY())
+                    .place_url(document.getPlace_url())
+                    .distance(document.getDistance())
+                    .features(features);
+
+            Optional<Store> storeOptional = storeRepository.findById(Long.parseLong(document.getId()));
+
+            // 여기부터 healeat Store 데이터
+            storeOptional.ifPresent(store -> {
+                StoreResonseDto.StorePreviewDto storePreviewDto = builder.reviewCount(store.getReviewCount())
+                        .totalScore(store.getTotalScore())
+                        .sickScore(store.getSickScore())
+                        .vegetScore(store.getVegetScore())
+                        .dietScore(store.getDietScore())
+                        .isBookMarked(false)
+                        .build();
+            });
+
+            return builder.build();
+        })
+                .toList();
+
+        Page<StoreResonseDto.StorePreviewDto> storePreviewDtoPage = CustomPagination.toPage(storePreviewDtoList, adjustedPage, 10);
 
         return null;
     }
