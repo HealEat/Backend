@@ -12,6 +12,7 @@ import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.FeatCategoryMap;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.*;
+import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.StoreRequestDto;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.print.Doc;
 import java.util.*;
@@ -29,6 +31,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Validated
 public class StoreQueryServiceImpl {
 
     private final StoreRepository storeRepository;
@@ -52,11 +55,16 @@ public class StoreQueryServiceImpl {
     // 리뷰가 존재 -> DB와 매핑된 데이터 먼저 표시
     // distance가 존재 -> distance로 정렬
     public Page<StoreResonseDto.StorePreviewDto> getSortedDocuments(
-            Integer page, StoreRequestDto.SearchKeywordDto request, Float minRating) {
+            Integer page,
+            StoreRequestDto.SearchKeywordDto request,
+            Float minRating) {
 
         List<Document> documents = getDocumentsByKeywords(request);
         int adjustedPage = Math.max(0, page - 1); // 페이징에 쓸 adjustedPage
 
+        /**
+         * 북마크 구현 필요 <- 멤버 (스프링 시큐리티 Authorization?)
+         */
         List<StoreResonseDto.StorePreviewDto> storePreviewDtoList = documents.stream()
                 .map(document -> {
 
@@ -99,7 +107,12 @@ public class StoreQueryServiceImpl {
         })
                 .toList();
 
-        Page<StoreResonseDto.StorePreviewDto> storePreviewDtoPage = CustomPagination.toPage(storePreviewDtoList, adjustedPage, 10);
+        // 정렬 구현 중
+        Comparator<StoreResonseDto.StorePreviewDto> comparator;
+
+        Page<StoreResonseDto.StorePreviewDto> storePreviewDtoPage
+                = CustomPagination.toPage(storePreviewDtoList, adjustedPage, 10, null);
+
 
         return null;
     }

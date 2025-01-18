@@ -9,6 +9,8 @@ import healeat.server.domain.Store;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.SearchPageService;
+import healeat.server.validation.annotation.CheckPage;
+import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.SearchPageResponseDto;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.web.dto.KakaoPlaceResponseDto;
@@ -32,7 +34,6 @@ public class SearchController {
     private final RecentSearchService recentSearchService;
     private final CategoryFeatureService categoryFeatureService;
 
-
     @Operation(summary = "힐릿 검색 로직 테스트용", description = "1. 쿼리 있든 없든 사용 가능" +
             "\n2. x, y 좌표값 String - 빈칸 또는 지정(nullable)" +
             "\n3. 2개 IdList 0 지우고 지정(nullable, 최대 5개)\n" + "\n\n위 형태로 만들어서 진행 할 것")
@@ -52,8 +53,8 @@ public class SearchController {
             "(사용자 위치, 음식 종류/특징 키워드, 최소 별점)을 받아서 가게 목록을 조회합니다.")
     @GetMapping
     public ApiResponse<StoreResonseDto.StorePreviewDtoList> getSearchResults(
-            @RequestParam Integer page,
-            @ModelAttribute StoreRequestDto.SearchKeywordDto request,
+            @CheckPage @RequestParam Integer page,
+            @CheckSizeSum @ModelAttribute StoreRequestDto.SearchKeywordDto request,
             @RequestParam Float minRating) {
 
         Page<StoreResonseDto.StorePreviewDto> docPage = storeQueryServiceImpl.getSortedDocuments(page, request, minRating);
@@ -92,7 +93,6 @@ public class SearchController {
 
         return ApiResponse.onSuccess(recentSearchService.toDeleteRecentSearch(recentId));
     }
-
 }
 
 
