@@ -63,6 +63,7 @@ public class StoreQueryServiceImpl {
      */
     public List<Document> getDocumentsByKeywords(StoreRequestDto.SearchKeywordDto request) {
 
+        apiCallCount = 0;
         String query = request.getQuery();
 
         // 필터 Set
@@ -92,7 +93,8 @@ public class StoreQueryServiceImpl {
             else : [originalQuery] 그대로 API
             */
             KakaoPlaceResponseDto kakaoList = storeApiClient
-                    .getKakaoByQuery(query, request.getX(), request.getY(), 1, "accuracy"); // 지역 검사용 첫 페이지
+                    .getKakaoByQuery(query + " " + "식당", // 지역명만 검색하는 경우를 위해 [" " + "식당"] 추가
+                            request.getX(), request.getY(), 1, "accuracy"); // 지역 검사용 첫 페이지
             apiCallCount++;
 
             String selectedRegion = kakaoList.getMeta().getSame_name().getSelected_region(); // 지역명
@@ -122,7 +124,8 @@ public class StoreQueryServiceImpl {
             // 그 외에는 지역 검사용에 썼던 쿼리와 동일하므로
             finalFilteredList.addAll(
                     filterAndGetDocuments(kakaoList, categoryIdSet)); // 지역 검사용 결과도 활용
-            currentPage = 2;
+            if (kakaoList.getMeta().getIs_end()) return finalFilteredList;
+            else currentPage = 2;
         }
         // 질의어 그대로 검색
         // 지역명 뺀 나머지 질의어가 음식 특징을 포함하지만, 정확히 일치한 것은 아닌 경우도 포함 (예 : 왕십리 야채빵)

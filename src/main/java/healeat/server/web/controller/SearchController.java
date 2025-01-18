@@ -21,8 +21,10 @@ public class SearchController {
 
     private final StoreQueryServiceImpl storeQueryServiceImpl;
 
-    @Operation(summary = "힐릿 검색 로직 테스트용", description = "쿼리 있든 없든 사용 가능, 필터(최대 5개) 지정 가능")
-    @GetMapping("/test")
+    @Operation(summary = "힐릿 검색 로직 테스트용", description = "1. 쿼리 있든 없든 사용 가능" +
+            "\n2. x, y 좌표값 String - 빈칸 또는 지정(nullable)" +
+            "\n3. 2개 IdList 0 지우고 지정(nullable, 최대 5개)\n" + "\n\n위 형태로 만들어서 진행 할 것")
+    @GetMapping("/test") // 테스트용이라 컨트롤러에서 로직 존재
     public ApiResponse<TestResponseDto> getApiTestResults(
             @ModelAttribute StoreRequestDto.SearchKeywordDto request) {
         List<KakaoPlaceResponseDto.Document> documentsByKeywords = storeQueryServiceImpl.getDocumentsByKeywords(request);
