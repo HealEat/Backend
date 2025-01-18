@@ -19,9 +19,8 @@ public class SearchPageService {
 
     private final CategoryFeatureService categoryFeatureService;
     private final RecentSearchService recentSearchService;
-    private final SearchPageConverter searchPageConverter;
 
-    public SearchPageResponseDto.AllSearchPageResponseDto getAllSearchPage() {
+    public SearchPageResponseDto getAllSearchPage() {
 
         //음식 종류, 음식 특징, 최근 검색 리스트 모두 가져오기
         List<FoodCategory> foodCategories = categoryFeatureService.getAllFoodCategories();
@@ -30,21 +29,21 @@ public class SearchPageService {
 
         //음식 종류 DTO 에 맞게 변환 후 리스트로 만들기
         List<SearchPageResponseDto.FoodCategoryResponseDto> foodCategoryList = foodCategories.stream()
-                .map(searchPageConverter::toFoodCategoryResponseDto)
+                .map(SearchPageConverter::toFoodCategoryResponseDto)
                 .toList();
 
         //음식 특징 DTO 에 맞게 변환 후 리스트로 만들기
         List<SearchPageResponseDto.FoodFeatureResponseDto> foodFeatureList = foodFeatures.stream()
-                .map(searchPageConverter::toFoodFeatureResponseDto)
+                .map(SearchPageConverter::toFoodFeatureResponseDto)
                 .toList();
 
         //최근 검색 DTO 에 맞게 변환 후 리스트로 만들기
         List<SearchPageResponseDto.RecentSearchResponseDto> recentSearchList = recentSearches.stream()
-                .map(searchPageConverter::toRecentSearchResponseDto)
+                .map(SearchPageConverter::toRecentSearchResponseDto)
                 .collect(Collectors.toList());
 
 
-        return SearchPageResponseDto.AllSearchPageResponseDto.builder()
+        return SearchPageResponseDto.builder()
                 .foodCategoryList(foodCategoryList)
                 .foodFeatureList(foodFeatureList)
                 .recentSearchList(recentSearchList)

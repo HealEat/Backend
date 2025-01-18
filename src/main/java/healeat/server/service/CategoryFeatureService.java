@@ -22,7 +22,6 @@ public class CategoryFeatureService {
 
     private final FoodCategoryRepository foodCategoryRepository;
     private final FoodFeatureRepository foodFeatureRepository;
-    private final SearchPageConverter searchPageConverter;
 
     public List<FoodCategory> getAllFoodCategories() {
         return foodCategoryRepository.findAll();
@@ -45,29 +44,15 @@ public class CategoryFeatureService {
 
     public SearchPageResponseDto.FoodCategoryListResponseDto getAllFoodCategoryPage() {
 
-        List<FoodCategory> foodCategories = getAllFoodCategories();
+        List<FoodCategory> foodCategories = foodCategoryRepository.findAll();
 
-        //음식 종류 DTO 에 맞게 변환 후 리스트로 만들기
-        List<SearchPageResponseDto.FoodCategoryResponseDto> foodCategoryList = foodCategories.stream()
-                .map(searchPageConverter::toFoodCategoryResponseDto)
-                .toList();
-
-        return SearchPageResponseDto.FoodCategoryListResponseDto.builder()
-                .FoodCategoryList(foodCategoryList)
-                .build();
+        return SearchPageConverter.toFoodCategoryListResponseDto(foodCategories);
     }
 
     public SearchPageResponseDto.FoodFeatureListResponseDto getAllFoodFeaturePage() {
 
-        List<FoodFeature> foodFeatures = getAllFoodFeatures();
+        List<FoodFeature> foodFeatures = foodFeatureRepository.findAll();
 
-        //음식 종류 DTO 에 맞게 변환 후 리스트로 만들기
-        List<SearchPageResponseDto.FoodFeatureResponseDto> foodFeatureList = foodFeatures.stream()
-                .map(searchPageConverter::toFoodFeatureResponseDto)
-                .toList();
-
-       return SearchPageResponseDto.FoodFeatureListResponseDto.builder()
-                .FoodFeatureList(foodFeatureList)
-                .build();
+        return SearchPageConverter.toFoodFeatureListResponseDto(foodFeatures);
     }
 }
