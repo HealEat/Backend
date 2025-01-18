@@ -8,6 +8,7 @@ import java.util.List;
 public class StoreRequestDto {
 
     @Getter
+    @Builder
     public static class SearchKeywordDto {
 
         String query; // 검색어
