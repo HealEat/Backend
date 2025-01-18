@@ -99,7 +99,7 @@ public class SearchPageController {
     }
 
     @Operation(summary = "최근 검색 기록 삭제", description = "최근 검색 기록을 삭제합니다.")
-    @DeleteMapping("/recent{/recentId}")
+    @DeleteMapping("/recent/{recentId}")
     public ApiResponse<SearchPageResponseDto.toDeleteResultDto> deleteRecentSearch(@PathVariable Long recentId) {
 
         RecentSearch deleteRecentSearch = recentSearchService.getRecentSearchById(recentId);
