@@ -99,7 +99,8 @@ public class StoreQueryServiceImpl {
 
             String selectedRegion = kakaoList.getMeta().getSame_name().getSelected_region(); // 지역명
 
-            String keyword = kakaoList.getMeta().getSame_name().getKeyword()   // 지역명 뺀 나머지 질의어
+            String keyword = kakaoList.getMeta().getSame_name().getKeyword()
+                    .replaceAll(" " + "식당", "")// 지역명 뺀 나머지 질의어
                     .replaceAll("\\s+", ""); // 공백 제거
 
             Optional<FoodFeature> sameNameFeature = foodFeatureRepository.findByName(keyword);
