@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface FeatCategoryMapRepository extends JpaRepository<FeatCategoryMap, Long> {
     List<FeatCategoryMap> findAllByFoodFeature(FoodFeature foodFeature);
+
+    List<FeatCategoryMap> findAllByFoodFeature_Id(Long foodFeatureId);
 }
