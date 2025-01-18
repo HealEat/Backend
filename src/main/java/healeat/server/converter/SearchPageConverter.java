@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @Component
 public class SearchPageConverter {
 
-
     public SearchPageResponseDto.toDeleteResultDto toDeleteResultDto(RecentSearch recentSearch) {
         return SearchPageResponseDto.toDeleteResultDto.builder()
                 .memberId(recentSearch.getMember().getId())
