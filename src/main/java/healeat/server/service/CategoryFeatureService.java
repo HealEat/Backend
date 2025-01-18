@@ -41,18 +41,4 @@ public class CategoryFeatureService {
         return foodFeatureRepository.findById(id).orElseThrow(() ->
                 new FoodFeatureHandler(ErrorStatus.FOOD_FEATURE_NOT_FOUND));
     }
-
-    public SearchPageResponseDto.FoodCategoryListResponseDto getAllFoodCategoryPage() {
-
-        List<FoodCategory> foodCategories = foodCategoryRepository.findAll();
-
-        return SearchPageConverter.toFoodCategoryListResponseDto(foodCategories);
-    }
-
-    public SearchPageResponseDto.FoodFeatureListResponseDto getAllFoodFeaturePage() {
-
-        List<FoodFeature> foodFeatures = foodFeatureRepository.findAll();
-
-        return SearchPageConverter.toFoodFeatureListResponseDto(foodFeatures);
-    }
 }

@@ -1,6 +1,7 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.converter.SearchPageConverter;
 import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Store;
 import healeat.server.service.CategoryFeatureService;
@@ -60,7 +61,7 @@ public class SearchController {
 //        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(docPage))
 //  }
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
-    @GetMapping("/searchPage")
+    @GetMapping("/recent")
     public ApiResponse<SearchPageResponseDto> getAllRecentSearches() {
 
         SearchPageResponseDto response = searchPageService.getAllSearchPage();
@@ -69,19 +70,21 @@ public class SearchController {
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")
-    @GetMapping("/foodCategory")
+    @GetMapping("/categories")
     public ApiResponse<SearchPageResponseDto.FoodCategoryListResponseDto> getFoodCategoryLists(){
 
-        SearchPageResponseDto.FoodCategoryListResponseDto response = categoryFeatureService.getAllFoodCategoryPage();
+        SearchPageResponseDto.FoodCategoryListResponseDto response = SearchPageConverter
+                .toFoodCategoryListResponseDto(categoryFeatureService.getAllFoodCategories());
 
         return ApiResponse.onSuccess(response);
     }
 
     @Operation(summary = "음식 특징 조회", description = "음식 특징을 전체 조회합니다.")
-    @GetMapping("/foodFeature")
+    @GetMapping("/features")
     public ApiResponse<SearchPageResponseDto.FoodFeatureListResponseDto> getFoodFeatureLists(){
 
-        SearchPageResponseDto.FoodFeatureListResponseDto response = categoryFeatureService.getAllFoodFeaturePage();
+        SearchPageResponseDto.FoodFeatureListResponseDto response = SearchPageConverter
+                .toFoodFeatureListResponseDto(categoryFeatureService.getAllFoodFeatures());
 
         return ApiResponse.onSuccess(response);
     }
