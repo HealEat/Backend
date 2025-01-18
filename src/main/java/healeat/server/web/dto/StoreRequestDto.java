@@ -9,9 +9,7 @@ public class StoreRequestDto {
 
     @Getter
     @Builder
-    public static class SearchFilterDto {
-
-        Integer page/* = 1*/; // 기본값은 1페이지
+    public static class SearchKeywordDto {
 
         String query; // 검색어
 
@@ -22,6 +20,5 @@ public class StoreRequestDto {
 
         List<Long> featureIdList;
 
-        Float minRating;
     }
 }
