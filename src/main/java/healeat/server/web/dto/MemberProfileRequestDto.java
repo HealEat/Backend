@@ -7,5 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberProfileRequestDto {
 
     private String name;
-    private MultipartFile profileImage;
+    private String profileImageUrl;
 }

@@ -6,6 +6,7 @@ import healeat.server.web.dto.MemberProfileRequestDto;
 import healeat.server.web.dto.MemberProfileResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,15 +37,16 @@ public class MemberController {
 
     @Operation(summary = "프로필 이미지 설정 API")
     @PostMapping("/profile_image")
-    public ApiResponse<String> setProfileImage(@RequestParam("profile_image") MultipartFile profileImage) {
-        return ApiResponse.onSuccess(memberService.setProfileImage(profileImage));
+    public ApiResponse<Void> setProfileImage(@RequestParam("profileImageUrl") String profileImageUrl) {
+        memberService.setProfileImage(profileImageUrl);
+        return ApiResponse.onSuccess(null);
     }
 
     @Operation(summary = "프로필 이미지 삭제 API")
     @DeleteMapping("/profile_image")
-    public ApiResponse<String> deleteProfileImage() {
+    public ApiResponse<Void> deleteProfileImage() {
         memberService.deleteProfileImage();
-        return ApiResponse.onSuccess("프로필 이미지를 삭제하였습니다.");
+        return ApiResponse.onSuccess(null);
     }
 
     @Operation(summary = "닉네임 중복 확인 API")
