@@ -15,20 +15,19 @@ public interface StoreApiClient {
      * 카카오 맵 API
      */
     @GetMapping("/v2/local/search/category.json")
-    KakaoPlaceResponseDto getStoresSimply(   // 홈 화면 추천 알고리즘에 사용
-                                                /* 쿼리가 없다 */
+    KakaoPlaceResponseDto getKakaoByLocation(   /* 쿼리가 없다 */
                                              @RequestParam String x,
                                              @RequestParam String y,
                                              @RequestParam(defaultValue = "1") Integer page,
                                              @RequestParam(defaultValue = "distance") String sort);
 
     @GetMapping("/v2/local/search/keyword.json")
-    KakaoPlaceResponseDto getStoresByQuery(  // 일반 검색(필터링)에 사용
-                                             @RequestParam String query, // 쿼리 존재
-                                             @RequestParam String x,
-                                             @RequestParam String y,
-                                             @RequestParam(defaultValue = "1") Integer page,
-                                             @RequestParam(defaultValue = "accuracy") String sort);
+    KakaoPlaceResponseDto getKakaoByQuery(  // 일반 검색(필터링)에 사용
+                                            @RequestParam String query, // 쿼리 존재
+                                            @RequestParam String x,
+                                            @RequestParam String y,
+                                            @RequestParam(defaultValue = "1") Integer page,
+                                            @RequestParam(defaultValue = "accuracy") String sort);
 
     /**
      * Daum 이미지 검색 API
@@ -37,7 +36,7 @@ public interface StoreApiClient {
      *  "OO동(리)(...) "(마지막 띄워쓰기 앞. -알고리즘)을 붙임.
      */
     @GetMapping("/v2/search/image")
-    DaumImageResponseDto getImagesByQuery(@RequestParam String query,
-                                          @RequestParam(defaultValue = "1") Integer page,
-                                          @RequestParam(defaultValue = "10") Integer size);
+    DaumImageResponseDto getDaumByQuery(@RequestParam String query,
+                                        @RequestParam(defaultValue = "1") Integer page,
+                                        @RequestParam(defaultValue = "10") Integer size);
 }
