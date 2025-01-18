@@ -2,9 +2,11 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.RecentSearchHandler;
+import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.repository.RecentSearchRepository;
 import healeat.server.web.dto.SearchPageRequestDto;
+import healeat.server.web.dto.SearchPageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.List;
 public class RecentSearchService {
 
     private final RecentSearchRepository recentSearchRepository;
+    private final SearchPageConverter searchPageConverter;
 
     public List<RecentSearch> getAllRecentSearches() {
         List<RecentSearch> recentSearches = recentSearchRepository.findAll();
@@ -51,6 +54,12 @@ public class RecentSearchService {
     @Transactional
     public void deleteRecentSearch(Long id) {recentSearchRepository.deleteById(id); }
 
+    public SearchPageResponseDto.toDeleteResultDto toDeleteRecentSearch(Long recentId) {
+        RecentSearch deleteRecentSearch = getRecentSearchById(recentId);
+        SearchPageResponseDto.toDeleteResultDto response = searchPageConverter.toDeleteResultDto(deleteRecentSearch);
 
+        deleteRecentSearch(recentId);
 
+        return response;
+    }
 }
