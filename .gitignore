@@ -39,3 +39,4 @@ out/
 
 ### application.yml ###
 src/main/resources/application.yml
+src/test/resources/application.yml
