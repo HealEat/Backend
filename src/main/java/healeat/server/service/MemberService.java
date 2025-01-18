@@ -33,7 +33,7 @@ public class MemberService {
     @Transactional
     public MemberProfileResponseDto createProfile(MemberProfileRequestDto request) {
         Member member = getAuthenticatedMember();
-        member.updateProfile(request.getName(), uploadImageToStorage(request.getProfileImage()));
+        member.updateProfile(request.getName(), request.getProfileImageUrl());
         memberRepository.save(member);
         return MemberProfileResponseDto.from(member);
     }
@@ -42,20 +42,17 @@ public class MemberService {
     @Transactional
     public MemberProfileResponseDto updateProfile(MemberProfileRequestDto request) {
         Member member = getAuthenticatedMember();
-        String profileImageUrl = request.getProfileImage() != null ? uploadImageToStorage(request.getProfileImage()) : member.getProfileImageUrl();
-        member.updateProfile(request.getName(), profileImageUrl);
+        member.updateProfile(request.getName(), request.getProfileImageUrl());
         memberRepository.save(member);
         return MemberProfileResponseDto.from(member);
     }
 
     // 프로필 이미지 설정 API
     @Transactional
-    public String setProfileImage(MultipartFile profileImage) {
+    public void setProfileImage(String profileImageUrl) {
         Member member = getAuthenticatedMember();
-        String uploadedUrl = uploadImageToStorage(profileImage);
-        member.updateProfileImageUrl(uploadedUrl);
+        member.updateProfileImageUrl(profileImageUrl);
         memberRepository.save(member);
-        return uploadedUrl;
     }
 
     // 프로필 이미지 삭제 API
@@ -79,13 +76,6 @@ public class MemberService {
         //
         return memberRepository.findById(1L)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-    }
-
-    private String uploadImageToStorage(MultipartFile file) {
-        //
-        // 파일 업로드 로직 필요
-        //
-        return null;
     }
 
 
