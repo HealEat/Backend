@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 //@SpringBootTest
+//@Transactional(readOnly = true)
 //public class FeatCategoryMapTest {
 //
 //    @Autowired
@@ -23,15 +24,14 @@ import java.util.List;
 //    private FoodFeatureRepository foodFeatureRepository;
 //
 //    @Test
-//    @Transactional(readOnly = true)
 //    public void 음식종류_출력() throws Exception {
 //
 //        List<FoodFeature> foodFeatures = foodFeatureRepository.findAll();
 //
 //        for (FoodFeature foodFeature : foodFeatures) {
-//            System.out.println(foodFeature.getName());
 //            List<FeatCategoryMap> featCategoryMapList = featCategoryMapRepository.findAllByFoodFeature(foodFeature);
 //            List<String> foodCategoryNames = featCategoryMapList.stream().map(FeatCategoryMap::getFoodCategory).map(FoodCategory::getName).toList();
+//            System.out.println(foodFeature.getName());
 //            for (String foodCategoryName : foodCategoryNames) {
 //                System.out.println(foodCategoryName);
 //            }
