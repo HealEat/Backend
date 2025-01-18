@@ -20,7 +20,6 @@ import java.util.List;
 public class RecentSearchService {
 
     private final RecentSearchRepository recentSearchRepository;
-    private final SearchPageConverter searchPageConverter;
 
     public List<RecentSearch> getAllRecentSearches() {
         List<RecentSearch> recentSearches = recentSearchRepository.findAll();
@@ -37,18 +36,18 @@ public class RecentSearchService {
                 new RecentSearchHandler(ErrorStatus.RECENT_SEARCH_NOT_FOUND));
     }
 
-    //최근 검색 생성
-    @Transactional
-    public RecentSearch createRecentSearch(SearchPageRequestDto.SearchPageCreateRequestDto request) {
-
-        RecentSearch recentSearch = RecentSearch.builder()
-                .searchType(request.getSearchType())
-                .store(request.getStore_id())
-                .query(request.getQuery())
-                .build();
-
-        return recentSearchRepository.save(recentSearch);
-    }
+//    //최근 검색 생성
+//    @Transactional
+//    public RecentSearch createRecentSearch(SearchPageRequestDto.SearchPageCreateRequestDto request) {
+//
+//        RecentSearch recentSearch = RecentSearch.builder()
+//                .searchType(request.getSearchType())
+//                .store(request.getStore_id())
+//                .query(request.getQuery())
+//                .build();
+//
+//        return recentSearchRepository.save(recentSearch);
+//    }
 
     //최근 검색 기록 삭제
     @Transactional
@@ -56,7 +55,7 @@ public class RecentSearchService {
 
     public SearchPageResponseDto.toDeleteResultDto toDeleteRecentSearch(Long recentId) {
         RecentSearch deleteRecentSearch = getRecentSearchById(recentId);
-        SearchPageResponseDto.toDeleteResultDto response = searchPageConverter.toDeleteResultDto(deleteRecentSearch);
+        SearchPageResponseDto.toDeleteResultDto response = SearchPageConverter.toDeleteResultDto(deleteRecentSearch);
 
         deleteRecentSearch(recentId);
 
