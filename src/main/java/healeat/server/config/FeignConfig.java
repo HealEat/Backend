@@ -15,7 +15,6 @@ public class FeignConfig {
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
             requestTemplate.header("Authorization", apiKey);
-            requestTemplate.query("category_group_code", "FD6");
         };
     }
 }

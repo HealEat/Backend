@@ -2,6 +2,7 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.FoodCategoryHandler;
+import healeat.server.apiPayload.exception.handler.FoodFeatureHandler;
 import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.domain.FoodFeature;
@@ -9,24 +10,31 @@ import healeat.server.domain.Store;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.enums.Vegetarian;
+import healeat.server.domain.mapping.FeatCategoryMap;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.*;
 import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.KakaoPlaceResponseDto.Document;
+import healeat.server.web.dto.KakaoXYResponseDto;
 import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
-import javax.print.Doc;
 import java.util.*;
+
+import static healeat.server.web.dto.StoreResonseDto.*;
+import static healeat.server.web.dto.StoreResonseDto.StorePreviewDto;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Validated
 public class StoreQueryServiceImpl {
 
     private final StoreRepository storeRepository;
@@ -45,140 +53,226 @@ public class StoreQueryServiceImpl {
     /**
      * 핵심 로직 이후
      * 정렬 및 페이징 적용
-     *  -> 이후 컨트롤러에 위임
+     * -> 이후 컨트롤러에 위임
      */
-    public Page<Document> getSortedDocuments(Integer page, StoreRequestDto.SearchKeywordDto request, Float minRating) {
+    // 리뷰가 존재 -> DB와 매핑된 데이터 먼저 표시
+    // distance가 존재 -> distance로 정렬
+    public Pair<Page<StorePreviewDto>, SearchInfo> getSortedDocuments(
+            Integer page,
+            StoreRequestDto.SearchKeywordDto request,
+            Float minRating) {
 
-        List<Document> documents = getDocumentsByKeywords(request);
+        Pair<List<Document>, SearchInfo> docInfoPair = getDocumentsByKeywords(request);
+        List<Document> documents = docInfoPair.getFirst();
+        SearchInfo searchInfo = docInfoPair.getSecond();
+
+        // api 호출 횟수 기록 후 초기화
+        searchInfo.setApiCallCount(getApiCallCount());
+        apiCallCount = 0;
+
         int adjustedPage = Math.max(0, page - 1); // 페이징에 쓸 adjustedPage
 
-        return null;
+        /**
+         * 북마크 구현 필요 <- 멤버 (스프링 시큐리티 Authorization?)
+         */
+        List<StorePreviewDto> storePreviewDtoList = documents.stream()
+                .map(document -> {
+
+                    List<String> features;
+                    List<FeatCategoryMap> featCategoryMapList = featCategoryMapRepository.findByFoodCategory_Name(document.getCategory_name());
+                    if (featCategoryMapList.isEmpty()) { // DB에 등록이 되지 않은 음식 카테고리면
+                        features = new ArrayList<>();
+                    } else {
+                        features = featCategoryMapList.stream()
+                                .map(fc -> fc.getFoodFeature().getName()).toList();
+                    }
+
+                    StorePreviewDto.StorePreviewDtoBuilder builder = StorePreviewDto.builder()
+                            .id(Long.parseLong(document.getId()))
+                            .place_name(document.getPlace_name())
+                            .category_name(document.getCategory_name())
+                            .phone(document.getPlace_url())
+                            .address_name(document.getAddress_name())
+                            .road_address_name(document.getRoad_address_name())
+                            .x(document.getX())
+                            .y(document.getY())
+                            .place_url(document.getPlace_url())
+                            .distance(document.getDistance())
+                            .features(features)
+                            .reviewCount(0)
+                            .totalScore(0.0f)
+                            .sickScore(0.0f)
+                            .vegetScore(0.0f)
+                            .dietScore(0.0f)
+                            .isBookMarked(false);
+
+                    Optional<Store> storeOptional = storeRepository.findById(Long.parseLong(document.getId()));
+
+                    // 여기부터 healeat Store 데이터
+                    storeOptional.ifPresent(store -> {
+                        builder.reviewCount(store.getReviewCount())
+                                .totalScore(store.getTotalScore())
+                                .sickScore(store.getSickScore())
+                                .vegetScore(store.getVegetScore())
+                                .dietScore(store.getDietScore())
+                                .isBookMarked(false);
+                    });
+
+                    return builder.build();
+                })
+                .toList();
+
+
+        List<StorePreviewDto> serverFirstList = new ArrayList<>(storePreviewDtoList.stream()
+                .filter(s -> s.getReviewCount() > 0 && s.getTotalScore() >= minRating)
+                .toList());
+
+        List<StorePreviewDto> remainList = storePreviewDtoList.stream()
+                .filter(s -> s.getReviewCount() == 0).toList();
+
+        serverFirstList.addAll(remainList); // 정렬 I. 리뷰가 존재하는 가게들 우선
+
+        Comparator<StorePreviewDto> comparator = Comparator
+                .comparing(StorePreviewDto::getDistance) // 정렬 II. 가까운 순
+                .thenComparing(StorePreviewDto::getTotalScore, Comparator.reverseOrder()); // (정렬 III. 전체 평점 높은 순)
+
+        // 동적 쿼리(QueryDSL)에 대해 생각할 필요 O
+        // (기본= 전체 평점), 드롭다운 : 질병 관리 평점, 베지테리언 평점, 다이어터 평점
+        Page<StorePreviewDto> storePreviewDtoPage =
+                CustomPagination.toPage(serverFirstList, adjustedPage, 10, comparator);
+
+        return Pair.of(storePreviewDtoPage, searchInfo);
     }
 
     /**
      * API 호출 핵심 로직
+     *
      * @param request
-     * @return 쿼리 또는 키워드 필터로 선택한
-     * 카카오 가게 리스트
+     * @return 쿼리 또는 키워드 필터로 선택한,
+     * 카카오 가게 리스트와
+     * 검색 정보 쌍 (Pair)
      */
-    public List<Document> getDocumentsByKeywords(StoreRequestDto.SearchKeywordDto request) {
+    public Pair<List<Document>, SearchInfo> getDocumentsByKeywords(StoreRequestDto.SearchKeywordDto request) {
 
-        apiCallCount = 0;
         String query = request.getQuery();
 
-        // 필터 Set
         Set<Long> categoryIdSet = getCategoryIdListByKeywordIds(
                 request.getFeatureIdList(), request.getCategoryIdList());
 
-        if (query == null || query.isBlank()) { // 질의어 없음
+        int fromPage = 1;
+        if (query == null || query.isBlank()) { // 질의어가 빈칸이거나 없음 : "", " "
 
-            return getDocsOnLoopByLocation(request, categoryIdSet, 1);
+            SearchInfo searchInfo = SearchInfo.builder()
+                    .baseX(request.getX())
+                    .baseY(request.getY())
+                    .query(query)
+                    .otherRegions(List.of(""))
+                    .selectedRegion("")
+                    .build();
+
+            List<Document> documents = getDocsOnLoopByLocation(request, categoryIdSet, fromPage);// 거리 정렬 완료
+            return Pair.of(documents, searchInfo);
         }
-        int currentPage = 1;
-        List<Document> finalFilteredList = new ArrayList<>();
-        if (containsFeature(query)) { // 질의어가 음식 특징을 포함함 ex) "홍대 소화가잘 되는 음식", "왕십리 야채빵"
-            /*
-            case I. 회생 케이스는 단 하나
-            "홍대 소화가 잘되는 음식" 와 같은 놈 -> [지역명 + " 식당"]으로 검색, '소화가 잘되는 음식' 필터 추가
 
-            case II. 특수 케이스 브레인스토밍:
-            "홍대 왕십리 날음식" -> 지역과 "왕십리 날음식" 그대로 API
-            "홍대 야채호빵" -> 지역과 "야채호빵" 그대로 API
-            "야채호빵" -> 그대로
-            "문지방" -> 그대로
-            "라면요리" -> 그대로
+        KakaoPlaceResponseDto kakaoList = storeApiClient
+                .getKakaoByQuery(query + " " + "식당", // 지역명만 검색하는 경우를 위해 [" " + "식당"] 추가
+                        request.getX(), request.getY(), fromPage++, "accuracy", "FD6"); // 지역 검사용 첫 페이지
+        apiCallCount++;
 
-            결론 :
-            if (지역 떼면, 특징 키워드 그 자체일 때) : 특징 필터 추가, 질의어는 [지역명 + " 식당"]
-            else : [originalQuery] 그대로 API
-            */
-            KakaoPlaceResponseDto kakaoList = storeApiClient
-                    .getKakaoByQuery(query + " " + "식당", // 지역명만 검색하는 경우를 위해 [" " + "식당"] 추가
-                            request.getX(), request.getY(), 1, "accuracy"); // 지역 검사용 첫 페이지
-            apiCallCount++;
+        String selectedAddress = kakaoList.getMeta().getSame_name().getSelected_region(); // 지역명
 
-            String selectedRegion = kakaoList.getMeta().getSame_name().getSelected_region(); // 지역명
+        String keyword = kakaoList.getMeta().getSame_name().getKeyword()
+                .replaceAll(" " + "식당", ""); // 지역명 뺀 나머지 질의어가 keyword
 
-            String keyword = kakaoList.getMeta().getSame_name().getKeyword()
-                    .replaceAll(" " + "식당", "")// 지역명 뺀 나머지 질의어
-                    .replaceAll("\\s+", ""); // 공백 제거
+        boolean queryContainsFeature = false;
+        String noWhiteKeyword = keyword.replaceAll("\\s+", ""); // keyword에서 공백 제거하고,
+        Optional<FoodFeature> foodFeatureOptional = foodFeatureRepository.findByName(noWhiteKeyword); // 음식 특징인지 체크
 
-            Optional<FoodFeature> sameNameFeature = foodFeatureRepository.findByName(keyword);
-            if (sameNameFeature.isPresent()) { // 포함하는 걸 넘어서 정확히 일치한다면
+        if (foodFeatureOptional.isPresent()) {
+            // 맞다면 필터에 추가하고 keyword는 지역명(빈칸일 수)을 따름
+            categoryIdSet.addAll(getCategoryIdList(foodFeatureOptional.get()));
+            keyword = selectedAddress;
+            fromPage = 1;
+            queryContainsFeature = true; // -> fromPage 절대 2로 안되게함
+        }
 
-                FoodFeature foodFeature = sameNameFeature.get();
-                List<Long> categoryIdList = featCategoryMapRepository.findAllByFoodFeature(foodFeature).stream()
-                        .map(f_c -> f_c.getFoodCategory().getId())
-                        .toList();
-                categoryIdSet.addAll(categoryIdList); // 해당 특징을 필터 Set에 추가
+        if (selectedAddress == null || selectedAddress.isBlank()) {
 
-                if (selectedRegion == null) { // 질의어에 지역이 없음. ex) "소화가 잘되는 음식"이었던 것-> 쿼리 없이 검색
+            List<FoodFeature> featuresInQuery = foodFeatureRepository.findByQueryContainingFeature(noWhiteKeyword);
+            if (kakaoList.getMeta().getIs_end() && !featuresInQuery.isEmpty()) {
 
-                    return getDocsOnLoopByLocation(request, categoryIdSet, 1);
+                fromPage = 1;
+                FoodFeature foodFeature = featuresInQuery.stream().findFirst().get();
+                categoryIdSet.addAll(getCategoryIdList(foodFeature)); // 필터에 추가
 
-                } else { // 질의어에 지역이 있음.
-                    // [지역명 + " " + "식당"] 으로 검색
-                    return getDocsOnLoopByQuery(request, categoryIdSet, 1, selectedRegion + " " + "식당");
-                }
+                String feature = foodFeature.getName();
+
+                String lastQuery = noWhiteKeyword.replace(feature, "");
+
+                SearchInfo baseInfo = SearchInfo.builder()
+                        .baseX(request.getX())
+                        .baseY(request.getY())
+                        .query(query)
+                        .otherRegions(List.of(""))
+                        .selectedRegion("")
+                        .build();
+
+                // 반복문, 지역이 발견되지 않으면 첫트에 중단
+                return getDocsOnLoopByQueryThatMustBeRegion(
+                        request.getX(), request.getY(), categoryIdSet, fromPage, lastQuery + " " + "식당",
+                        baseInfo);
             }
 
-            // 그 외에는 지역 검사용에 썼던 쿼리와 동일하므로
-            finalFilteredList.addAll(
-                    filterAndGetDocuments(kakaoList, categoryIdSet)); // 지역 검사용 결과도 활용
-            if (kakaoList.getMeta().getIs_end()) return finalFilteredList;
-            else currentPage = 2;
-        }
-        // 질의어 그대로 검색
-        // 지역명 뺀 나머지 질의어가 음식 특징을 포함하지만, 정확히 일치한 것은 아닌 경우도 포함 (예 : 왕십리 야채빵)
-        finalFilteredList.addAll(
-                getDocsOnLoopByQuery(request, categoryIdSet, currentPage, query));
-        return finalFilteredList;
-    }
+            query = queryContainsFeature ? keyword : query;
 
-    public KakaoPlaceResponseDto getKakaoByLocation(StoreRequestDto.SearchKeywordDto request, Integer page) {
-        apiCallCount++;
-        return storeApiClient.getKakaoByLocation(request.getX(), request.getY(), page, "distance");
-    }
+            SearchInfo searchInfo = SearchInfo.builder()
+                    .baseX(request.getX())
+                    .baseY(request.getY())
+                    .query(query)
+                    .otherRegions(List.of(""))
+                    .selectedRegion("")
+                    .build();
+            // 반복문에는 + " " + "식당" 포함 , fromPage ? : 로직 포함
+            List<Document> documents = getDocsOnLoopByQuery(
+                    request.getX(), request.getY(), categoryIdSet, fromPage, query + " " + "식당");
+            return Pair.of(documents, searchInfo);
+        } else {
+            query = queryContainsFeature ? keyword : query;
 
-    private List<Document> getDocsOnLoopByLocation(StoreRequestDto.SearchKeywordDto request, Set<Long> categoryIdSet, Integer page) {
-        List<Document> filteredList = new ArrayList<>();
-        int pageIter = page;
-        while (pageIter <= 3) {
+            KakaoXYResponseDto selectedXY = storeApiClient.addressToXY(selectedAddress, 1, 1);
+            String x; String y;
+            if (selectedXY.getDocuments().isEmpty()) {
+                Document hotPlace = storeApiClient.getHotPlaceByQuery(selectedAddress, request.getX(), request.getY(), 1, "accuracy")
+                        .getDocuments().stream().findFirst().get(); // 명소를 찾는다. (음식점 한정 X)
+                x = hotPlace.getX();
+                y = hotPlace.getY();
 
-            KakaoPlaceResponseDto kakaoList = getKakaoByLocation(request, pageIter++);
+            } else {
+                x = selectedXY.getDocuments().stream().findFirst().get().getX();
+                y = selectedXY.getDocuments().stream().findFirst().get().getY();
+            }
             apiCallCount++;
 
-            filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
-            if (kakaoList.getMeta().getIs_end())
-                break;
+            SearchInfo searchInfo = SearchInfo.builder()
+                    .baseX(x)
+                    .baseY(y)
+                    .query(query)
+                    .otherRegions(kakaoList.getMeta().getSame_name().getRegion())
+                    .selectedRegion(selectedAddress)
+                    .build();
+            // 반복문에는 + " " + "식당" 포함 , fromPage ? : 로직 포함
+            List<Document> documents = getDocsOnLoopByQuery(
+                    x, y, categoryIdSet, fromPage, query + " " + "식당");
+            return Pair.of(documents, searchInfo);
         }
-        return filteredList;
-    }
-
-    private List<Document> getDocsOnLoopByQuery(StoreRequestDto.SearchKeywordDto request, Set<Long> categoryIdSet, Integer page, String query) {
-        List<Document> filteredList = new ArrayList<>();
-        int pageIter = page;
-        while (pageIter <= 3) {
-            KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByQuery(
-                    query,
-                    request.getX(),
-                    request.getY(),
-                    pageIter++,
-                    "accuracy");
-            apiCallCount++;
-
-            filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
-            if (kakaoList.getMeta().getIs_end())
-                break;
-        }
-        return filteredList;
     }
 
     private Set<Long> getCategoryIdListByKeywordIds(List<Long> featureIdList, List<Long> categoryIdList) {
 
         // 계산용 카테고리 ID Set
         Set<Long> categoryIdSet = new HashSet<>();
-        if (categoryIdList != null && !categoryIdList.isEmpty()) {
+
+        if (categoryIdList != null && !categoryIdList.isEmpty()) { // 선택한 음식 종류 필터가 존재할 때
             categoryIdSet.addAll(categoryIdList.stream()
                     .map(foodCategoryRepository::findById)
                     .map(op_c -> op_c.orElseThrow(
@@ -190,24 +284,28 @@ public class StoreQueryServiceImpl {
         if (featureIdList != null && !featureIdList.isEmpty()) { // 선택한 음식 특징 필터가 존재할 때
 
             featureIdList.stream()
-                    .map(featCategoryMapRepository::findAllByFoodFeature_Id)
-                    .map(featCategoryMaps -> featCategoryMaps.stream()
-                            .map(f_c -> f_c.getFoodCategory().getId())
-                            .toList())
+                    .map(id -> getCategoryIdList(
+                            foodFeatureRepository.findById(id).orElseThrow(() ->
+                            new FoodFeatureHandler(ErrorStatus.FOOD_FEATURE_NOT_FOUND))
+                            )
+                    )
                     .forEach(categoryIdSet::addAll);
         }
 
         return categoryIdSet;
     }
 
-    private Boolean containsFeature(String query) {
-        return !foodFeatureRepository.findByQueryContainingFeature(query).isEmpty();
+    private List<Long> getCategoryIdList(FoodFeature foodFeature) {
+
+        return featCategoryMapRepository.findAllByFoodFeature(foodFeature).stream()
+                .map(f_c -> f_c.getFoodCategory().getId())
+                .toList();
     }
 
     private List<Document> filterAndGetDocuments(KakaoPlaceResponseDto kakaoList, Set<Long> categoryIdSet) {
 
-        if (kakaoList.getMeta().getIs_end()) {
-
+        if (kakaoList.getDocuments().isEmpty()) {
+            return List.of();
         }
 
         if (categoryIdSet != null && !categoryIdSet.isEmpty()) {
@@ -222,6 +320,85 @@ public class StoreQueryServiceImpl {
         } else {
             return kakaoList.getDocuments();
         }
+    }
+
+    private List<Document> getDocsOnLoopByLocation(StoreRequestDto.SearchKeywordDto request, Set<Long> categoryIdSet, Integer fromPage) {
+        List<Document> filteredList = new ArrayList<>();
+        int pageIter = fromPage;
+        while (pageIter <= 3) {
+
+            KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByLocation(
+                    request.getX(), request.getY(), pageIter++, "distance");
+            apiCallCount++;
+
+            filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
+            if (kakaoList.getMeta().getIs_end())
+                break;
+        }
+        return filteredList;
+    }
+
+    private List<Document> getDocsOnLoopByQuery(String x, String y, Set<Long> categoryIdSet, Integer fromPage, String query) {
+        List<Document> filteredList = new ArrayList<>();
+        int pageIter = fromPage;
+        while (pageIter <= 3) {
+            KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByQuery(
+                    query, x, y, pageIter++, "accuracy", "FD6");
+            apiCallCount++;
+
+            filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
+            if (kakaoList.getMeta().getIs_end())
+                break;
+        }
+        return filteredList;
+    }
+
+    private Pair<List<Document>, SearchInfo> getDocsOnLoopByQueryThatMustBeRegion(
+            String x, String y, Set<Long> categoryIdSet, Integer fromPage, String query, SearchInfo baseInfo) {
+        List<Document> filteredList = new ArrayList<>();
+        int pageIter = fromPage;
+
+        KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByQuery(
+                query, x, y, pageIter, "accuracy", "FD6");
+        if (kakaoList.getMeta().getSame_name().getRegion().isEmpty()) {
+            return Pair.of(filteredList, baseInfo);
+        } // 지역명이 추출이 안될 경우 스톱
+
+        String selectedAddress = kakaoList.getMeta().getSame_name().getSelected_region();
+        List<String> otherRegions = kakaoList.getMeta().getSame_name().getRegion();
+        KakaoXYResponseDto selectedXY = storeApiClient.addressToXY(selectedAddress, 1, 1);
+        String newX; String newY;
+        if (selectedXY.getDocuments().isEmpty()) {
+            Document hotPlace = storeApiClient.getHotPlaceByQuery(selectedAddress, x, y, 1, "accuracy")
+                    .getDocuments().stream().findFirst().get(); // 명소를 찾는다. (음식점 한정 X)
+            newX = hotPlace.getX();
+            newY = hotPlace.getY();
+
+        } else {
+            newX = selectedXY.getDocuments().stream().findFirst().get().getX();
+            newY = selectedXY.getDocuments().stream().findFirst().get().getY();
+        }
+        apiCallCount++;
+
+        while (pageIter <= 3) {
+            kakaoList = storeApiClient.getKakaoByQuery(
+                    query, newX, newY, pageIter++, "accuracy", "FD6");
+            apiCallCount++;
+
+            filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
+            if (kakaoList.getMeta().getIs_end())
+                break;
+        }
+
+        SearchInfo searchInfo = SearchInfo.builder()
+                .baseX(newX)
+                .baseY(newY)
+                .query(query.replaceAll(" " + "식당", ""))
+                .otherRegions(otherRegions)
+                .selectedRegion(selectedAddress)
+                .build();
+
+        return Pair.of(filteredList, searchInfo);
     }
 
     public Page<Review> getReviewList(Long storeId, Integer page, SortBy sort, String sortOrder) {
