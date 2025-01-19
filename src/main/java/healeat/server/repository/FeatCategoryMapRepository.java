@@ -1,5 +1,6 @@
 package healeat.server.repository;
 
+import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.mapping.FeatCategoryMap;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,6 @@ public interface FeatCategoryMapRepository extends JpaRepository<FeatCategoryMap
     List<FeatCategoryMap> findAllByFoodFeature_Id(Long foodFeatureId);
 
     List<FeatCategoryMap> findByFoodCategory_Name(String foodCategoryName);
+
+    List<FeatCategoryMap> findByFoodCategory(FoodCategory foodCategory);
 }
