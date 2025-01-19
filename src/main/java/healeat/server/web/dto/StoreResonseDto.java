@@ -16,12 +16,40 @@ public class StoreResonseDto {
     @AllArgsConstructor
     public static class StorePreviewDtoList {
 
+
+        // 가게 목록
         List<StorePreviewDto> storeList;
+
+        // 페이징 관련
         Integer listSize;
         Integer totalPage;
         Long totalElements;
         Boolean isFirst;
         Boolean isLast;
+
+        // 검색 정보
+        SearchInfo searchInfo;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SearchInfo {
+        // 현재 위치 또는 검색 지역명 위치
+        String baseX;
+        String baseY;
+
+        String query;
+        List<String> otherRegions;
+        String selectedRegion;
+
+        // 런칭 때 지우기
+        Integer apiCallCount;
+
+        public void setApiCallCount(Integer apiCallCount) {
+            this.apiCallCount = apiCallCount;
+        }
     }
 
     @Builder

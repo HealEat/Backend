@@ -14,6 +14,8 @@ public interface FoodFeatureRepository extends JpaRepository<FoodFeature, Long> 
 
     Optional<FoodFeature> findByName(String name);
 
-    @Query("SELECT f FROM FoodFeature f WHERE REPLACE(:query, ' ', '') LIKE CONCAT('%', f.name, '%')")
+    @Query("SELECT f FROM FoodFeature f " +
+            "WHERE REPLACE(:query, ' ', '') LIKE CONCAT('%', f.name, '%') " +
+            "AND LENGTH(f.name) >= 2")
     List<FoodFeature> findByQueryContainingFeature(@Param("query") String query);
 }
