@@ -14,14 +14,42 @@ public class StoreResonseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class StorePreviewListDto {
+    public static class StorePreviewDtoList {
 
+
+        // 가게 목록
         List<StorePreviewDto> storeList;
+
+        // 페이징 관련
         Integer listSize;
         Integer totalPage;
         Long totalElements;
         Boolean isFirst;
         Boolean isLast;
+
+        // 검색 정보
+        SearchInfo searchInfo;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SearchInfo {
+        // 현재 위치 또는 검색 지역명 위치
+        String baseX;
+        String baseY;
+
+        String query;
+        List<String> otherRegions;
+        String selectedRegion;
+
+        // 런칭 때 지우기
+        Integer apiCallCount;
+
+        public void setApiCallCount(Integer apiCallCount) {
+            this.apiCallCount = apiCallCount;
+        }
     }
 
     @Builder
@@ -30,20 +58,26 @@ public class StoreResonseDto {
     @AllArgsConstructor
     public static class StorePreviewDto {
 
-        Long storeId;
-        String storeName;
-        String category; // 음식 종류
+        // 카카오 로컬 API
+        Long id;
+        String place_name;
+        String category_name;
+        String phone;
+        String address_name;
+        String road_address_name;
+        String x;
+        String y;
+        String place_url; // 카카오맵으로 열기
+        String distance;
+
+        // 힐릿 DB
         List<String> features; // 음식 특징
-
         Integer reviewCount; // 리뷰 수
-
         Float totalScore;
         Float sickScore; // 환자 점수
         Float vegetScore; // 베지테리언 점수
         Float dietScore; // 다이어터 점수
-
         Boolean isBookMarked;
-        String kakaoMapUrl; // 카카오맵으로 열기
     }
 
     @Builder
