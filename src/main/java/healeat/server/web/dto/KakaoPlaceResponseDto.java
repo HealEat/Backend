@@ -80,6 +80,9 @@ public class KakaoPlaceResponseDto {
         // 예: "중앙로 맛집" 검색 시, 사용자에게 가까운 "중앙로"가 (변환되어) 저장됨.
         String selected_region;
 
+        // 동명의 다른 지역 리스트
+        List<String> region;
+
 //        @Override
 //        public String toString() {
 //            return "\nSameName [" +
