@@ -17,11 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 class MemberHealthInfoConverterTest {
+
     @Autowired
-    private MemberHealthInfoConverter converter;
+    private MemberHealthInfoConverter memberHealthInfoConverter;
 
     @Test
-    void testToQuestionResponseDto() {
+    void testToQuestionResponseDto() throws Exception {
         MemberHealQuestion question = MemberHealQuestion.builder()
                 .id(1)
                 .question(Question.HEALTH_ISSUE)
@@ -31,7 +32,7 @@ class MemberHealthInfoConverterTest {
                 ))
                 .build();
 
-        QuestionResponseDto dto = converter.toQuestionResponseDto(question);
+        QuestionResponseDto dto = memberHealthInfoConverter.toQuestionResponseDto(question);
 
         assertEquals(1, dto.getQuestionId());
         assertEquals("HEALTH_ISSUE", dto.getQuestionText());
@@ -39,8 +40,8 @@ class MemberHealthInfoConverterTest {
     }
 
     @Test
-    void testToAnswerResponseDto() {
-        AnswerResponseDto dto = converter.toAnswerResponseDto(1L, 2, List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE));
+    void testToAnswerResponseDto() throws Exception {
+        AnswerResponseDto dto = memberHealthInfoConverter.toAnswerResponseDto(1L, 2, List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE));
 
         assertEquals(1L, dto.getMemberId());
         assertEquals(2, dto.getQuestionId());
