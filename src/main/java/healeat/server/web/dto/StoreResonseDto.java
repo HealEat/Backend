@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class StoreResonseDto {
@@ -70,6 +69,9 @@ public class StoreResonseDto {
         String place_url; // 카카오맵으로 열기
         String distance;
 
+        // 다음 이미지 API
+        List<String> imageUrlList; // 한번에 받아와서, ..캐싱..
+
         // 힐릿 DB
         List<String> features; // 음식 특징
         Integer reviewCount; // 리뷰 수
@@ -84,29 +86,22 @@ public class StoreResonseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReviewPreviewListDto {
+    public static class StoreImageListDto {
 
-        List<ReviewPreviewDto> reviewList;
-        Integer listSize;
-        Integer totalPage;
-        Long totalElements;
-        Boolean isFirst;
-        Boolean isLast;
+        // 리뷰 이미지 정보
+        List<ReviewImagePreviewDto> reviewImagePreviewDtoList;
+        // 다음 이미지 API
+        List<String> daumImageUrls;
     }
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReviewPreviewDto {
-
-        String name;
-        List<String> currentPurposes;
+    public static class ReviewImagePreviewDto {
 
         Long reviewId;
-        Float totalScore;
-        List<String> images;
-        String body;
-        LocalDateTime createdAt;
+        ReviewResponseDto.ReviewerInfo reviewerInfo;
+        String firstImageUrl;
     }
 }
