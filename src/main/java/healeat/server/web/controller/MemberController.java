@@ -1,12 +1,14 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.domain.Member;
 import healeat.server.service.MemberService;
 import healeat.server.web.dto.MemberProfileRequestDto;
 import healeat.server.web.dto.MemberProfileResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,12 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
 
     private final MemberService memberService;
-
-    @Operation(summary = "프로필 정보 조회 API")
-    @GetMapping
-    public ApiResponse<MemberProfileResponseDto> getProfileInfo() {
-        return ApiResponse.onSuccess(memberService.getProfileInfo());
-    }
 
     @Operation(summary = "프로필 설정(생성) API")
     @PostMapping
