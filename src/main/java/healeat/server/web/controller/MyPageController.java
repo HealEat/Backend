@@ -20,14 +20,15 @@ public class MyPageController {
 
     @Operation(summary = "프로필 정보 조회 API", description = "프로필 수정 화면에 사용합니다.")
     @GetMapping
-    public ApiResponse<MemberProfileResponseDto> getProfileInfo() {
-        return ApiResponse.onSuccess(memberService.getProfileInfo());
+    public ApiResponse<MemberProfileResponseDto> getProfileInfo(@AuthenticationPrincipal Member member) {
+        return ApiResponse.onSuccess(memberService.getProfileInfo(member));
     }
 
     @Operation(summary = "프로필 수정 API")
     @PatchMapping
-    public ApiResponse<MemberProfileResponseDto> updateProfile(@RequestBody MemberProfileRequestDto request) {
-        return ApiResponse.onSuccess(memberService.updateProfile(request));
+    public ApiResponse<MemberProfileResponseDto> updateProfile(
+            @AuthenticationPrincipal Member member, @RequestBody MemberProfileRequestDto request) {
+        return ApiResponse.onSuccess(memberService.updateProfile(member, request));
     }
 
     @Operation(summary = "내가 남긴 후기 목록 조회 API")
