@@ -12,10 +12,8 @@ import healeat.server.validation.annotation.CheckPage;
 import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.SearchPageResponseDto;
 import healeat.server.service.StoreQueryServiceImpl;
-import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.StoreResonseDto;
-import healeat.server.web.dto.TestResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +39,7 @@ public class SearchController {
             @RequestParam(defaultValue = "0") Float minRating) {
 
         return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(
-                storeQueryServiceImpl.getSortedDocuments(page, request, minRating)));
+                storeQueryServiceImpl.mapDocumentWithDB(page, request, minRating)));
     }
 
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
