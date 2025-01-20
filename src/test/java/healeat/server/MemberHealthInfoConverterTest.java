@@ -1,5 +1,6 @@
-package healeat.server.converter;
+package healeat.server;
 
+import healeat.server.converter.MemberHealthInfoConverter;
 import healeat.server.domain.HealthInfoAnswer;
 import healeat.server.domain.MemberHealQuestion;
 import healeat.server.domain.enums.Answer;
@@ -14,7 +15,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
 class MemberHealthInfoConverterTest {
+
+    @Autowired
+    private MemberHealthInfoConverter memberHealthInfoConverter;
 
     @Test
     void testToQuestionResponseDto() throws Exception {
@@ -27,7 +32,7 @@ class MemberHealthInfoConverterTest {
                 ))
                 .build();
 
-        QuestionResponseDto dto = MemberHealthInfoConverter.toQuestionResponseDto(question);
+        QuestionResponseDto dto = memberHealthInfoConverter.toQuestionResponseDto(question);
 
         assertEquals(1, dto.getQuestionId());
         assertEquals("HEALTH_ISSUE", dto.getQuestionText());
@@ -36,7 +41,7 @@ class MemberHealthInfoConverterTest {
 
     @Test
     void testToAnswerResponseDto() throws Exception {
-        AnswerResponseDto dto = MemberHealthInfoConverter.toAnswerResponseDto(1L, 2, List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE));
+        AnswerResponseDto dto = memberHealthInfoConverter.toAnswerResponseDto(1L, 2, List.of(Answer.LOW_FAT, Answer.HIGH_VEGETABLE));
 
         assertEquals(1L, dto.getMemberId());
         assertEquals(2, dto.getQuestionId());

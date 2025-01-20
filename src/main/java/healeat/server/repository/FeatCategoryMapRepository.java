@@ -11,9 +11,5 @@ import java.util.List;
 public interface FeatCategoryMapRepository extends JpaRepository<FeatCategoryMap, Long> {
     List<FeatCategoryMap> findAllByFoodFeature(FoodFeature foodFeature);
 
-    List<FeatCategoryMap> findAllByFoodFeature_Id(Long foodFeatureId);
-
-    List<FeatCategoryMap> findByFoodCategory_Name(String foodCategoryName);
-
     List<FeatCategoryMap> findByFoodCategory(FoodCategory foodCategory);
 }
