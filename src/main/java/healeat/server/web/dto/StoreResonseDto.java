@@ -104,4 +104,40 @@ public class StoreResonseDto {
         ReviewResponseDto.ReviewerInfo reviewerInfo;
         String firstImageUrl;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HomeStorePreviewDto {
+
+        String storeName;
+
+        Float sickScore; // 환자 평점
+        Integer sickCount; // 환자 리뷰 수
+
+        Float vegetScore; // 베지테리언 평점
+        Integer vegetCount; // 베지테리언 리뷰 수
+
+        Float dietScore; // 다이어터 평점
+        Integer dietCount; // 다이어터 리뷰 수
+
+        List<String> images;
+
+        List<HomeReviewPreviewDto> reviews; // 디자인에 나와있는 것처럼 리뷰 2개
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HomeReviewPreviewDto {
+
+        String name; // reviewer info 로 대체될 예정
+
+        Long reviewId;
+        Float totalScore;
+        String body;
+        LocalDateTime createdAt;
+    }
 }

@@ -2,6 +2,7 @@ package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.HealthPlan;
+import healeat.server.domain.Member;
 import healeat.server.service.HealthPlanService;
 import healeat.server.converter.HealthPlanConverter;
 import healeat.server.web.dto.HealthPlanResponseDto;
@@ -9,6 +10,7 @@ import healeat.server.web.dto.HealthPlanRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +30,8 @@ public class HealthPlanController {
      */
     @Operation(summary = "건강 관리 목표 조회", description = "건강 관리 목표를 전체 조회합니다.")
     @GetMapping
-    public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans() {
+    public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans(
+            @AuthenticationPrincipal Member member) {
         List<HealthPlan> healthPlans = healthPlanService.getAllHealthPlans();
         List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
                 .map(healthPlanConverter::toHealthPlanOneDto)
@@ -46,7 +49,8 @@ public class HealthPlanController {
             "(이미지와 메모는 아직 추가되지 않았음)")
     @PostMapping
     public ApiResponse<HealthPlanResponseDto.setResultDto> createHealthPlan(
-            @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request) {
+            @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request,
+            @AuthenticationPrincipal Member member) {
         HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request);
 
         return ApiResponse.onSuccess(healthPlanConverter.toSetResultDto(createdHealthPlan));
@@ -59,6 +63,7 @@ public class HealthPlanController {
             "(이미지와 메모는 아직 추가되지 않았음)")
     @PatchMapping("/{planId}")
     public ApiResponse<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlanPartial(
+            @AuthenticationPrincipal Member member,
             @PathVariable Long planId,
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest) {
         HealthPlan updatedHealthPlan = healthPlanService.updateHealthPlanPartial(planId, updateRequest);
@@ -71,7 +76,9 @@ public class HealthPlanController {
      */
     @Operation(summary = "건강 관리 목표 삭제", description = "건강 관리 목표를 삭제합니다.")
     @DeleteMapping("/{planId}")
-    public ApiResponse<HealthPlanResponseDto.deleteResultDto> deleteHealthPlan(@PathVariable Long planId) {
+    public ApiResponse<HealthPlanResponseDto.deleteResultDto> deleteHealthPlan(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long planId) {
         HealthPlan deleteHealthPlan = healthPlanService.getHealthPlanById(planId);
         HealthPlanResponseDto.deleteResultDto response = healthPlanConverter.toDeleteResultDto(deleteHealthPlan);
 

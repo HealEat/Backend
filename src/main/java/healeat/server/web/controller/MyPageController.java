@@ -44,4 +44,13 @@ public class MyPageController {
 
         return ApiResponse.onSuccess(null);
     }
+
+    @GetMapping("/health-info")
+    @Operation(summary = "마이페이지 나의 건강정보 조회 API",
+            description = "마이페이지에서 나의 건강정보를 전체 조회할 수 있습니다.")
+    public ApiResponse<MemberProfileResponseDto.MyHealthProfileDto> getMyHealthInfo(
+            @AuthenticationPrincipal Member member) {
+
+        return ApiResponse.onSuccess(null);
+    }
 }
