@@ -19,12 +19,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @Operation(summary = "프로필 정보 조회 API")
-    @GetMapping
-    public ApiResponse<MemberProfileResponseDto> getProfileInfo(@AuthenticationPrincipal Member member) {
-        return ApiResponse.onSuccess(memberService.getProfileInfo(member));
-    }
-
     @Operation(summary = "프로필 설정(생성) API")
     @PostMapping
     public ApiResponse<MemberProfileResponseDto> createProfile(
