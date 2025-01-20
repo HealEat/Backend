@@ -24,15 +24,13 @@ public class MemberService {
 
     // 프로필 정보 조회 API
     @Transactional(readOnly = true)
-    public MemberProfileResponseDto getProfileInfo() {
-        Member member = getAuthenticatedMember();
+    public MemberProfileResponseDto getProfileInfo(Member member) {
         return MemberProfileResponseDto.from(member);
     }
 
     // 프로필 설정(생성) API
     @Transactional
-    public MemberProfileResponseDto createProfile(MemberProfileRequestDto request) {
-        Member member = getAuthenticatedMember();
+    public MemberProfileResponseDto createProfile(Member member, MemberProfileRequestDto request) {
         member.updateProfile(request.getName(), request.getProfileImageUrl());
         memberRepository.save(member);
         return MemberProfileResponseDto.from(member);
@@ -40,8 +38,7 @@ public class MemberService {
 
     // 프로필 수정 API
     @Transactional
-    public MemberProfileResponseDto updateProfile(MemberProfileRequestDto request) {
-        Member member = getAuthenticatedMember();
+    public MemberProfileResponseDto updateProfile(Member member, MemberProfileRequestDto request) {
         member.updateProfile(request.getName(), request.getProfileImageUrl());
         memberRepository.save(member);
         return MemberProfileResponseDto.from(member);
@@ -49,16 +46,14 @@ public class MemberService {
 
     // 프로필 이미지 설정 API
     @Transactional
-    public void setProfileImage(String profileImageUrl) {
-        Member member = getAuthenticatedMember();
+    public void setProfileImage(Member member, String profileImageUrl) {
         member.updateProfileImageUrl(profileImageUrl);
         memberRepository.save(member);
     }
 
     // 프로필 이미지 삭제 API
     @Transactional
-    public void deleteProfileImage() {
-        Member member = getAuthenticatedMember();
+    public void deleteProfileImage(Member member) {
         member.updateProfileImageUrl(null);
         memberRepository.save(member);
     }
@@ -67,15 +62,6 @@ public class MemberService {
     public boolean checkNameAvailability(String name) {
         Optional<Member> existingMember = memberRepository.findByName(name);
         return existingMember.isEmpty();
-    }
-
-
-    private Member getAuthenticatedMember() {
-        //
-        // JWT 토큰으로 인증된 사용자 정보를 가져오는 로직 필요
-        //
-        return memberRepository.findById(1L)
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
 
