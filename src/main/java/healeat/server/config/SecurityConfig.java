@@ -65,7 +65,8 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/search/**", "/swagger-ui/**", "/v3/api-docs/**")
+                .securityMatcher("/plans/**", "/home/**", "/info/**", "/my-page/**", "/search/**", "/stores/**",
+                        "/swagger-ui/**", "/v3/api-docs/**")
                 .authorizeHttpRequests(authz -> authz
                         .anyRequest().permitAll()
                 )
