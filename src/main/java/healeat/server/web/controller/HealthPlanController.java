@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/plan")
+@RequestMapping("/plans")
 @RequiredArgsConstructor
 public class HealthPlanController {
 

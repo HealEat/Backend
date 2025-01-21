@@ -11,10 +11,10 @@ public class StoreRequestDto {
     @Getter
     public static class HealEatRequestDto {
 
-        String x; // 바라보는 맵 경도
-        String y; // 바라보는 맵 위도
+        String x; // 추천받을 위치 경도
+        String y; // 추천받을 위치 위도
 
-        Integer radius;
+        Integer radius; // 조사할 반경
     }
 
     @Getter
