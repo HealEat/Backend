@@ -13,6 +13,7 @@ import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.FeatCategoryMap;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.*;
+import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.KakaoXYResponseDto;
@@ -51,11 +52,6 @@ public class StoreQueryServiceImpl {
         return apiCallCount;
     }
 
-//    public Pair<Page<StorePreviewDto>, SearchInfo> getStoresPage(Integer page, List<StorePreviewDto> sortedDocuments) {
-//
-//
-//    }
-
     /**
      * 핵심 로직 이후
      * 정렬 및 페이징 적용
@@ -64,7 +60,7 @@ public class StoreQueryServiceImpl {
     // 리뷰가 존재 -> DB와 매핑된 데이터 먼저 표시
     // distance가 존재 -> distance로 정렬
     public Pair<Page<StorePreviewDto>, SearchInfo> mapDocumentWithDB(
-            Integer page,
+            @CheckPage Integer page,
             StoreRequestDto.SearchKeywordDto request,
             Float minRating) {
 
@@ -173,7 +169,6 @@ public class StoreQueryServiceImpl {
         Set<Long> categoryIdSet = getCategoryIdListByKeywordIds(
                 request.getFeatureIdList(), request.getCategoryIdList());
 
-        int fromPage = 1;
         if (query == null || query.isBlank()) { // 질의어가 빈칸이거나 없음 : "", " "
 
             SearchInfo searchInfo = SearchInfo.builder()
@@ -184,13 +179,14 @@ public class StoreQueryServiceImpl {
                     .selectedRegion("")
                     .build();
 
-            List<Document> documents = getDocsOnLoopByLocation(request, categoryIdSet, fromPage);// 거리 정렬 완료
+            List<Document> documents = getDocsOnLoopByLocation(
+                    request.getX(), request.getY(), categoryIdSet, 1);// 거리 정렬 완료
             return Pair.of(documents, searchInfo);
         }
 
         KakaoPlaceResponseDto kakaoList = storeApiClient
                 .getKakaoByQuery(query + " " + "식당", // 지역명만 검색하는 경우를 위해 [" " + "식당"] 추가
-                        request.getX(), request.getY(), fromPage++, "accuracy", "FD6"); // 지역 검사용 첫 페이지
+                        request.getX(), request.getY(), 1, "accuracy", "FD6"); // 지역 검사용 첫 페이지
         apiCallCount++;
 
         String selectedAddress = kakaoList.getMeta().getSame_name().getSelected_region(); // 지역명
@@ -203,11 +199,10 @@ public class StoreQueryServiceImpl {
         Optional<FoodFeature> foodFeatureOptional = foodFeatureRepository.findByName(noWhiteKeyword); // 음식 특징인지 체크
 
         if (foodFeatureOptional.isPresent()) {
-            // 맞다면 필터에 추가하고 keyword는 지역명(빈칸일 수)을 따름
+            // 맞다면 필터에 추가하고 keyword는 빈칸이 됨.
             categoryIdSet.addAll(getCategoryIdList(foodFeatureOptional.get()));
-            keyword = selectedAddress;
-            fromPage = 1;
-            queryContainsFeature = true; // -> fromPage 절대 2로 안되게함
+            keyword = "";
+            queryContainsFeature = true;
         }
 
         List<Document> finalFilteredList = new ArrayList<>(kakaoList.getDocuments());
@@ -233,11 +228,9 @@ public class StoreQueryServiceImpl {
 
                 // 반복문, 지역이 발견되지 않으면 첫트에 중단
                 return getDocsOnLoopByQueryThatMustBeRegion(
-                        request.getX(), request.getY(), categoryIdSet, lastQuery + " " + "식당",
+                        request.getX(), request.getY(), categoryIdSet, lastQuery,
                         baseInfo);
             }
-
-            query = queryContainsFeature ? keyword : query;
 
             SearchInfo searchInfo = SearchInfo.builder()
                     .baseX(request.getX())
@@ -246,16 +239,15 @@ public class StoreQueryServiceImpl {
                     .otherRegions(List.of(""))
                     .selectedRegion("")
                     .build();
-            // 반복문에는 + " " + "식당" 포함 , fromPage ? : 로직 포함
+
             List<Document> documents = getDocsOnLoopByQuery(
-                    request.getX(), request.getY(), categoryIdSet, fromPage, query + " " + "식당");
+                    request.getX(), request.getY(), categoryIdSet, 1, keyword);
             if (queryContainsFeature) return Pair.of(documents, searchInfo);
             else {
                 finalFilteredList.addAll(documents);
                 return Pair.of(finalFilteredList, searchInfo);
             }
         } else {
-            query = queryContainsFeature ? keyword : query;
 
             KakaoXYResponseDto selectedXY = storeApiClient.addressToXY(selectedAddress, 1, 1);
             String x; String y;
@@ -278,9 +270,9 @@ public class StoreQueryServiceImpl {
                     .otherRegions(kakaoList.getMeta().getSame_name().getRegion())
                     .selectedRegion(selectedAddress)
                     .build();
-            // 반복문에는 + " " + "식당" 포함
+            // 반복문
             List<Document> documents = getDocsOnLoopByQuery(
-                    x, y, categoryIdSet, 1, query + " " + "식당");
+                    x, y, categoryIdSet, 1, keyword);
             return Pair.of(documents, searchInfo);
         }
     }
@@ -340,13 +332,13 @@ public class StoreQueryServiceImpl {
         }
     }
 
-    private List<Document> getDocsOnLoopByLocation(StoreRequestDto.SearchKeywordDto request, Set<Long> categoryIdSet, Integer fromPage) {
+    private List<Document> getDocsOnLoopByLocation(String x, String y, Set<Long> categoryIdSet, Integer fromPage) {
         List<Document> filteredList = new ArrayList<>();
         int pageIter = fromPage;
         while (pageIter <= 3) {
 
             KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByLocation(
-                    request.getX(), request.getY(), pageIter++, "distance");
+                    x, y, pageIter++, "accuracy", "FD6");
             apiCallCount++;
 
             filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
@@ -357,6 +349,7 @@ public class StoreQueryServiceImpl {
     }
 
     private List<Document> getDocsOnLoopByQuery(String x, String y, Set<Long> categoryIdSet, Integer fromPage, String query) {
+        if (query == null || query.isBlank()) return getDocsOnLoopByLocation(x, y, categoryIdSet, fromPage);
         List<Document> filteredList = new ArrayList<>();
         int pageIter = fromPage;
         while (pageIter <= 3) {
@@ -374,10 +367,9 @@ public class StoreQueryServiceImpl {
     private Pair<List<Document>, SearchInfo> getDocsOnLoopByQueryThatMustBeRegion(
             String x, String y, Set<Long> categoryIdSet, String query, SearchInfo baseInfo) {
         List<Document> filteredList = new ArrayList<>();
-        int pageIter = 1;
 
         KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByQuery(
-                query, x, y, pageIter, "accuracy", "FD6");
+                query + " " + "식당", x, y, 1, "accuracy", "FD6");
         if (kakaoList.getMeta().getSame_name().getRegion().isEmpty()) {
             return Pair.of(filteredList, baseInfo);
         } // 지역명이 추출이 안될 경우 스톱
@@ -398,9 +390,9 @@ public class StoreQueryServiceImpl {
         }
         apiCallCount++;
 
+        int pageIter = 1;
         while (pageIter <= 3) {
-            kakaoList = storeApiClient.getKakaoByQuery(
-                    query, newX, newY, pageIter++, "accuracy", "FD6");
+            kakaoList = storeApiClient.getKakaoByLocation(newX, newY, pageIter++, "accuracy", "FD6");
             apiCallCount++;
 
             filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
@@ -411,7 +403,7 @@ public class StoreQueryServiceImpl {
         SearchInfo searchInfo = SearchInfo.builder()
                 .baseX(newX)
                 .baseY(newY)
-                .query(query.replaceAll(" " + "식당", ""))
+                .query(baseInfo.getQuery())
                 .otherRegions(otherRegions)
                 .selectedRegion(selectedAddress)
                 .build();
