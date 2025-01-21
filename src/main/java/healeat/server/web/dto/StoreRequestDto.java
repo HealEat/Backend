@@ -9,6 +9,15 @@ import java.util.List;
 public class StoreRequestDto {
 
     @Getter
+    public static class HealEatRequestDto {
+
+        String x; // 추천받을 위치 경도
+        String y; // 추천받을 위치 위도
+
+        Integer radius; // 조사할 반경
+    }
+
+    @Getter
     @Builder
     public static class SearchKeywordDto {
 
