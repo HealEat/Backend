@@ -20,7 +20,8 @@ public interface StoreApiClient {
                                              @RequestParam(defaultValue = "") String x,
                                              @RequestParam(defaultValue = "") String y,
                                              @RequestParam(defaultValue = "1") Integer page,
-                                             @RequestParam(defaultValue = "distance") String sort);
+                                             @RequestParam(defaultValue = "distance") String sort,
+                                             @RequestParam(defaultValue = "FD6") String category_group_code);
 
     @GetMapping("/v2/local/search/keyword.json")
     KakaoPlaceResponseDto getKakaoByQuery(  // 일반 검색(필터링)에 사용
