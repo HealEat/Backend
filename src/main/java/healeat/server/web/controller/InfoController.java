@@ -3,21 +3,32 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.Member;
 import healeat.server.service.MemberHealthInfoService;
-import healeat.server.web.dto.AnswerRequestDto;
-import healeat.server.web.dto.AnswerResponseDto;
-import healeat.server.web.dto.MemberHealthInfoResponseDto;
-import healeat.server.web.dto.QuestionResponseDto;
+import healeat.server.service.MemberService;
+import healeat.server.web.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/info")
 @RequiredArgsConstructor
-public class MemberHealthInfoController {
+public class InfoController {
 
+    private final MemberService memberService;
     private final MemberHealthInfoService memberHealthInfoService;
+
+    @Operation(summary = "프로필 설정 API")
+    @PostMapping
+    public ApiResponse<MemberProfileResponseDto> createProfile(
+            @AuthenticationPrincipal Member member,
+            @RequestBody MemberProfileRequestDto request) {
+
+        // create, update, delete(이미지가 null로 들어온다든지), 동일 이름 중복 .. 의 로직을 통합해서
+        // createOrUpdate(member, request) <- 등의 메서드를 서비스 단에 개발하는 것 추천
+        // 모두 POST로 묶으면 됨. POST는 무적
+        return ApiResponse.onSuccess(/*memberService.createProfile(member, request)*/null);
+    }
 
     @Operation(summary = "사용자 앱 사용 목적과 질문 및 답변 전체 조회 API")
     @GetMapping("/purposes")
