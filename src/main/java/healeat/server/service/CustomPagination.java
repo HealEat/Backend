@@ -10,25 +10,24 @@ import java.util.stream.Collectors;
 
 public class CustomPagination {
 
-    public static <T> Page<T> toPage(List<T> list, int page, int size, Comparator<T> comparator) {
-        // 기본 유효성 검증
+    /**
+     * 정렬 없이 페이지네이션만 수행합니다.
+     */
+    static <T> Page<T> toPage(List<T> list, int page, int size) {
         if (list == null || list.isEmpty()) {
             return Page.empty(PageRequest.of(page, size));
         }
 
-        // 시작 인덱스와 종료 인덱스 계산
+        int totalSize = list.size();
         int start = page * size;
-        if (start >= list.size()) {
+
+        if (start >= totalSize) {
             return Page.empty(PageRequest.of(page, size));
         }
 
-        int end = Math.min(start + size, list.size());
+        int end = Math.min(start + size, totalSize);
+        List<T> subList = list.subList(start, end);
 
-        // 필요한 부분만 스트림으로 정렬 및 수집
-        List<T> sortedSubList = list.subList(start, end).stream()
-                .sorted(comparator)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(sortedSubList, PageRequest.of(page, size), list.size());
+        return new PageImpl<>(subList, PageRequest.of(page, size), totalSize);
     }
 }
