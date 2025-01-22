@@ -34,12 +34,12 @@ public class SearchController {
             "(사용자 위치, 음식 종류/특징 키워드, 최소 별점)을 받아서 가게 목록을 조회합니다.")
     @GetMapping
     public ApiResponse<StoreResonseDto.StorePreviewDtoList> getSearchResults(
-            @CheckPage @RequestParam Integer page,
-            @CheckSizeSum @ModelAttribute StoreRequestDto.SearchKeywordDto request,
+            @RequestParam Integer page,
+            @ModelAttribute StoreRequestDto.SearchKeywordDto request,
             @RequestParam(defaultValue = "0") Float minRating) {
 
         return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(
-                storeQueryServiceImpl.mapDocumentWithDB(page, request, minRating)));
+                storeQueryServiceImpl.searchAndMapStores(page, request, minRating)));
     }
 
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
