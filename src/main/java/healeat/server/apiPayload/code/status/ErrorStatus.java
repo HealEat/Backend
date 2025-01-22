@@ -34,6 +34,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 건강 목표 관련 응답
     HEALTH_PLAN_NOT_FOUND(HttpStatus.BAD_REQUEST, "HEALTH_PLAN4001", "건강 목표가 없습니다."),
 
+    // 건강 목표 설정 시 목표 횟수가 1 ~ 10 이 아닐 때
+    HEALTH_PLAN_GOAL_NUMBER(HttpStatus.BAD_REQUEST, "HEALTH_PLAN4002", "유효하지 않은 목표 횟수입니다."),
+
     // 회원 관련 응답
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다."),
 
