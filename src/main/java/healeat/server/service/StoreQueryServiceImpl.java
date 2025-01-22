@@ -86,20 +86,9 @@ public class StoreQueryServiceImpl {
          *  북마크 기능 구현
          *  가게 정보를 DB와 카카오 API 에서 가져오고 북마크 여부 확인
          */
-        // 현재 로그인한 사용자 가져오기
-        Member currentMember = getAuthenticatedMember();
-
-        // 로그인한 사용자의 북마크된 가게 ID 리스트 조회
-        List<Long> bookmarkedStoreIds = bookmarkRepository.findByMember(currentMember)
-                .stream()
-                .map(bookmark -> bookmark.getStore().getId())
-                .collect(Collectors.toList());
 
         List<StorePreviewDto> storePreviewDtoList = documents.stream()
                 .map(document -> {
-
-                    Set<Long> bookmarkedStoreIdsSet = new HashSet<>(bookmarkedStoreIds);
-                    boolean isBookmarked = bookmarkedStoreIdsSet.contains(Long.parseLong(document.getId()));
 
                     Set<FoodFeature> featureSet = foodCategoryRepository.findAll().stream()
                             .filter(fc -> document.getCategory_name().contains(fc.getName()))
@@ -136,7 +125,7 @@ public class StoreQueryServiceImpl {
                             .sickScore(0.0f)
                             .vegetScore(0.0f)
                             .dietScore(0.0f)
-                            .isBookMarked(isBookmarked);
+                            .isBookMarked(false);
 
                     Optional<Store> storeOptional = storeRepository.findById(Long.parseLong(document.getId()));
 
@@ -147,7 +136,7 @@ public class StoreQueryServiceImpl {
                                 .sickScore(store.getSickScore())
                                 .vegetScore(store.getVegetScore())
                                 .dietScore(store.getDietScore())
-                                .isBookMarked(isBookmarked);
+                                .isBookMarked(false);
                     });
 
                     return builder.build();
@@ -479,9 +468,5 @@ public class StoreQueryServiceImpl {
         } else {
             return Sort.Direction.DESC;
         }
-    }
-
-    private Member getAuthenticatedMember() {
-        return (Member) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

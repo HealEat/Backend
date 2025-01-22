@@ -28,31 +28,4 @@ public class StoreConverter {
                 .searchInfo(searchInfo)
                 .build();
     }
-
-    // 가게 정보를 StorePreviewDto 로 변환 (북마크 포함)
-    public StoreResonseDto.StorePreviewDto toStorePreviewDto(KakaoPlaceResponseDto.Document document, boolean isBookmarked) {
-        return StoreResonseDto.StorePreviewDto.builder()
-                .id(Long.parseLong(document.getId()))
-                .place_name(document.getPlace_name())
-                .category_name(document.getCategory_name())
-                .phone(document.getPhone())
-                .address_name(document.getAddress_name())
-                .road_address_name(document.getRoad_address_name())
-                .x(document.getX())
-                .y(document.getY())
-                .place_url(document.getPlace_url())
-                .distance(document.getDistance())
-                .isBookMarked(isBookmarked)
-                .reviewCount(0)
-                .totalScore(0.0f)
-                .features(List.of())  // 기본 빈 리스트
-                .build();
-    }
-
-    // 북마크된 가게 리스트 변환
-    public List<StoreResonseDto.StorePreviewDto> toStorePreviewDtoList(List<KakaoPlaceResponseDto.Document> documents, List<Long> bookmarkedIds) {
-        return documents.stream()
-                .map(document -> toStorePreviewDto(document, bookmarkedIds.contains(Long.parseLong(document.getId()))))
-                .collect(Collectors.toList());
-    }
 }
