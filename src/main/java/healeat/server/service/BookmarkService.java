@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,14 +57,35 @@ public class BookmarkService {
                 .map(bookmark -> bookmark.getStore().getId())
                 .collect(Collectors.toList());
 
-        // 북마크한 가게의 정보를 카카오 API를 통해 조회
-        List<KakaoPlaceResponseDto.Document> documents = storeIds.stream()
-                .map(storeId -> storeApiClient.getKakaoByQuery(storeId.toString(), "", "", 1, "accuracy", "FD6"))
-                .filter(response ->!response.getDocuments().isEmpty())
-                .map(response -> response.getDocuments().get(0))
-                .collect(Collectors.toList());
+        List<StoreResonseDto.StorePreviewDto> storeList = new ArrayList<>();
 
-        // StoreConverter 사용
-        return storeConverter.toStorePreviewDtoList(documents, storeIds);
+        for(Long storeId : storeIds) {
+            // 가게 정보 조회
+            KakaoPlaceResponseDto response = storeApiClient.getKakaoByQuery(storeId.toString(), "", "", 1, "accuracy", "FD6");
+            if(response.getDocuments().isEmpty()) {
+                continue;
+            }
+            KakaoPlaceResponseDto.Document document = response.getDocuments().get(0);
+
+            // KakaoPlaceResponseDto 를 데이터를 StorePreviewDto 로 변환
+            StoreResonseDto.StorePreviewDto storePreviewDto = StoreResonseDto.StorePreviewDto.builder()
+                    .id(Long.parseLong(document.getId()))
+                    .place_name(document.getPlace_name())
+                    .category_name(document.getCategory_name())
+                    .phone(document.getPhone())
+                    .address_name(document.getAddress_name())
+                    .road_address_name(document.getRoad_address_name())
+                    .x(document.getX())
+                    .y(document.getY())
+                    .place_url(document.getPlace_url())
+                    .distance(document.getDistance())
+                    .isBookMarked(true)
+                    .reviewCount(0)
+                    .totalScore(0.0f)
+                    .features(Collections.emptyList())
+                    .build();
+            storeList.add(storePreviewDto);
+        }
+        return storeList;
     }
 }
