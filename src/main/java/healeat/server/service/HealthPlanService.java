@@ -28,9 +28,16 @@ public class HealthPlanService {
                 new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
     }
 
+    public List<HealthPlan> getHealthPlanByMemberId(Long memberId) {
+        return healthPlanRepository.findByMemberId(memberId);
+    }
+
     @Transactional
     public HealthPlan createHealthPlan(HealthPlanRequestDto.HealthPlanUpdateRequestDto request) {
 
+        if(request.getNumber() < 1 || request.getNumber() > 10) {
+            throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_GOAL_NUMBER);
+        }
         HealthPlan healthPlan = HealthPlan.builder()
                 .duration(request.getDuration())
                 .goalNumber(request.getNumber())

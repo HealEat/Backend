@@ -42,6 +42,7 @@ public class HealthPlanResponseDto {
     @AllArgsConstructor
     public static class HealthPlanOneDto{
 
+        private Long id;
         private String name;
         private Duration duration;
         private Integer goalNumber;

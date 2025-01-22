@@ -33,6 +33,7 @@ public class HealthPlanConverter {
                 .collect(Collectors.toList());
 
         return HealthPlanResponseDto.HealthPlanOneDto.builder()
+                .id(healthPlan.getId())
                 .name(healthPlan.getMember().getName()) // 로그인한 사용자의 이름 설정
                 .duration(healthPlan.getDuration())
                 .goalNumber(healthPlan.getGoalNumber())
