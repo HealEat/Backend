@@ -1,11 +1,9 @@
 package healeat.server.domain.enums;
 
 public enum Duration {
-    //결정되면 수정
-    MINUTE,
-    HOUR,
+    //확정
     DAY,
     WEEK,
-    MONTH,
-    YEAR
+    DAY10,
+    MONTH
 }
