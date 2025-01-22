@@ -8,8 +8,6 @@ import healeat.server.domain.FoodFeature;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.SearchPageService;
-import healeat.server.validation.annotation.CheckPage;
-import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.SearchPageResponseDto;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.web.dto.StoreRequestDto;
@@ -35,11 +33,11 @@ public class SearchController {
     @GetMapping
     public ApiResponse<StoreResonseDto.StorePreviewDtoList> getSearchResults(
             @RequestParam Integer page,
-            @ModelAttribute StoreRequestDto.SearchKeywordDto request,
-            @RequestParam(defaultValue = "0") Float minRating) {
+            @ModelAttribute StoreRequestDto.SearchFilterDto filter,
+            @ModelAttribute StoreRequestDto.SearchKeywordDto request) {
 
         return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(
-                storeQueryServiceImpl.searchAndMapStores(page, request, minRating)));
+                storeQueryServiceImpl.searchAndMapStores(page, filter, request)));
     }
 
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")

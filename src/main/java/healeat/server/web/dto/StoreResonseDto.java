@@ -41,10 +41,11 @@ public class StoreResonseDto {
         String baseY;
 
         String query;
+        String addedFilterFromQuery; // 쿼리로부터 추가된 필터
         List<String> otherRegions;
         String selectedRegion;
 
-        // 런칭 때 지우기
+        // 검색 시점의 api 호출 횟수
         Integer apiCallCount;
 
         public void setApiCallCount(Integer apiCallCount) {
