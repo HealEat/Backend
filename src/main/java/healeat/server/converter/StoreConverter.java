@@ -4,7 +4,12 @@ import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.StoreResonseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
 public class StoreConverter {
 
     public static StoreResonseDto.StorePreviewDtoList toStorePreviewListDto(
