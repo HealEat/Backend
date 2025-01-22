@@ -33,12 +33,12 @@ public interface StoreApiClient {
                                             @RequestParam(defaultValue = "FD6") String category_group_code);
 
     @GetMapping("/v2/local/search/keyword.json")
-    KakaoPlaceResponseDto getHotPlaceByQuery(  // 일반 검색(필터링)에 사용
-                                            @RequestParam String query, // 쿼리 존재
-                                            @RequestParam(defaultValue = "") String x,
-                                            @RequestParam(defaultValue = "") String y,
-                                            @RequestParam(defaultValue = "1") Integer page,
-                                            @RequestParam(defaultValue = "accuracy") String sort);
+    KakaoPlaceResponseDto getLandmarkByQuery(  // 일반 검색(필터링)에 사용
+                                               @RequestParam String query, // 쿼리 존재
+                                               @RequestParam(defaultValue = "") String x,
+                                               @RequestParam(defaultValue = "") String y,
+                                               @RequestParam(defaultValue = "1") Integer page,
+                                               @RequestParam(defaultValue = "accuracy") String sort);
 
     @GetMapping("/v2/local/search/address.json")
     KakaoXYResponseDto addressToXY( // 주소를 좌표로 변환 - 검색 시 지역명이 포함될 때 사용

@@ -18,6 +18,8 @@ import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.KakaoXYResponseDto;
 import healeat.server.web.dto.StoreRequestDto;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -133,6 +135,7 @@ public class StoreQueryServiceImpl {
                 })
                 .toList();
 
+        // 정렬 I. 리뷰가 존재하는 가게들 우선
         List<StorePreviewDto> serverFirstList = new ArrayList<>(storePreviewDtoList.stream()
                 .filter(s -> (s.getReviewCount() > 0) && (s.getTotalScore() >= minRating))
                 .toList());
@@ -140,11 +143,19 @@ public class StoreQueryServiceImpl {
         List<StorePreviewDto> remainList = storePreviewDtoList.stream()
                 .filter(s -> s.getReviewCount() == 0).toList();
 
-        serverFirstList.addAll(remainList); // 정렬 I. 리뷰가 존재하는 가게들 우선
+        serverFirstList.addAll(remainList);
 
         Comparator<StorePreviewDto> comparator = Comparator
-                .comparing((StorePreviewDto s) -> Integer.parseInt(s.getDistance())) // 정렬 II. 가까운 순
-                .thenComparing(StorePreviewDto::getTotalScore, Comparator.reverseOrder()); // (정렬 III. 전체 평점 높은 순)
+                // 정렬 II. 가까운 순
+                .comparing((StorePreviewDto s) -> {
+                    String distance = s.getDistance();
+                    // 거리 정보가 없는 경우 가장 멀리 정렬되도록 Integer.MAX_VALUE 반환
+                    return distance == null || distance.isEmpty()
+                            ? Integer.MAX_VALUE
+                            : Integer.parseInt(distance);
+                })
+                // (정렬 III. 전체 평점 높은 순)
+                .thenComparing(StorePreviewDto::getTotalScore, Comparator.reverseOrder());
 
         // 동적 쿼리(QueryDSL)에 대해 생각할 필요 O
         // (기본= 전체 평점), 드롭다운 : 질병 관리 평점, 베지테리언 평점, 다이어터 평점
@@ -155,126 +166,235 @@ public class StoreQueryServiceImpl {
     }
 
     /**
-     * API 호출 핵심 로직
-     *
-     * @param request
-     * @return 쿼리 또는 키워드 필터로 선택한,
-     * 카카오 가게 리스트와
-     * 검색 정보 쌍 (Pair)
+     * 메인 검색 로직
      */
     public Pair<List<Document>, SearchInfo> getDocumentsByKeywords(StoreRequestDto.SearchKeywordDto request) {
-
         String query = request.getQuery();
+        Set<Long> categoryIdSet = getCategoryIdListByKeywordIds(request.getFeatureIdList(), request.getCategoryIdList());
 
-        Set<Long> categoryIdSet = getCategoryIdListByKeywordIds(
-                request.getFeatureIdList(), request.getCategoryIdList());
-
-        if (query == null || query.isBlank()) { // 질의어가 빈칸이거나 없음 : "", " "
-
-            SearchInfo searchInfo = SearchInfo.builder()
-                    .baseX(request.getX())
-                    .baseY(request.getY())
-                    .query(query)
-                    .otherRegions(List.of(""))
-                    .selectedRegion("")
-                    .build();
-
-            List<Document> documents = getDocsOnLoopByLocation(
-                    request.getX(), request.getY(), categoryIdSet, 1);// 거리 정렬 완료
-            return Pair.of(documents, searchInfo);
+        // 빈 쿼리 처리
+        if (query == null || query.isBlank()) {
+            return handleEmptyQuery(request, categoryIdSet);
         }
 
-        KakaoPlaceResponseDto kakaoList = storeApiClient
-                .getKakaoByQuery(query + " " + "식당", // 지역명만 검색하는 경우를 위해 [" " + "식당"] 추가
-                        request.getX(), request.getY(), 1, "accuracy", "FD6"); // 지역 검사용 첫 페이지
+        // 초기 검색 수행
+        InitialSearchResult initialResult = performInitialSearch(request, query);
+
+        // 특징 추출 및 카테고리 추가
+        FeatureExtractionResult featureResult = extractFeatures(initialResult.getKeyword(), categoryIdSet);
+
+        // 지역 기반 또는 키워드 기반 검색 수행
+        return performFinalSearch(request, initialResult, featureResult);
+    }
+
+    /**
+     * 빈 쿼리 처리 (캐시 대상)
+     */
+    private Pair<List<Document>, SearchInfo> handleEmptyQuery(StoreRequestDto.SearchKeywordDto request, Set<Long> categoryIdSet) {
+        SearchInfo searchInfo = SearchInfo.builder()
+                .baseX(request.getX())
+                .baseY(request.getY())
+                .query(request.getQuery())
+                .otherRegions(List.of(""))
+                .selectedRegion("")
+                .build();
+
+        List<Document> documents = getDocsOnLoopByLocation(request.getX(), request.getY(), categoryIdSet, 1);
+        return Pair.of(documents, searchInfo);
+    }
+
+    /**
+     * 초기 검색 결과를 담는 클래스 (캐시 결과 포함 가능)
+     */
+    @Getter
+    @Builder
+    private static class InitialSearchResult {
+        private final KakaoPlaceResponseDto response;
+        private final String selectedAddress;
+        private final String keyword;
+        private final List<Document> initialDocuments;
+    }
+
+    /**
+     * 초기 검색 수행 (캐시 대상)
+     */
+    private InitialSearchResult performInitialSearch(StoreRequestDto.SearchKeywordDto request, String query) {
+        KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByQuery(
+                query + " 식당",
+                request.getX(), request.getY(), 1, "accuracy", "FD6");
         apiCallCount++;
 
-        String selectedAddress = kakaoList.getMeta().getSame_name().getSelected_region(); // 지역명
+        return InitialSearchResult.builder()
+                .response(kakaoList)
+                .selectedAddress(kakaoList.getMeta().getSame_name().getSelected_region())
+                .keyword(kakaoList.getMeta().getSame_name().getKeyword().replaceAll(" 식당", ""))
+                .initialDocuments(new ArrayList<>(kakaoList.getDocuments()))
+                .build();
+    }
 
-        String keyword = kakaoList.getMeta().getSame_name().getKeyword()
-                .replaceAll(" " + "식당", ""); // 지역명 뺀 나머지 질의어가 keyword
+    /**
+     * 특징 추출 결과를 담는 record
+     */
+    @Builder
+    private record FeatureExtractionResult(Set<Long> updatedCategoryIds,
+                                           String processedKeyword,
+                                           boolean containsFeature) {
+    }
 
-        boolean queryContainsFeature = false;
-        String noWhiteKeyword = keyword.replaceAll("\\s+", ""); // keyword에서 공백 제거하고,
-        Optional<FoodFeature> foodFeatureOptional = foodFeatureRepository.findByName(noWhiteKeyword); // 음식 특징인지 체크
+    /**
+     * 특징 추출 및 카테고리 추가 (캐시 대상)
+     */
+    private FeatureExtractionResult extractFeatures(String keyword, Set<Long> categoryIdSet) {
+        String noWhiteKeyword = keyword.replaceAll("\\s+", "");
+        Optional<FoodFeature> foodFeatureOptional = foodFeatureRepository.findByName(noWhiteKeyword);
 
+        Set<Long> updatedCategoryIds = new HashSet<>(categoryIdSet);
+        String processedKeyword = keyword;
+        boolean containsFeature = false;
+
+        // 쿼리에 지역명을 제외하고 음식 특징이 존재
+        //  -> 필터에 추가, 카카오 API 쿼리에서는 제거
         if (foodFeatureOptional.isPresent()) {
-            // 맞다면 필터에 추가하고 keyword는 빈칸이 됨.
-            categoryIdSet.addAll(getCategoryIdList(foodFeatureOptional.get()));
-            keyword = "";
-            queryContainsFeature = true;
+            updatedCategoryIds.addAll(getCategoryIdList(foodFeatureOptional.get()));
+            processedKeyword = "";
+            containsFeature = true;
         }
 
-        List<Document> finalFilteredList = new ArrayList<>(kakaoList.getDocuments());
-        if (selectedAddress == null || selectedAddress.isBlank()) {
+        return FeatureExtractionResult.builder()
+                .updatedCategoryIds(updatedCategoryIds)
+                .processedKeyword(processedKeyword)
+                .containsFeature(containsFeature)
+                .build();
+    }
 
-            List<FoodFeature> featuresInQuery = foodFeatureRepository.findByQueryContainingFeature(noWhiteKeyword);
-            if (kakaoList.getMeta().getIs_end() && !featuresInQuery.isEmpty()) {
+    /**
+     * 최종 검색 수행
+     */
+    private Pair<List<Document>, SearchInfo> performFinalSearch(
+            StoreRequestDto.SearchKeywordDto request,
+            InitialSearchResult initialResult,
+            FeatureExtractionResult featureResult) {
 
-                FoodFeature foodFeature = featuresInQuery.stream().findFirst().get();
-                categoryIdSet.addAll(getCategoryIdList(foodFeature)); // 필터에 추가
-
-                String feature = foodFeature.getName();
-
-                String lastQuery = noWhiteKeyword.replace(feature, "");
-
-                SearchInfo baseInfo = SearchInfo.builder()
-                        .baseX(request.getX())
-                        .baseY(request.getY())
-                        .query(query)
-                        .otherRegions(List.of(""))
-                        .selectedRegion("")
-                        .build();
-
-                // 반복문, 지역이 발견되지 않으면 첫트에 중단
-                return getDocsOnLoopByQueryThatMustBeRegion(
-                        request.getX(), request.getY(), categoryIdSet, lastQuery,
-                        baseInfo);
-            }
-
-            SearchInfo searchInfo = SearchInfo.builder()
-                    .baseX(request.getX())
-                    .baseY(request.getY())
-                    .query(query)
-                    .otherRegions(List.of(""))
-                    .selectedRegion("")
-                    .build();
-
-            List<Document> documents = getDocsOnLoopByQuery(
-                    request.getX(), request.getY(), categoryIdSet, 1, keyword);
-            if (queryContainsFeature) return Pair.of(documents, searchInfo);
-            else {
-                finalFilteredList.addAll(documents);
-                return Pair.of(finalFilteredList, searchInfo);
-            }
+        /*
+            "왕십리 소화가 잘되는 음식"
+            -> 카카오 로컬 API에서 지역 인식을 하지 못함.
+            따라서 handleNonRegionalSearch에서
+            이와 같은 상황은 특수 케이스 분류로 처리
+        */
+        if (initialResult.getSelectedAddress() == null || initialResult.getSelectedAddress().isBlank()) {
+            // "근처 맛집", "부드러운 음식", "왕십리 소화가 잘되는 음식"
+            return handleNonRegionalSearch(request, initialResult, featureResult);
         } else {
-
-            KakaoXYResponseDto selectedXY = storeApiClient.addressToXY(selectedAddress, 1, 1);
-            String x; String y;
-            if (selectedXY.getDocuments().isEmpty()) {
-                Document hotPlace = storeApiClient.getHotPlaceByQuery(selectedAddress, request.getX(), request.getY(), 1, "accuracy")
-                        .getDocuments().stream().findFirst().get(); // 명소를 찾는다. (음식점 한정 X)
-                x = hotPlace.getX();
-                y = hotPlace.getY();
-
-            } else {
-                x = selectedXY.getDocuments().stream().findFirst().get().getX();
-                y = selectedXY.getDocuments().stream().findFirst().get().getY();
-            }
-            apiCallCount++;
-
-            SearchInfo searchInfo = SearchInfo.builder()
-                    .baseX(x)
-                    .baseY(y)
-                    .query(query)
-                    .otherRegions(kakaoList.getMeta().getSame_name().getRegion())
-                    .selectedRegion(selectedAddress)
-                    .build();
-            // 반복문
-            List<Document> documents = getDocsOnLoopByQuery(
-                    x, y, categoryIdSet, 1, keyword);
-            return Pair.of(documents, searchInfo);
+            // "아차산 맛집", "경대병원 죽", "홍대 소화가 잘되는 음식"
+            return handleRegionalSearch(request, initialResult, featureResult);
         }
+    }
+
+    /**
+     * 지역 없는 검색 처리 (캐시 대상)
+     */
+    private Pair<List<Document>, SearchInfo> handleNonRegionalSearch(
+            StoreRequestDto.SearchKeywordDto request,
+            InitialSearchResult initialResult,
+            FeatureExtractionResult featureResult) {
+
+        String noWhiteKeyword = featureResult.processedKeyword().replaceAll("\\s+", "");
+        List<FoodFeature> featuresInQuery = foodFeatureRepository.findByQueryContainingFeature(noWhiteKeyword);
+
+        // "왕십리 소화가 잘 되는 음식"과 같은 예
+        if (initialResult.getResponse().getMeta().getIs_end() && !featuresInQuery.isEmpty()) {
+            return handleFeatureBasedRegionalSearch(request, noWhiteKeyword, featuresInQuery, featureResult.updatedCategoryIds());
+        }
+
+        SearchInfo searchInfo = SearchInfo.builder()
+                .baseX(request.getX())
+                .baseY(request.getY())
+                .query(request.getQuery())
+                .otherRegions(List.of(""))
+                .selectedRegion("")
+                .build();
+
+        List<Document> documents = getDocsOnLoopByQuery(
+                request.getX(), request.getY(),
+                featureResult.updatedCategoryIds(),
+                1, featureResult.processedKeyword());
+
+        return Pair.of(documents, searchInfo);
+    }
+
+    /**
+     * 특징 기반 지역 검색 처리 (캐시 대상)
+     */
+    private Pair<List<Document>, SearchInfo> handleFeatureBasedRegionalSearch(
+            StoreRequestDto.SearchKeywordDto request,
+            String noWhiteKeyword,
+            List<FoodFeature> featuresInQuery,
+            Set<Long> categoryIdSet) {
+
+        FoodFeature foodFeature = featuresInQuery.get(0);
+        categoryIdSet.addAll(getCategoryIdList(foodFeature));
+
+        String lastQuery = noWhiteKeyword.replace(foodFeature.getName(), "");
+
+        SearchInfo baseInfo = SearchInfo.builder()
+                .baseX(request.getX())
+                .baseY(request.getY())
+                .query(request.getQuery())
+                .otherRegions(List.of(""))
+                .selectedRegion("")
+                .build();
+
+        // 반복문, 지역이 발견되지 않으면 첫트에 중단
+        return getDocsOnLoopByQueryThatMustBeRegion(
+                request.getX(), request.getY(), categoryIdSet, lastQuery,
+                baseInfo);
+    }
+
+    /**
+     * 지역에 대한 좌표 조회 (캐시 대상)
+     */
+    private Pair<String, String> getCoordinatesForRegion(String address, String x, String y) {
+        KakaoXYResponseDto selectedXY = storeApiClient.addressToXY(address, 1, 1);
+        apiCallCount++;
+
+        if (selectedXY.getDocuments().isEmpty()) {
+            // 주소-좌표 변환 실패시 랜드마크로 시도
+            Document landmark = storeApiClient.getLandmarkByQuery(
+                            address, x, y, 1, "accuracy")
+                    .getDocuments().stream()
+                    .findFirst().get(); // 명소를 찾는다. (음식점 한정 X)
+            return Pair.of(landmark.getX(), landmark.getY());
+        } else {
+            KakaoXYResponseDto.Document location = selectedXY.getDocuments().stream().findFirst().get();
+            return Pair.of(location.getX(), location.getY());
+        }
+    }
+
+    /**
+     * 지역 기반 검색 처리 (캐시 대상)
+     */
+    private Pair<List<Document>, SearchInfo> handleRegionalSearch(
+            StoreRequestDto.SearchKeywordDto request,
+            InitialSearchResult initialResult,
+            FeatureExtractionResult featureResult) {
+
+        Pair<String, String> coordinates = getCoordinatesForRegion(
+                initialResult.getSelectedAddress(), request.getX(), request.getY());
+
+        SearchInfo searchInfo = SearchInfo.builder()
+                .baseX(coordinates.getFirst())
+                .baseY(coordinates.getSecond())
+                .query(request.getQuery())
+                .otherRegions(initialResult.getResponse().getMeta().getSame_name().getRegion())
+                .selectedRegion(initialResult.getSelectedAddress())
+                .build();
+
+        List<Document> documents = getDocsOnLoopByQuery(
+                coordinates.getFirst(), coordinates.getSecond(),
+                featureResult.updatedCategoryIds(),
+                1, featureResult.processedKeyword());
+
+        return Pair.of(documents, searchInfo);
     }
 
     private Set<Long> getCategoryIdListByKeywordIds(List<Long> featureIdList, List<Long> categoryIdList) {
@@ -370,29 +490,20 @@ public class StoreQueryServiceImpl {
 
         KakaoPlaceResponseDto kakaoList = storeApiClient.getKakaoByQuery(
                 query + " " + "식당", x, y, 1, "accuracy", "FD6");
+        apiCallCount++;
         if (kakaoList.getMeta().getSame_name().getRegion().isEmpty()) {
             return Pair.of(filteredList, baseInfo);
         } // 지역명이 추출이 안될 경우 스톱
 
         String selectedAddress = kakaoList.getMeta().getSame_name().getSelected_region();
         List<String> otherRegions = kakaoList.getMeta().getSame_name().getRegion();
-        KakaoXYResponseDto selectedXY = storeApiClient.addressToXY(selectedAddress, 1, 1);
-        String newX; String newY;
-        if (selectedXY.getDocuments().isEmpty()) {
-            Document hotPlace = storeApiClient.getHotPlaceByQuery(selectedAddress, x, y, 1, "accuracy")
-                    .getDocuments().stream().findFirst().get(); // 명소를 찾는다. (음식점 한정 X)
-            newX = hotPlace.getX();
-            newY = hotPlace.getY();
 
-        } else {
-            newX = selectedXY.getDocuments().stream().findFirst().get().getX();
-            newY = selectedXY.getDocuments().stream().findFirst().get().getY();
-        }
-        apiCallCount++;
+        Pair<String, String> coordinates = getCoordinatesForRegion(selectedAddress, x, y);
 
         int pageIter = 1;
         while (pageIter <= 3) {
-            kakaoList = storeApiClient.getKakaoByLocation(newX, newY, pageIter++, "accuracy", "FD6");
+            kakaoList = storeApiClient.getKakaoByLocation(coordinates.getFirst(), coordinates.getSecond(),
+                    pageIter++, "accuracy", "FD6");
             apiCallCount++;
 
             filteredList.addAll(filterAndGetDocuments(kakaoList, categoryIdSet));
@@ -401,8 +512,8 @@ public class StoreQueryServiceImpl {
         }
 
         SearchInfo searchInfo = SearchInfo.builder()
-                .baseX(newX)
-                .baseY(newY)
+                .baseX(coordinates.getFirst())
+                .baseY(coordinates.getSecond())
                 .query(baseInfo.getQuery())
                 .otherRegions(otherRegions)
                 .selectedRegion(selectedAddress)
