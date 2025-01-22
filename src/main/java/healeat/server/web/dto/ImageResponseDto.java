@@ -9,7 +9,7 @@ public class ImageResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
-    public class GetS3UrlDto {
+    public static class GetS3UrlDto {
 
         private String preSignedUrl;
         private String key;
