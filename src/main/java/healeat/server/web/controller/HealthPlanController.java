@@ -13,8 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.hibernate.query.sqm.tree.SqmNode.log;
 
 @RestController
 @RequestMapping("/plans")
@@ -32,6 +35,16 @@ public class HealthPlanController {
     @GetMapping
     public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member) {
+
+        if (member == null || member.getId() == null) {
+            log.warn("Member is null, using default member ID for testing.");
+            Long defaultMemberId = 999L; // 테스트용 기본 Member ID
+            member = Member.builder()
+                    .id(defaultMemberId)
+                    .build();
+        }
+
+        //정상적으로 HealthPlan 조회
         List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMemberId(member.getId());
         List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
                 .map(healthPlanConverter::toHealthPlanOneDto)
@@ -51,7 +64,7 @@ public class HealthPlanController {
     public ApiResponse<HealthPlanResponseDto.setResultDto> createHealthPlan(
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request,
             @AuthenticationPrincipal Member member) {
-        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request);
+        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request, member);
 
         return ApiResponse.onSuccess(healthPlanConverter.toSetResultDto(createdHealthPlan));
     }
