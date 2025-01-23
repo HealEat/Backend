@@ -16,6 +16,11 @@ public enum ErrorStatus implements BaseErrorCode {
     _UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
 
+    // 검색 관련 응답
+    FILTERS_LESS_EQUAL_THAN_5(HttpStatus.BAD_REQUEST, "SEARCH4001", "페이지 번호는 1 이상이어야 합니다."),
+    INVALID_SEARCH_CASE(HttpStatus.BAD_REQUEST, "SEARCH4002", "검색 결과가 없음으로 처리해주세요." +
+            "(질문사항이 있으면 성우에게 연락주세요)"),
+
     // 페이징 관련 응답
     PAGE_NUM_NOT_NATURAL(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),
 

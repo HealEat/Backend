@@ -3,6 +3,7 @@ package healeat.server.service;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
+import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.SortBy;
@@ -11,6 +12,7 @@ import healeat.server.domain.mapping.Review;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.*;
+import healeat.server.service.search.SearchListenerService;
 import healeat.server.service.search.SearchFeatureService;
 import healeat.server.service.search.StoreMappingService;
 import healeat.server.service.search.StoreSearchService;
@@ -18,12 +20,12 @@ import healeat.server.validation.annotation.CheckPage;
 import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.internal.util.MutableInteger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -44,8 +46,10 @@ public class StoreQueryServiceImpl {
     private final SearchResultItemRepository searchResultItemRepository;
 
     private final StoreSearchService storeSearchService;
-    private final StoreMappingService storeMappingService;
     private final SearchFeatureService searchFeatureService;
+    private final StoreMappingService storeMappingService;
+
+    private final SearchListenerService searchListenerService;
 
     /**
      * 핵심 로직 이후
@@ -54,20 +58,20 @@ public class StoreQueryServiceImpl {
      */
     @Transactional
     public Pair<Page<StorePreviewDto>, SearchInfo> searchAndMapStores(
+            @AuthenticationPrincipal Member member,
             @CheckPage Integer page,
-            @CheckSizeSum StoreRequestDto.SearchFilterDto filter,
-            StoreRequestDto.SearchKeywordDto request) {
-
-        MutableInteger apiCallCounter = new MutableInteger();
+            @CheckSizeSum StoreRequestDto.SearchKeywordDto request) {
 
         // 1. 검색 및 결과 저장
-        SearchResult searchResult = storeSearchService.searchAndSave(request, filter, apiCallCounter);
+        SearchResult searchResult = storeSearchService.searchAndSave(request);
+        int apiCallCount = searchListenerService.getAndResetApiCallCount();
+        long newFeatureId = searchListenerService.getAndResetFeatureId();
 
         // 2. category와 feature 기반으로 필터링할 placeId 목록 조회
         Set<String> filteredPlaceIds = searchFeatureService.getFilteredPlaceIds(
                 searchResult.getItems(),
-                filter.getCategoryIdList(),
-                filter.getFeatureIdList()
+                request.getCategoryIdList(),
+                request.getFeatureIdList()
         );
 
         // 3. 페이지 요청 생성 (페이지는 0부터 시작하므로 page - 1)
@@ -77,15 +81,15 @@ public class StoreQueryServiceImpl {
         Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
                 searchResult,
                 filteredPlaceIds,
-                filter.getMinRating(),
-                filter.getSortBy(),
+                request.getMinRating(),
+                request.getSortBy(),
                 pageable
         );
 
         // 5. DTO 변환 및 결과 반환
         return Pair.of(
-                items.map(storeMappingService::mapToDto),
-                searchResult.toSearchInfo(apiCallCounter)
+                items.map(item -> storeMappingService.mapToDto(member, item)),
+                searchResult.toSearchInfo(newFeatureId, apiCallCount)
         );
     }
 

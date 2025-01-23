@@ -3,6 +3,7 @@ package healeat.server.service.search;
 import lombok.Builder;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Builder
 public record SearchResultKey(
@@ -10,7 +11,7 @@ public record SearchResultKey(
         String x,
         String y
 ) {
-    private static final double LOCATION_THRESHOLD = 0.001; // 약 100m 정도의 차이
+    private static final double LOCATION_THRESHOLD = 0.02; // 약 200m 정도의 차이
 
     public String generateId() {
         // x, y 좌표를 반올림하여 비슷한 위치는 동일하게 처리

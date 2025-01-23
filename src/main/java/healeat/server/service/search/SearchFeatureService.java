@@ -7,11 +7,10 @@ import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.FeatCategoryMapRepository;
 import healeat.server.repository.FoodCategoryRepository;
 import healeat.server.repository.FoodFeatureRepository;
-import healeat.server.web.dto.KakaoPlaceResponseDto.Document;
-import lombok.Builder;
-import lombok.Getter;
+import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,17 +20,29 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SearchFeatureService {
 
     private final FoodFeatureRepository foodFeatureRepository;
     private final FeatCategoryMapRepository featCategoryMapRepository;
     private final FoodCategoryRepository foodCategoryRepository;
 
+    public Set<FoodFeature> extractFeaturesForDocument(Document document) {
+        return foodCategoryRepository.findAll().stream()
+                .filter(fc -> document.getCategory_name().contains(fc.getName()))
+                .flatMap(fc -> {
+                    List<FeatCategoryMap> featCategoryMaps = featCategoryMapRepository.findByFoodCategory(fc);
+                    return featCategoryMaps.stream()
+                            .map(FeatCategoryMap::getFoodFeature);
+                })
+                .collect(Collectors.toSet());
+    }
+
     // 카테고리와 특징 기반으로 필터링
     public Set<String> getFilteredPlaceIds(
             List<SearchResultItem> items,
-            List<Long> categoryIdList,
-            List<Long> featureIdList) {
+            Set<Long> categoryIdList,
+            Set<Long> featureIdList) {
 
         if ((categoryIdList == null || categoryIdList.isEmpty())
                 && (featureIdList == null || featureIdList.isEmpty())) {
@@ -40,18 +51,18 @@ public class SearchFeatureService {
                     .collect(Collectors.toSet());
         }
 
-        Set<String> filteredIds = new HashSet<>();
+        Set<String> filteredPlaceIds = new HashSet<>();
 
         for (SearchResultItem item : items) {
             if (matchesFilters(item.getCategoryName(), categoryIdList, featureIdList)) {
-                filteredIds.add(item.getPlaceId());
+                filteredPlaceIds.add(item.getPlaceId());
             }
         }
 
-        return filteredIds;
+        return filteredPlaceIds;
     }
 
-    private boolean matchesFilters(String categoryName, List<Long> categoryIdList, List<Long> featureIdList) {
+    private boolean matchesFilters(String categoryName, Set<Long> categoryIdList, Set<Long> featureIdList) {
         // 카테고리 필터링
         if (categoryIdList != null && !categoryIdList.isEmpty()) {
             boolean matchesCategory = categoryIdList.stream()
@@ -78,75 +89,5 @@ public class SearchFeatureService {
         }
 
         return true;
-    }
-
-    public List<Long> getCategoryIdList(FoodFeature foodFeature) {
-
-        return featCategoryMapRepository.findAllByFoodFeature(foodFeature).stream()
-                .map(f_c -> f_c.getFoodCategory().getId())
-                .toList();
-    }
-
-    /**
-     * 특징 추출 결과를 담는 record
-     */
-    @Getter
-    public static class FeatureExtractionResult {
-
-        String addedFeatureFromQuery;
-        Set<Long> newCategoryIds;
-        String processedKeyword;
-        Boolean containsFeature;
-
-        @Builder
-        public FeatureExtractionResult(String addedFeatureFromQuery, Set<Long> newCategoryIds,
-                                       String processedKeyword, Boolean containsFeature) {
-            this.addedFeatureFromQuery = addedFeatureFromQuery;
-            this.newCategoryIds = newCategoryIds;
-            this.processedKeyword = processedKeyword;
-            this.containsFeature = containsFeature;
-        }
-    }
-
-    /**
-     * 특징 추출 및 카테고리 추가
-     */
-    public FeatureExtractionResult extractFeatures(String keyword) {
-        String noWhiteKeyword = keyword.replaceAll("\\s+", "");
-        Optional<FoodFeature> foodFeatureOptional = foodFeatureRepository.findByName(noWhiteKeyword);
-
-        Set<Long> categoryIds = new HashSet<>();
-        String processedKeyword = keyword;
-
-        FeatureExtractionResult.FeatureExtractionResultBuilder builder = FeatureExtractionResult.builder()
-                .addedFeatureFromQuery("")
-                .newCategoryIds(categoryIds)
-                .processedKeyword(processedKeyword)
-                .containsFeature(false);
-
-        // 쿼리에 지역명을 제외하고 음식 특징이 존재
-        //  -> 필터에 추가, 카카오 API 쿼리에서는 제거
-        if (foodFeatureOptional.isPresent()) {
-            categoryIds.addAll(getCategoryIdList(foodFeatureOptional.get()));
-            processedKeyword = "";
-
-            builder.addedFeatureFromQuery(noWhiteKeyword)
-                    .newCategoryIds(categoryIds)
-                    .processedKeyword(processedKeyword)
-                    .containsFeature(true);
-        }
-
-        return builder.build();
-    }
-
-    public Set<FoodFeature> extractFeaturesForDocument(Document document) {
-        return foodCategoryRepository.findAll().stream()
-                .filter(fc -> document.getCategory_name().contains(fc.getName()))
-                .flatMap(fc -> {
-                    List<FeatCategoryMap> featCategoryMaps = featCategoryMapRepository.findByFoodCategory(fc);
-                    return featCategoryMaps.stream()
-                            .map(FeatCategoryMap::getFoodFeature);
-                })
-                .collect(Collectors.toSet());
     }
 }

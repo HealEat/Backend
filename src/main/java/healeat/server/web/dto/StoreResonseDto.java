@@ -16,7 +16,6 @@ public class StoreResonseDto {
     @AllArgsConstructor
     public static class StorePreviewDtoList {
 
-
         // 가게 목록
         List<StorePreviewDto> storeList;
 
@@ -35,53 +34,46 @@ public class StoreResonseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SearchInfo {
-        // 현재 위치 또는 검색 지역명 위치
-        String baseX;
-        String baseY;
+    public static class StorePreviewDto {
 
-        String query;
-        String addedFilterFromQuery; // 쿼리로부터 추가된 필터
-        List<String> otherRegions;
-        String selectedRegion;
-
-        // 검색 시점의 api 호출 횟수
-        Integer apiCallCount;
-
-        public void setApiCallCount(Integer apiCallCount) {
-            this.apiCallCount = apiCallCount;
-        }
+        Long placeId;
+        String headForAPI;
+        String placeName;
+        String categoryName;
+        String phone;
+        String addressName;
+        String roadAddressName;
+        String x;
+        String y;
+        String placeUrl;
+        String distance;
+        List<String> imageUrlList;
+        List<String> features;
+        Integer reviewCount;
+        Float totalScore;
+        Float sickScore;
+        Float vegetScore;
+        Float dietScore;
+        Boolean isBookMarked;
     }
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class StorePreviewDto {
+    public static class SearchInfo {
+        // 현재 위치 또는 검색 지역명 위치
+        String baseX;
+        String baseY;
 
-        // 카카오 로컬 API
-        Long id;
-        String place_name;
-        String category_name;
-        String phone;
-        String address_name;
-        String road_address_name;
-        String x;
-        String y;
-        String place_url; // 카카오맵으로 열기
-        String distance;
+        String query;
+        Long addedFeatureFilterId; // 쿼리로부터 추가된 특징 id
 
-        // 다음 이미지 API
-        List<String> imageUrlList; // 한번에 받아와서, ..캐싱..
+        List<String> otherRegions;
+        String selectedRegion;
 
-        // 힐릿 DB
-        List<String> features; // 음식 특징
-        Integer reviewCount; // 리뷰 수
-        Float totalScore;
-        Float sickScore; // 환자 점수
-        Float vegetScore; // 베지테리언 점수
-        Float dietScore; // 다이어터 점수
-        Boolean isBookMarked;
+        // 검색 시점의 api 호출 횟수
+        Integer apiCallCount;
     }
 
     @Builder

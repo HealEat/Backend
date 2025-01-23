@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,9 @@ public class SearchResultItem extends BaseEntity {
 
     @Column(nullable = false)
     private String placeId;
+
+    @Column
+    private String headForAPI;
 
     @Column(nullable = false)
     private String placeName;
@@ -56,9 +61,13 @@ public class SearchResultItem extends BaseEntity {
     private String placeUrl;
 
     @Column
-    private String distance;
+    private Integer distance;
 
-    @ElementCollection
+    // 다음 이미지 API
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> imageUrlList = new ArrayList<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<String> features = new ArrayList<>();
 
     @Column
@@ -77,12 +86,14 @@ public class SearchResultItem extends BaseEntity {
     private Float dietScore;
 
     @Builder
-    public SearchResultItem(String placeId, String placeName, String categoryName,
-                            String phone, String addressName, String roadAddressName,
-                            String x, String y, String placeUrl, String distance,
-                            List<String> features, Integer reviewCount, Float totalScore,
+    public SearchResultItem(String placeId, String placeName, String categoryName, String phone,
+                            String addressName, String roadAddressName, String headForAPI,
+                            String x, String y, String placeUrl, Integer distance,
+                            List<String> imageUrlList, List<String> features,
+                            Integer reviewCount, Float totalScore,
                             Float sickScore, Float vegetScore, Float dietScore) {
         this.placeId = placeId;
+        this.headForAPI = headForAPI;
         this.placeName = placeName;
         this.categoryName = categoryName;
         this.phone = phone;
@@ -92,6 +103,7 @@ public class SearchResultItem extends BaseEntity {
         this.y = y;
         this.placeUrl = placeUrl;
         this.distance = distance;
+        this.imageUrlList = imageUrlList;
         this.features = features;
         this.reviewCount = reviewCount;
         this.totalScore = totalScore;
