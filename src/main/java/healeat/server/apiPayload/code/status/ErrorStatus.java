@@ -50,7 +50,10 @@ public enum ErrorStatus implements BaseErrorCode {
     RECENT_SEARCH_NOT_FOUND(HttpStatus.BAD_REQUEST, "RECENT_SEARCH4001", "최근 검색 기록 없습니다."),
 
     // 음식 특징 관련 응답
-    FOOD_FEATURE_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOOD_FEATURE4001", "음식 특징이 없습니다.")
+    FOOD_FEATURE_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOOD_FEATURE4001", "음식 특징이 없습니다."),
+
+    // 음식 특징 관련 응답
+    IMAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4001", "해당 이미지 종류가 없습니다.")
     ;
 
     private final HttpStatus httpStatus;
