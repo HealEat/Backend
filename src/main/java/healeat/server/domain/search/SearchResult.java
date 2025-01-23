@@ -7,7 +7,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.internal.util.MutableInteger;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,9 @@ public class SearchResult extends BaseEntity {
     @Id
     private String searchId;
 
+    @Column(unique = true)
+    private String initId;
+
     private String baseX;
 
     private String baseY;
@@ -28,40 +32,47 @@ public class SearchResult extends BaseEntity {
 
     private String selectedRegion;
 
-    @ElementCollection
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<String> otherRegions = new ArrayList<>();
 
-    @Column
-    private Integer apiCallCount;
-
-    @OneToMany(mappedBy = "searchResult", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "searchResult",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<SearchResultItem> items = new ArrayList<>();
-
-    @Builder
-    public SearchResult(String searchId, String baseX, String baseY, String query,
-                        String selectedRegion, List<String> otherRegions, Integer apiCallCount) {
-        this.searchId = searchId;
-        this.baseX = baseX;
-        this.baseY = baseY;
-        this.query = query;
-        this.selectedRegion = selectedRegion;
-        this.otherRegions = otherRegions;
-        this.apiCallCount = apiCallCount;
-    }
 
     public void addItem(SearchResultItem item) {
         this.items.add(item);
         item.setSearchResult(this);
     }
 
-    public StoreResonseDto.SearchInfo toSearchInfo(MutableInteger apiCallCounter) {
+    @PreRemove
+    private void preRemove() {
+        items.clear();
+    }
+
+    @Builder
+    public SearchResult(String searchId, String initId,
+                        String baseX, String baseY, String query,
+                        String selectedRegion, List<String> otherRegions) {
+        this.searchId = searchId;
+        this.initId = initId;
+        this.baseX = baseX;
+        this.baseY = baseY;
+        this.query = query;
+        this.selectedRegion = selectedRegion;
+        this.otherRegions = otherRegions;
+    }
+
+    public StoreResonseDto.SearchInfo toSearchInfo(long newFeatureId, int apiCallCount) {
+
         return StoreResonseDto.SearchInfo.builder()
                 .baseX(baseX)
                 .baseY(baseY)
                 .query(query)
-                .selectedRegion(selectedRegion)
+                .addedFeatureFilterId(newFeatureId)
                 .otherRegions(otherRegions)
-                .apiCallCount(apiCallCounter.get())
+                .selectedRegion(selectedRegion)
+                .apiCallCount(apiCallCount)
                 .build();
     }
 }
