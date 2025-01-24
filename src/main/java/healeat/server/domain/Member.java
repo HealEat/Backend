@@ -1,19 +1,15 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.DietAns;
-import healeat.server.domain.enums.Vegeterian;
-import healeat.server.domain.mapping.MemberFoodToAvoid;
-import healeat.server.domain.mapping.MemberMealNeeded;
-import healeat.server.domain.mapping.MemberNutrientNeeded;
-import healeat.server.domain.mapping.MemberTerm;
-import healeat.server.domain.mapping.Bookmark;
-import healeat.server.domain.mapping.RecentSearch;
+import healeat.server.domain.enums.Diet;
+import healeat.server.domain.enums.Vegetarian;
+import healeat.server.domain.mapping.*;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -29,38 +25,55 @@ public class Member extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(name = "profile_image_url")
+    @Column(nullable = true)
+    private String provider; // 소셜 로그인 제공자 ( KAKAO, NAVER, APPLE)
+
+    @Column(nullable = true, unique = true)
+    private String providerId; // 소셜 로그인 제공자로부터 받은 사용자 ID
+
+    @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "diet_answer", length = 3)
-    private DietAns dietAns; // 다이어트 답변 ( ENUM : YES, NO )
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Builder.Default
+    private List<String> diseases = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "veget_answer")
-    private Vegeterian vegetAnswer; // 채식 답변 ( ENUM )
+    @Builder.Default
+    private Vegetarian vegetarian = Vegetarian.NONE;
 
-    // 연관관계 매핑
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberTerm> memberTerms;
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<RecentSearch> recentSearchList = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Diet diet = Diet.NONE;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberMealNeeded> memberMealNeeded;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberNutrientNeeded> memberNutrientNeeded;
+    // 건강 정보 로직 반영 결과 저장 (음식 카테고리 리스트)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Builder.Default
+    private List<String> healEatFoods = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberFoodToAvoid> memberFoodToAvoid;
+    private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();  // 건강 정보 설정
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HealthPlan> healthPlans;
+    private List<MemberTerm> memberTerms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Bookmark> bookmarks;
+    private List<RecentSearch> recentSearches = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Bookmark> bookmarkList = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HealthPlan> healthPlans = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
+
+    // 프로필을 위한 업데이트 메서드
+    public void updateProfile(String name, String profileImageUrl) {
+        if(name != null) this.name = name;
+        if(profileImageUrl != null) this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.1'
+	id 'org.springframework.boot' version '3.2.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -23,6 +23,10 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	set('springCloudVersion', "2023.0.0") // Canal 버전
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -35,8 +39,51 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// 외부 API를 위한 Feign Client 의존성 추가
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-oauth2-core'
+
+	// S3 에 업로드, 외부 API 를 사용하기 위한 의존성 추가
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.767'
+	implementation 'software.amazon.awssdk:s3:2.27.3'
+	implementation 'software.amazon.awssdk:s3control:2.27.3'
+	implementation 'software.amazon.awssdk:s3outposts:2.27.3'
+
+	// QueryDSL 관련 의존성
+	implementation "com.querydsl:querydsl-jpa:5.1.0:jakarta"  // QueryDSL JPA 모듈
+	annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"  // Annotation Processor
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"  // JPA API
+
+	implementation 'org.hibernate.orm:hibernate-core:6.0.2.Final'  // Hibernate 6.0.2 이상
+	implementation 'mysql:mysql-connector-java:8.0.33'  // MySQL 드라이버 추가
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Querydsl 설정부
+def querydslDir = "src/main/generated"
+
+sourceSets {
+	main.java.srcDirs += [ querydslDir ]
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+}
+
+clean.doLast {
+	file(querydslDir).deleteDir()
 }

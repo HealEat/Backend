@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: /*카톡 방에 공유함*/
-    username: root
-    password: /*카톡 방에 공유함*/
+    url: #카톡방에 공유함
+    username: #카톡방에 공유함
+    password: #카톡방에 공유함
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
@@ -18,3 +18,9 @@ spring:
         hbm2ddl:
           auto: update
         default_batch_fetch_size: 1000
+
+# 스프링 시큐리티 설정 필요함.
+
+
+kakao:
+  api-key: # 공유 예정
