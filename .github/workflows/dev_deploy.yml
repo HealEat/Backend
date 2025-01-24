@@ -26,10 +26,10 @@ jobs:
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
         run: chmod +x gradlew
 
-      - name: Build with Gradle  # Gradle을 사용하여 프로젝트 빌드
+      - name: Clean and Build with Gradle  # Gradle clean build 실행
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: clean build
 
       - name: Upload build artifact  # 빌드된 아티팩트 업로드
         uses: actions/upload-artifact@v4
