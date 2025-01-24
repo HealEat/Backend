@@ -74,7 +74,13 @@ public class StoreSearchService {
 
         System.out.println("캐시가 없으므로 새로 저장합니다.");
         List<Document> documents = getDocsOnLoopByQuery(searchKey);
-        return createSearchResult(realSearchInfo, searchKey, initKey, documents);
+
+        SearchResult result = createSearchResult(realSearchInfo, searchKey, initKey, documents);
+
+        System.out.println("SearchResult: searchId=" + result.getSearchId() +
+                ", query=" + result.getQuery() +
+                ", items=" + result.getItems().size());
+        return result;
     }
 
     @Transactional

@@ -64,6 +64,9 @@ public class StoreQueryServiceImpl {
 
         // 1. 검색 및 결과 저장
         SearchResult searchResult = storeSearchService.searchAndSave(request);
+        System.out.println("searchResult items size: " + searchResult.getItems().size());
+        System.out.println("searchResult: " + searchResult);
+
         int apiCallCount = searchListenerService.getAndResetApiCallCount();
         long newFeatureId = searchListenerService.getAndResetFeatureId();
 
@@ -73,24 +76,37 @@ public class StoreQueryServiceImpl {
                 request.getCategoryIdList(),
                 request.getFeatureIdList()
         );
+        System.out.println("Filtered Place IDs: " + filteredPlaceIds);
 
-        // 3. 페이지 요청 생성 (페이지는 0부터 시작하므로 page - 1)
-        Pageable pageable = PageRequest.of(page - 1, 10);
+        if (filteredPlaceIds.isEmpty()) {
 
-        // 4. 정렬된 검색 결과 조회
-        Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
-                searchResult,
-                filteredPlaceIds,
-                request.getMinRating(),
-                request.getSortBy(),
-                pageable
-        );
+            return Pair.of(Page.empty(), searchResult.toSearchInfo(newFeatureId, apiCallCount));
 
-        // 5. DTO 변환 및 결과 반환
-        return Pair.of(
-                items.map(item -> storeMappingService.mapToDto(member, item)),
-                searchResult.toSearchInfo(newFeatureId, apiCallCount)
-        );
+        } else {        // 3. 페이지 요청 생성 (페이지는 0부터 시작하므로 page - 1)
+            Pageable pageable = PageRequest.of(page - 1, 10, Sort.unsorted());
+
+            // 4. 정렬된 검색 결과 조회
+            Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
+                    searchResult.getSearchId(),
+                    filteredPlaceIds,
+                    request.getMinRating(),
+                    request.getSortBy(),
+                    pageable
+            );
+
+            System.out.println("Page content size: " + items.getContent().size());
+            System.out.println("Page content: " + items.getContent());
+
+            // 5. DTO 변환 및 결과 반환
+            return Pair.of(
+                    items.map(item -> {
+                        StorePreviewDto dto = storeMappingService.mapToDto(member, item);
+                        System.out.println("Mapped DTO: " + dto);
+                        return dto;
+                    }),
+                    searchResult.toSearchInfo(newFeatureId, apiCallCount)
+            );
+        }
     }
 
     public Page<Review> getReviewList(Long storeId, Integer page, SortBy sort, String sortOrder) {
