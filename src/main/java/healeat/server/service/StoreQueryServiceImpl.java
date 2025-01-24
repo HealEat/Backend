@@ -12,6 +12,7 @@ import healeat.server.domain.mapping.Review;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.*;
+import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
 import healeat.server.service.search.SearchListenerService;
 import healeat.server.service.search.SearchFeatureService;
 import healeat.server.service.search.StoreMappingService;
