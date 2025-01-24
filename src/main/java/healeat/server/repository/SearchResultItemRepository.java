@@ -1,6 +1,5 @@
 package healeat.server.repository;
 
-import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,22 +11,21 @@ import java.util.Set;
 
 public interface SearchResultItemRepository extends JpaRepository<SearchResultItem, Long> {
 
-    @Query("""
-            SELECT s FROM SearchResultItem s
-            WHERE s.searchResult = :searchResult
-            AND s.placeId IN :placeIds
-            AND s.totalScore >= :minRating
-            ORDER BY CASE WHEN s.reviewCount > 0 THEN 1 ELSE 0 END DESC,
-                     s.distance ASC,
-                     CASE :sortBy
-                         WHEN 'DEFAULT' THEN s.totalScore
-                         WHEN 'SICK_SCORE' THEN s.sickScore
-                         WHEN 'VEGET_SCORE' THEN s.vegetScore
-                         WHEN 'DIET_SCORE' THEN s.dietScore
-                     END DESC
-            """)
+    // 동적 정렬을 위한 네이티브 SQL
+    @Query(value = """
+    SELECT * FROM search_result_item s
+    WHERE s.search_result_id = :searchResultId
+      AND s.place_id IN :placeIds
+      AND s.total_score >= :minRating
+    ORDER BY 
+        IF(:sortBy = 'DEFAULT', s.total_score, 
+           IF(:sortBy = 'SICK', s.sick_score, 
+           IF(:sortBy = 'VEGET', s.veget_score, 
+           IF(:sortBy = 'DIET', s.diet_score, s.total_score)))) DESC,
+        s.distance ASC
+    """, nativeQuery = true)
     Page<SearchResultItem> findSortedStores(
-            @Param("searchResult") SearchResult searchResult,
+            @Param("searchResultId") String searchResultId,
             @Param("placeIds") Set<String> placeIds,
             @Param("minRating") Float minRating,
             @Param("sortBy") String sortBy,

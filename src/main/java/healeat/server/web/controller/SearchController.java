@@ -16,6 +16,8 @@ import healeat.server.web.dto.StoreResonseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +40,9 @@ public class SearchController {
             @AuthenticationPrincipal Member member,
             @RequestParam Integer page,
             @Valid @RequestBody StoreRequestDto.SearchKeywordDto request) {
-
-        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(
-                storeQueryServiceImpl.searchAndMapStores(member, page, request)));
+        Pair<Page<StoreResonseDto.StorePreviewDto>, StoreResonseDto.SearchInfo> pair = storeQueryServiceImpl.searchAndMapStores(member, page, request);
+        System.out.println("Final result: " + pair);
+        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(pair));
     }
 
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
