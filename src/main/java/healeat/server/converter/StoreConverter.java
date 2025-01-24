@@ -1,6 +1,5 @@
 package healeat.server.converter;
 
-import healeat.server.web.dto.KakaoPlaceResponseDto;
 import healeat.server.web.dto.StoreResonseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;

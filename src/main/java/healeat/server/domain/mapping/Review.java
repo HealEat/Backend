@@ -28,10 +28,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-//    @JdbcTypeCode(SqlTypes.JSON)
-//    private Map<Purpose, List<String>> currentPurposes = new HashMap<>();  // 현재 건강 목적
-
-    @JdbcTypeCode(SqlTypes.ARRAY)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
     private List<String> currentPurposes = new ArrayList<>();
 

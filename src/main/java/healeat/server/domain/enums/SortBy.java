@@ -1,8 +1,9 @@
 package healeat.server.domain.enums;
 
+
 public enum SortBy {
 
-    LATEST,
+    DEFAULT,
     SICK,
     VEGET,
     DIET

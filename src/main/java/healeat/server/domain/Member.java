@@ -34,7 +34,7 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
     private List<String> diseases = new ArrayList<>();
 
@@ -47,7 +47,7 @@ public class Member extends BaseEntity {
     private Diet diet = Diet.NONE;
 
     // 건강 정보 로직 반영 결과 저장 (음식 카테고리 리스트)
-    @JdbcTypeCode(SqlTypes.ARRAY)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
     private List<String> healEatFoods = new ArrayList<>();
 

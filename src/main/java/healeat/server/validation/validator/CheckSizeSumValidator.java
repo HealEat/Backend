@@ -1,5 +1,6 @@
 package healeat.server.validation.validator;
 
+import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.StoreRequestDto;
 import jakarta.validation.ConstraintValidator;
@@ -26,9 +27,8 @@ public class CheckSizeSumValidator implements ConstraintValidator<CheckSizeSum, 
 
         if (!isValid) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate(
-                    "categoryIdList와 featureIdList의 크기 합이 6 이상일 수 없습니다."
-            ).addConstraintViolation();
+            context.buildConstraintViolationWithTemplate(ErrorStatus.FILTERS_LESS_EQUAL_THAN_5.toString())
+                    .addConstraintViolation();
         }
 
         return isValid;
