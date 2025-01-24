@@ -27,12 +27,12 @@ public class BookmarkController {
         return ApiResponse.onSuccess(null);
     }
 
-    @Operation(summary = "저장한 가게 북마크 목록 조회 API-(마이페이지)")
-    @GetMapping
-    public ApiResponse<List<StoreResonseDto.StorePreviewDto>> getBookmarkedStores(
-            @AuthenticationPrincipal Member member) {
-        List<StoreResonseDto.StorePreviewDto> stores = bookmarkService.getBookmarkedStores(member);
-        return ApiResponse.onSuccess(stores);
-    }
+//    @Operation(summary = "저장한 가게 북마크 목록 조회 API-(마이페이지)")
+//    @GetMapping
+//    public ApiResponse<List<StoreResonseDto.StorePreviewDto>> getBookmarkedStores(
+//            @AuthenticationPrincipal Member member) {
+//        List<StoreResonseDto.StorePreviewDto> stores = bookmarkService.getBookmarkedStores(member);
+//        return ApiResponse.onSuccess(stores);
+//    }
 
 }
