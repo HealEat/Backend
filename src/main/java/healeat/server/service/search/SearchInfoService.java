@@ -57,7 +57,9 @@ public class SearchInfoService {
 
         KakaoCoordResponseDto.Document document = apiResponse.getDocuments().get(0);
 
-        String region3depthName = document.getAddress().getRegion_3depth_name();
+        String location4ImgSearch = document.getAddress().getRegion_3depth_name();
+        if (location4ImgSearch == null || location4ImgSearch.isBlank())
+            location4ImgSearch = document.getAddress().getRegion_3depth_h_name();
 
         return RealSearchInfo.builder()
                 .keyword(keyword)
@@ -65,7 +67,7 @@ public class SearchInfoService {
                 .y(document.getY())
                 .selectedRegion(selectedRegion)
                 .region(region)
-                .location4ImgSearch(region3depthName)
+                .location4ImgSearch(location4ImgSearch)
                 .newFeatureId(newFeatureId)
                 .build();
     }
