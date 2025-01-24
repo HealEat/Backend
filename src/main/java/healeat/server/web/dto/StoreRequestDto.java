@@ -1,10 +1,11 @@
 package healeat.server.web.dto;
 
-import lombok.Builder;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 public class StoreRequestDto {
 
@@ -18,7 +19,6 @@ public class StoreRequestDto {
     }
 
     @Getter
-    @Builder
     public static class SearchKeywordDto {
 
         String query; // 검색어
@@ -26,8 +26,15 @@ public class StoreRequestDto {
         String x; // 사용자 경도
         String y; // 사용자 위도
 
-        List<Long> categoryIdList;
+        Set<Long> categoryIdList;
 
-        List<Long> featureIdList;
+        Set<Long> featureIdList;
+
+        @Max(value = 5, message = "최소 별점은 5 이하여야 합니다")
+        @Min(value = 0, message = "최소 별점은 0 이상이어야 합니다")
+        Float minRating;
+
+        @Pattern(regexp = "^(DEFAULT|SICK|VEGET|DIET)$", message = "정렬 기준이 올바르지 않습니다")
+        String sortBy = "DEFAULT";
     }
 }

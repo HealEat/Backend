@@ -24,7 +24,7 @@ class MemberHealthInfoConverterTest {
     @Test
     void testToQuestionResponseDto() throws Exception {
         MemberHealQuestion question = MemberHealQuestion.builder()
-                .id(1)
+                .id(1L)
                 .question(Question.HEALTH_ISSUE)
                 .healthInfoAnswers(List.of(
                         HealthInfoAnswer.builder().answer(Answer.WEIGHT_LOSS).build(),
