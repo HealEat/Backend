@@ -32,7 +32,7 @@ public class HealthPlan extends BaseEntity {
     @Builder.Default
     private Integer count = 0; // 목표까지 카운트
 
-    @Column(length = 50)
+    @Column(length = 30)
     private String goal;
 
     @Column(length = 200)

@@ -46,6 +46,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.security:spring-security-oauth2-core'
+
+	// S3 에 업로드, 외부 API 를 사용하기 위한 의존성 추가
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.767'
+	implementation 'software.amazon.awssdk:s3:2.27.3'
+	implementation 'software.amazon.awssdk:s3control:2.27.3'
+	implementation 'software.amazon.awssdk:s3outposts:2.27.3'
 }
 
 dependencyManagement {

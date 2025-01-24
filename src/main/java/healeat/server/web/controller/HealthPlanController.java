@@ -13,8 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.hibernate.query.sqm.tree.SqmNode.log;
 
 @RestController
 @RequestMapping("/plans")
@@ -28,11 +31,21 @@ public class HealthPlanController {
     /*
      GET/plan - 건강 관리 목표 전체 조회
      */
-    @Operation(summary = "건강 관리 목표 조회", description = "건강 관리 목표를 전체 조회합니다.")
+    @Operation(summary = "건강 관리 목표 조회", description = "사용자의 건강 관리 목표를 전체 조회합니다.")
     @GetMapping
     public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member) {
-        List<HealthPlan> healthPlans = healthPlanService.getAllHealthPlans();
+
+        if (member == null || member.getId() == null) {
+            log.warn("Member is null, using default member ID for testing.");
+            Long defaultMemberId = 999L; // 테스트용 기본 Member ID
+            member = Member.builder()
+                    .id(defaultMemberId)
+                    .build();
+        }
+
+        //정상적으로 HealthPlan 조회
+        List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMemberId(member.getId());
         List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
                 .map(healthPlanConverter::toHealthPlanOneDto)
                 .collect(Collectors.toList());
@@ -51,7 +64,7 @@ public class HealthPlanController {
     public ApiResponse<HealthPlanResponseDto.setResultDto> createHealthPlan(
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request,
             @AuthenticationPrincipal Member member) {
-        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request);
+        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request, member);
 
         return ApiResponse.onSuccess(healthPlanConverter.toSetResultDto(createdHealthPlan));
     }
