@@ -83,12 +83,13 @@ public class StoreQueryServiceImpl {
 
             return Pair.of(Page.empty(), searchResult.toSearchInfo(newFeatureId, apiCallCount));
 
-        } else {        // 3. 페이지 요청 생성 (페이지는 0부터 시작하므로 page - 1)
-            Pageable pageable = PageRequest.of(page - 1, 10, Sort.unsorted());
+        } else {
+            // 3. 페이지 요청 생성 (페이지는 0부터 시작하므로 page - 1)
+            Pageable pageable = PageRequest.of(page - 1, 10);
 
             // 4. 정렬된 검색 결과 조회
             Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
-                    searchResult.getSearchId(),
+                    searchResult,
                     filteredPlaceIds,
                     request.getMinRating(),
                     request.getSortBy(),

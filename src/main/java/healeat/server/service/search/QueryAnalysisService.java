@@ -156,7 +156,7 @@ public class QueryAnalysisService {
         Long newFeatureId = feature.getId();
         request.getFeatureIdList().add(newFeatureId);
 
-        return getCoordinatesForRegion(canBeRegionQuery, newFeatureId,
+        return getCoordinatesForRegion("", newFeatureId,
                 sameName.getSelected_region(), sameName.getRegion(), request);
     }
 
@@ -186,6 +186,7 @@ public class QueryAnalysisService {
     public RealSearchInfo getCoordinatesForRegion(String keyword, Long newFeatureId,
                                                   String selectedRegion, List<String> region,
                                                   SearchKeywordDto request) {
+        System.out.println("디버깅1: " + keyword + " " + newFeatureId + " " + selectedRegion + " " + region);
 
         KakaoCoordResponseDto selectedXY = storeApiClient.address2Coord(selectedRegion, 1, 1);
         searchListenerService.incrementApiCallCount();

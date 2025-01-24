@@ -22,5 +22,7 @@ public class KakaoCoordResponseDto {
     public static class Address {
 
         String region_3depth_name;
+
+        String region_3depth_h_name;
     }
 }

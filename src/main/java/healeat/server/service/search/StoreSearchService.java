@@ -45,11 +45,12 @@ public class StoreSearchService {
         Optional<SearchResult> optionalInitResult = searchResultRepository.findByInitIdAndCreatedAtAfter(
                 initKey.generateId(), LocalDateTime.now().minusMinutes(30));
         if (optionalInitResult.isPresent()) {
+            System.out.println(LocalDateTime.now() + " 초기 검색 정보를 통해 캐시가 반환됩니다.");
 
-            System.out.println("초기 검색 정보를 통해 캐시가 반환됩니다.");
             return optionalInitResult.get();
         }
 
+        System.out.println(LocalDateTime.now() + " 검색어 분석을 시작합니다.");
         // 핵심 로직 호출
         // 카카오 로컬 API 활용
         RealSearchInfo realSearchInfo = queryAnalysisService.analyze(request);
@@ -68,11 +69,11 @@ public class StoreSearchService {
                 searchKey.generateId(), LocalDateTime.now().minusMinutes(30));
 
         if (optionalSearchResult.isPresent()) {     // 없다면 캐시에 저장
-            System.out.println("로직을 통해 알아낸 정보로 캐시가 반환됩니다.");
+            System.out.println(LocalDateTime.now() + " 로직을 통해 알아낸 정보로 캐시가 반환됩니다.");
             return optionalSearchResult.get();
         }
 
-        System.out.println("캐시가 없으므로 새로 저장합니다.");
+        System.out.println(LocalDateTime.now() + " 캐시가 없으므로 새로 저장합니다.");
         List<Document> documents = getDocsOnLoopByQuery(searchKey);
 
         SearchResult result = createSearchResult(realSearchInfo, searchKey, initKey, documents);
