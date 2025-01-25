@@ -36,14 +36,6 @@ public class HealthPlanController {
     public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member) {
 
-        if (member == null || member.getId() == null) {
-            log.warn("Member is null, using default member ID for testing.");
-            Long defaultMemberId = 999L; // 테스트용 기본 Member ID
-            member = Member.builder()
-                    .id(defaultMemberId)
-                    .build();
-        }
-
         //정상적으로 HealthPlan 조회
         List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMemberId(member.getId());
         List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
