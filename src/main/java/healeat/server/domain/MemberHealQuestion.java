@@ -32,7 +32,8 @@ public class MemberHealQuestion extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Answer> answers = new ArrayList<>();
 
-    public void updateAnswers(List<Answer> answers) {
+    public MemberHealQuestion updateAnswers(List<Answer> answers) {
         this.answers = answers;
+        return this;
     }
 }
