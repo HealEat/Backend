@@ -26,18 +26,15 @@ public class MemberHealthInfoService {
 
     private final MemberHealQuestionRepository memberHealQuestionRepository;
 
-    public HealInfoResponseDto.ChoseResultDto chooseVegetarian(Member member, String choose) {
+    public Member chooseVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
         member.setVegetAndCheckChanged(vegetarian);
         String chooseName = vegetarian.name();
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
-    public HealInfoResponseDto.ChoseResultDto updateVegetarian(Member member, String choose) {
+    public Member updateVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
         String chooseName = vegetarian.name();
@@ -48,24 +45,18 @@ public class MemberHealthInfoService {
             makeHealEat(member);
         }
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
 
-    public HealInfoResponseDto.ChoseResultDto chooseDiet(Member member, String choose) {
+    public Member chooseDiet(Member member, String choose) {
 
         Diet diet = Diet.getByDescription(choose);
         member.setDietAndCheckChanged(diet);
         String chooseName = diet.name();
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
-    public HealInfoResponseDto.ChoseResultDto updateDiet(Member member, String choose) {
+    public Member updateDiet(Member member, String choose) {
 
         Diet diet = Diet.getByDescription(choose);
         member.setDietAndCheckChanged(diet);
@@ -77,10 +68,7 @@ public class MemberHealthInfoService {
             makeHealEat(member);
         }
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
 
     // Question에 대한 회원의 답변 저장

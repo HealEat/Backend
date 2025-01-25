@@ -1,24 +1,16 @@
 package healeat.server.service;
 
-import healeat.server.apiPayload.code.status.ErrorStatus;
-import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.mapping.Bookmark;
 import healeat.server.repository.BookmarkRepository;
 import healeat.server.repository.StoreRepository;
-import healeat.server.web.dto.StoreResonseDto;
-import healeat.server.web.dto.api_response.KakaoPlaceResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,25 +18,22 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final StoreRepository storeRepository;
-    private final StoreApiClient storeApiClient;
-    private final StoreConverter storeConverter;
 
-    // 북마크 추가/삭제 토글
+    // 북마크를 회원에 저장
     @Transactional
-    public void toggleBookmark(Member member, Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
+    public void saveBookmark(Member member, Long storeId) {
 
-        Optional<Bookmark> existingBookmark = bookmarkRepository.findByMemberAndStore(member, store);
-
-        if(existingBookmark.isPresent()) {
-            bookmarkRepository.delete(existingBookmark.get());
-        } else {
+        Optional<Store> optionalStore = storeRepository.findById(storeId);
+        if (optionalStore.isPresent()) {
+            Store store = optionalStore.get();
             Bookmark bookmark = Bookmark.builder()
                     .member(member)
                     .store(store)
                     .build();
             bookmarkRepository.save(bookmark);
+        } else {
+
+
         }
     }
 
