@@ -3,7 +3,9 @@ package healeat.server.service;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
 import healeat.server.domain.HealthPlan;
+import healeat.server.domain.HealthPlanImage;
 import healeat.server.domain.Member;
+import healeat.server.repository.HealthPlanImageRepository;
 import healeat.server.repository.HealthPlanRepository;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import static org.hibernate.query.sqm.tree.SqmNode.log;
 public class HealthPlanService {
 
     private final HealthPlanRepository healthPlanRepository;
+    private final HealthPlanImageRepository healthPlanImageRepository;
 
     public List<HealthPlan> getAllHealthPlans() {
         return healthPlanRepository.findAll();
@@ -33,6 +36,10 @@ public class HealthPlanService {
 
     public List<HealthPlan> getHealthPlanByMemberId(Long memberId) {
         return healthPlanRepository.findByMemberId(memberId);
+    }
+
+    public List<HealthPlanImage> getHealthPlanImageByPlanId(Long planId) {
+        return healthPlanImageRepository.findAllByHealthPlanId(planId);
     }
 
     @Transactional
@@ -71,7 +78,5 @@ public class HealthPlanService {
     }
 
     @Transactional
-    public void deleteHealthPlan(Long id) {
-        healthPlanRepository.deleteById(id);
-    }
+    public void deleteHealthPlan(Long id) {healthPlanRepository.deleteById(id);}
 }

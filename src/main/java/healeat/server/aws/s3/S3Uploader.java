@@ -1,7 +1,9 @@
 package healeat.server.aws.s3;
 
+import com.amazonaws.services.s3.AmazonS3;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.S3Handler;
+import healeat.server.web.dto.ImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +18,13 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class S3Uploader {
+
+    private static AmazonS3 amazonS3;
 
     @Autowired
     private final S3Presigner s3Presigner;
@@ -40,7 +43,7 @@ public class S3Uploader {
      * @param imageExtension 이미지 확장자
      * @return upload URL과 public URL이 담긴 Map
      */
-    public Map<String, String> createPresignedUrl(String imageType, String imageExtension) {
+    public ImageResponseDto.PresignedUrlDto createPresignedUrl(String imageType, String imageExtension) {
 
         // 폴더별로 경로 설정
         String folder;
@@ -83,10 +86,14 @@ public class S3Uploader {
         log.info("Presigned URL to upload a file to: {}", uploadUrl);
         log.info("HTTP method: {}", presignedRequest.httpRequest().method());
 
-        Map<String, String> responseMap = new ConcurrentHashMap<>();
-        responseMap.put("uploadUrl", uploadUrl);
-        responseMap.put("publicUrl", publicUrl);
+        return ImageResponseDto.PresignedUrlDto.builder()
+                .presignedUrl(uploadUrl)
+                .publicUrl(publicUrl)
+                .build();
+    }
 
-        return responseMap;
+    public void deleteObject(String key) {
+        amazonS3.deleteObject(bucket, key);
+        log.info("Deleted object from S3: {}", key);
     }
 }
