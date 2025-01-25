@@ -5,70 +5,55 @@ import healeat.server.domain.enums.Answer;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FoodRecommendation {
 
-    public static List<String> getRecommendedFoods (Set<Answer> answers, Set<Vegetarian> vegetarians, Set<Diet> diets) {
-        Set<String> recommendedFoods = new HashSet<>();
+    public static List<String> getFinalFoods (Set<Answer> answers, Vegetarian vegetarian, Diet diet) {
 
-        // 답변 - 필요한 음식 추가
-        for (Answer answer : answers) {
-            List<String> answerFoods = FoodMappingConfig.ANSWER_FOOD_ASSIGNMENT.get(answer);
-            if (answerFoods != null) {
-                recommendedFoods.addAll(answerFoods);
-            }
-        }
-        // 베지테리언 - 필요한 음식 추가
-        for (Vegetarian vegetarian : vegetarians) {
-            List<String> vegetarianFoods = FoodMappingConfig.VEGETARIAN_FOOD_ASSIGNMENT.get(vegetarian);
-            if (vegetarianFoods != null) {
-                recommendedFoods.addAll(vegetarianFoods);
-            }
-        }
-        // 다이어트 - 필요한 음식 추가
-        for (Diet diet : diets) {
-            List<String> dietFoods = FoodMappingConfig.DIET_FOOD_ASSIGNMENT.get(diet);
-            if (dietFoods != null) {
-                recommendedFoods.addAll(dietFoods);
-            }
-        }
-        return new ArrayList<>(recommendedFoods);
-    }
-
-    public static List<String> getAvoidedFoods(Set<Answer> answers, Set<Vegetarian> vegetarians) {
-        Set<String> avoidedFoods = new HashSet<> ();
-
-        // 답변 - 피해야 되는 음식 추가
-        for (Answer answer : answers) {
-            List<String> answerFoods = FoodMappingConfig.ANSWER_FOOD_AVOIDANCE.get(answer);
-            if (answerFoods != null) {
-                avoidedFoods.addAll(answerFoods);
-            }
-        }
-        // 베지테리언 - 피해야 되는 음식 추가
-        for (Vegetarian vegetarian : vegetarians) {
-            List<String> vegetFoods = FoodMappingConfig.VEGETARIAN_FOOD_AVOIDANCE.get(vegetarian);
-            if (vegetFoods != null) {
-                avoidedFoods.addAll(vegetFoods);
-            }
-        }
-
-        return new ArrayList<> (avoidedFoods);
-    }
-
-    public static List<String> getFinalFoods (Set<Answer> answers, Set<Vegetarian> vegetarians, Set<Diet> diets) {
         //필요한 옥식
-        Set<String> recommendedFoods = new HashSet<>(getRecommendedFoods(answers, vegetarians, diets));
+        Set<String> recommendedFoods =
+                new HashSet<>(getRecommendedFoods(answers, vegetarian, diet));
         //피해야 할 음식
-        Set<String> avoidedFoods = new HashSet<>(getAvoidedFoods(answers, vegetarians));
+        Set<String> avoidedFoods =
+                new HashSet<>(getAvoidedFoods(answers, vegetarian));
 
         //최종 추천 음식: recommendedFoods - avoidedFoods
         recommendedFoods.removeAll(avoidedFoods);
 
         return new ArrayList<>(recommendedFoods);
+    }
+
+    public static List<String> getRecommendedFoods (Set<Answer> answers, Vegetarian vegetarian, Diet diet) {
+
+        // 답변 - 필요한 음식 추가
+        Set<String> recommendedFoods = answers.stream()
+                .map(FoodMappingConfig.ANSWER_FOOD_ASSIGNMENT::get)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+
+        // 베지테리언 - 필요한 음식 추가
+        recommendedFoods.addAll(FoodMappingConfig.VEGETARIAN_FOOD_ASSIGNMENT.get(vegetarian));
+
+        // 다이어트 - 필요한 음식 추가
+        recommendedFoods.addAll(FoodMappingConfig.DIET_FOOD_ASSIGNMENT.get(diet));
+
+        return new ArrayList<>(recommendedFoods);
+    }
+
+    public static List<String> getAvoidedFoods(Set<Answer> answers, Vegetarian vegetarian) {
+
+        // 답변 - 피해야 되는 음식 추가
+        Set<String> avoidedFoods = answers.stream()
+                .map(FoodMappingConfig.ANSWER_FOOD_AVOIDANCE::get)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream).collect(Collectors.toSet());
+
+        // 베지테리언 - 피해야 되는 음식 추가
+        avoidedFoods.addAll(FoodMappingConfig.VEGETARIAN_FOOD_AVOIDANCE.get(vegetarian));
+
+        return new ArrayList<>(avoidedFoods);
     }
 }
