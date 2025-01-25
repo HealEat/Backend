@@ -2,6 +2,7 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthInfoHandler;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.web.dto.MemberProfileRequestDto;
