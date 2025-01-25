@@ -59,7 +59,9 @@ public class Review extends BaseEntity {
     public void initializeReviewAndStore() {
 
         // 현재 멤버의 건강 목적을 리뷰에 저장
-        currentPurposes.addAll(member.getDiseases());
+        for(Disease disease : member.getDiseases()) {
+            currentPurposes.add(disease.getName());
+        }
         currentPurposes.add(member.getVegetarian().toString());
         currentPurposes.add(member.getDiet().toString());
 
