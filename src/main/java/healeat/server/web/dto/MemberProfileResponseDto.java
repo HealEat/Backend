@@ -45,6 +45,6 @@ public class MemberProfileResponseDto {
     public static class MyProfileQnaDto {
 
         Question question;
-        List<Answer> healthInfoAnswers;
+        List<Answer> answers;
     }
 }

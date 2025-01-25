@@ -67,6 +67,18 @@ public class Member extends BaseEntity {
     private List<Bookmark> bookmarks = new ArrayList<>();
 
 
+    public void setVegetarian(Vegetarian vegetarian) {
+        this.vegetarian = vegetarian;
+    }
+
+    public void setDiet(Diet diet) {
+        this.diet = diet;
+    }
+
+    public void setHealEatFoods(List<String> healEatFoods) {
+        this.healEatFoods = healEatFoods;
+    }
+
     // 프로필을 위한 업데이트 메서드
     public void updateProfile(String name, String profileImageUrl) {
         if(name != null) this.name = name;

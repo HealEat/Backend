@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class FoodRecommendation {
 
-    public static List<String> getFinalFoods (Set<Answer> answers, Vegetarian vegetarian, Diet diet) {
+    public static List<String> getFinalFoods(List<Answer> answers, Vegetarian vegetarian, Diet diet) {
 
         //필요한 옥식
         Set<String> recommendedFoods =
@@ -25,7 +25,7 @@ public class FoodRecommendation {
         return new ArrayList<>(recommendedFoods);
     }
 
-    public static List<String> getRecommendedFoods (Set<Answer> answers, Vegetarian vegetarian, Diet diet) {
+    public static List<String> getRecommendedFoods(List<Answer> answers, Vegetarian vegetarian, Diet diet) {
 
         // 답변 - 필요한 음식 추가
         Set<String> recommendedFoods = answers.stream()
@@ -43,7 +43,7 @@ public class FoodRecommendation {
         return new ArrayList<>(recommendedFoods);
     }
 
-    public static List<String> getAvoidedFoods(Set<Answer> answers, Vegetarian vegetarian) {
+    public static List<String> getAvoidedFoods(List<Answer> answers, Vegetarian vegetarian) {
 
         // 답변 - 피해야 되는 음식 추가
         Set<String> avoidedFoods = answers.stream()
