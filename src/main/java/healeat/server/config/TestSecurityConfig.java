@@ -30,7 +30,7 @@ public class TestSecurityConfig {
     private final MemberRepository memberRepository;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, Filter testAuthenticationFilter) throws Exception {
+    public SecurityFilterChain testSecurityFilterChain(HttpSecurity http, Filter testAuthenticationFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
