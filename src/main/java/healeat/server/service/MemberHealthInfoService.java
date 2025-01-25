@@ -1,68 +1,119 @@
 package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
-import healeat.server.apiPayload.exception.handler.MemberHealthInfoHandler;
-import healeat.server.converter.MemberHealthInfoConverter;
-import healeat.server.domain.HealthInfoAnswer;
+import healeat.server.apiPayload.exception.handler.HealthInfoHandler;
 import healeat.server.domain.Member;
 import healeat.server.domain.MemberHealQuestion;
+import healeat.server.domain.enums.Answer;
+import healeat.server.domain.enums.Diet;
+import healeat.server.domain.enums.Question;
+import healeat.server.domain.enums.Vegetarian;
 import healeat.server.repository.*;
 import healeat.server.web.dto.AnswerRequestDto;
-import healeat.server.web.dto.AnswerResponseDto;
-import healeat.server.web.dto.MemberHealthInfoResponseDto;
-import healeat.server.web.dto.QuestionResponseDto;
+import healeat.server.web.dto.HealInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberHealthInfoService {
 
-    private final MemberRepository memberRepository;
-    private final MemberHealQuestionRepository questionRepository;
-    private final HealthInfoAnswerRepository answerRepository;
-    private final MemberHealthInfoConverter converter;
+    private final MemberHealQuestionRepository memberHealQuestionRepository;
 
-    // 회원의 건강 정보 질문 및 답변 데이터 전체 조회
-    @Transactional(readOnly = true)
-    public MemberHealthInfoResponseDto getMemberHealthInfo(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    public HealInfoResponseDto.ChoseResultDto chooseVegetarian(Member member, String choose) {
 
-        List<QuestionResponseDto> questions = member.getMemberHealQuestions().stream()
-                .map(converter::toQuestionResponseDto)
+        Vegetarian vegetarian = Vegetarian.getByDescription(choose);
+        member.setVegetarian(vegetarian);
+        String chooseName = vegetarian.name();
+
+        return HealInfoResponseDto.ChoseResultDto.builder()
+                .memberId(member.getId())
+                .choose(chooseName)
+                .build();
+    }
+
+    public HealInfoResponseDto.ChoseResultDto chooseDiet(Member member, String choose) {
+
+        Diet diet = Diet.getByDescription(choose);
+        member.setDiet(diet);
+        String chooseName = diet.name();
+
+        return HealInfoResponseDto.ChoseResultDto.builder()
+                .memberId(member.getId())
+                .choose(chooseName)
+                .build();
+    }
+
+    // Question에 대한 회원의 답변 저장
+    public MemberHealQuestion createQuestion(Member member, Integer questionNum, AnswerRequestDto request) {
+
+        // 1. HEALTH_ISSUE, 2. MEAL_NEEDED, 3. NUTRIENT_NEEDED, 4. FOOD_TO_AVOID
+        questionNum = Math.max(0, questionNum - 1);
+        Question question = Question.values()[questionNum];
+
+        List<Answer> answers = request.getSelectedAnswers().stream()
+                .map(Answer::getByDescription)
                 .toList();
 
-        return converter.toMemberHealthInfoResponseDto(member, questions);
+        MemberHealQuestion memberHealQuestion = MemberHealQuestion.builder()
+                .member(member)
+                .question(question)
+                .answers(answers)
+                .build();
+
+        return memberHealQuestionRepository.save(memberHealQuestion);
     }
 
-    // 특정 질문 조회하기
-    @Transactional(readOnly = true)
-    public QuestionResponseDto getQuestion(Integer questionId) {
-        MemberHealQuestion question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
+    // Question에 대한 회원의 답변 수정
+    public MemberHealQuestion updateQuestion(Member member, Integer questionNum, AnswerRequestDto request) {
 
-        return converter.toQuestionResponseDto(question);
+        // 1. HEALTH_ISSUE, 2. MEAL_NEEDED, 3. NUTRIENT_NEEDED, 4. FOOD_TO_AVOID
+        questionNum = Math.max(0, questionNum - 1);
+        Question question = Question.values()[questionNum];
+
+        List<Answer> answers = request.getSelectedAnswers().stream()
+                .map(Answer::getByDescription)
+                .toList();
+
+        List<MemberHealQuestion> memberHealQuestions = memberHealQuestionRepository.findByMember(member);
+        MemberHealQuestion memberHealQuestion = memberHealQuestions.stream()
+                .filter(mhq -> mhq.getQuestion() == question)
+                .findFirst().orElseThrow(() ->
+                        new HealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
+
+        // 답변에 변경 사항이 없으면 리턴
+        boolean isSame = new HashSet<>(memberHealQuestion.getAnswers())
+                .equals(new HashSet<>(answers));
+        if (isSame)
+            return memberHealQuestion;
+
+        // 변경 사항 있을 시 알고리즘 새로 계산
+        makeHealEat(member);
+        return memberHealQuestion.updateAnswers(answers);
     }
 
-    // 특정 질문에 대한 회원의 답변 저장
-    @Transactional
-    public AnswerResponseDto saveAnswer(Long memberId, Integer questionId, AnswerRequestDto request) {
+    public HealInfoResponseDto makeHealEat(Member member) {
 
-        MemberHealQuestion question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
+        List<Answer> answers = new ArrayList<>();
 
-        // 기존 답변 삭제
-        answerRepository.deleteByMemberHealQuestion(question);
+        member.getMemberHealQuestions()
+                .forEach(mhq -> answers.addAll(mhq.getAnswers()));
 
-        // 새로운 답변 저장
-        List<HealthInfoAnswer> answers = converter.toHealthInfoAnswers(request.getSelectedAnswers(), question);
-        answerRepository.saveAll(answers);
+        List<String> healEatFoods = FoodRecommendation
+                .getFinalFoods(answers, member.getVegetarian(), member.getDiet());
 
-        return converter.toAnswerResponseDto(memberId, questionId, request.getSelectedAnswers());
+        member.setHealEatFoods(healEatFoods);
+
+        return HealInfoResponseDto.builder()
+                .memberId(member.getId())
+                .healEatFoods(healEatFoods)
+                .build();
     }
-
 }

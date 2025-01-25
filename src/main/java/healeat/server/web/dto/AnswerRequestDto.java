@@ -13,5 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class AnswerRequestDto {
-    private List<Answer> selectedAnswers;
+
+    List<String> selectedAnswers;
 }

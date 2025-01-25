@@ -1,9 +1,12 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
+import healeat.server.domain.enums.Answer;
 import healeat.server.domain.enums.Question;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,11 @@ public class MemberHealQuestion extends BaseEntity {
     @Column(nullable = false)
     private Question question;
 
-    @OneToMany(mappedBy = "memberHealQuestion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HealthInfoAnswer> healthInfoAnswers = new ArrayList<>();
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<Answer> answers = new ArrayList<>();
+
+    public MemberHealQuestion updateAnswers(List<Answer> answers) {
+        this.answers = answers;
+        return this;
+    }
 }
