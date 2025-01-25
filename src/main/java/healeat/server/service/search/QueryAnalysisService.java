@@ -60,6 +60,7 @@ public class QueryAnalysisService {
         // " ", "소화가 잘 되는 음식"
         Long newFeatId = getNewQueryAndFeatId(query);
         request.getFeatureIdList().add(newFeatId);
+        if (newFeatId != 0L) searchListenerService.setNewFeatureId(newFeatId);
         if (newFeatId != 0L || query == null || query.isBlank()) {
             System.out.println("빈 쿼리 및 음식 특징 처리\n"
             + "\" \", \"소화가 잘 되는 음식\"");
@@ -102,6 +103,7 @@ public class QueryAnalysisService {
         Long newFeatId = getNewQueryAndFeatId(keyword);
         request.getFeatureIdList().add(newFeatId);
         if (newFeatId != 0L) {
+            searchListenerService.setNewFeatureId(newFeatId);
             System.out.println("지역명을 제외하면 음식 특징만 남는 경우 처리\n"
             + "홍대 소화가 잘 되는 음식");
             return getCoordinatesForRegion("", newFeatId, selectedRegion, region, request);
@@ -155,6 +157,7 @@ public class QueryAnalysisService {
         // "왕십리 소화가 잘 되는 음식"
         Long newFeatureId = feature.getId();
         request.getFeatureIdList().add(newFeatureId);
+        searchListenerService.setNewFeatureId(newFeatureId);
 
         return getCoordinatesForRegion("", newFeatureId,
                 sameName.getSelected_region(), sameName.getRegion(), request);

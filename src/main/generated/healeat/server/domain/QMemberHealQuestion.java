@@ -24,10 +24,10 @@ public class QMemberHealQuestion extends EntityPathBase<MemberHealQuestion> {
 
     public final healeat.server.domain.common.QBaseEntity _super = new healeat.server.domain.common.QBaseEntity(this);
 
+    public final ListPath<healeat.server.domain.enums.Answer, EnumPath<healeat.server.domain.enums.Answer>> answers = this.<healeat.server.domain.enums.Answer, EnumPath<healeat.server.domain.enums.Answer>>createList("answers", healeat.server.domain.enums.Answer.class, EnumPath.class, PathInits.DIRECT2);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
-
-    public final ListPath<HealthInfoAnswer, QHealthInfoAnswer> healthInfoAnswers = this.<HealthInfoAnswer, QHealthInfoAnswer>createList("healthInfoAnswers", HealthInfoAnswer.class, QHealthInfoAnswer.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

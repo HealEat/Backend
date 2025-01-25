@@ -1,6 +1,7 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.converter.MemberHealQuestionConverter;
 import healeat.server.domain.Member;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
@@ -19,35 +20,58 @@ public class InfoController {
     private final MemberHealthInfoService memberHealthInfoService;
 
     @Operation(summary = "프로필 설정 API")
-    @PostMapping
+    @PostMapping("/profile")
     public ApiResponse<MemberProfileResponseDto> createProfile(
             @AuthenticationPrincipal Member member,
             @RequestBody MemberProfileRequestDto request) {
 
-        // create, update, delete(이미지가 null로 들어온다든지), 동일 이름 중복 .. 의 로직을 통합해서
-        // createOrUpdate(member, request) <- 등의 메서드를 서비스 단에 개발하는 것 추천
-        // 모두 POST로 묶으면 됨. POST는 무적
-        return ApiResponse.onSuccess(/*memberService.createProfile(member, request)*/null);
+        return ApiResponse.onSuccess(memberService.createProfile(member, request));
     }
 
-    @Operation(summary = "사용자 앱 사용 목적과 질문 및 답변 전체 조회 API")
-    @GetMapping("/purposes")
-    public ApiResponse<MemberHealthInfoResponseDto> getMemberHealthInfo(@AuthenticationPrincipal Member member) {
-        return ApiResponse.onSuccess(memberHealthInfoService.getMemberHealthInfo(member.getId()));
+    @Operation(summary = "질환 정보 저장 API")
+    @PostMapping("/disease")
+    public ApiResponse<Void> saveDiseases() {
+
+        return ApiResponse.onSuccess(null);
     }
 
-    @Operation(summary = "특정 질문 조회하기 API")
-    @GetMapping("/questions/{questionId}")
-    public ApiResponse<QuestionResponseDto> getQuestion(@PathVariable Integer questionId) {
-        return ApiResponse.onSuccess(memberHealthInfoService.getQuestion(questionId));
-    }
-
-    @Operation(summary = "특정 질문 답변 저장하기 API")
-    @PutMapping("/questions/{questionId}/answers")
-    public ApiResponse<AnswerResponseDto> saveAnswer(
+    @Operation(summary = "베지테리언 선택 API")
+    @PatchMapping("/veget")
+    public ApiResponse<HealInfoResponseDto.ChoseResultDto> chooseVegetarian(
             @AuthenticationPrincipal Member member,
-            @PathVariable Integer questionId,
+            @RequestParam String vegetarian) {
+        return ApiResponse.onSuccess(memberHealthInfoService.chooseVegetarian(member, vegetarian));
+    }
+
+    @Operation(summary = "다이어트 선택 API")
+    @PatchMapping("/diet")
+    public ApiResponse<HealInfoResponseDto.ChoseResultDto> chooseDiet(
+                @AuthenticationPrincipal Member member,
+                @RequestParam String diet) {
+        return ApiResponse.onSuccess(memberHealthInfoService.chooseDiet(member, diet));
+    }
+
+    @Operation(summary = "기본 질문의 답변 저장 API", description =
+            """
+                    1. 질병으로 인해 겪는 건강 상의 불편함은 무엇인가요?
+                    2. 건강 관리를 위해 필요한 식사는 무엇인가요?
+                    3. 건강 관리를 위해 특별히 필요한 영양소가 있나요?
+                    4. 건강 관리를 위해 피해야 하는 음식이 있나요?""")
+    @PostMapping("/{questionNum}")
+    public ApiResponse<HealInfoResponseDto.BaseResultDto> saveAnswer(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Integer questionNum,
             @RequestBody AnswerRequestDto request) {
-        return ApiResponse.onSuccess(memberHealthInfoService.saveAnswer(member.getId(), questionId, request));
+
+        return ApiResponse.onSuccess(MemberHealQuestionConverter.toBaseQuestionDto(
+                memberHealthInfoService.createQuestion(member, questionNum, request)));
+    }
+
+    @Operation(summary = "알고리즘 계산 API", description = "알고리즘을 통해 healEatFoods(추천 음식 카테고리 리스트)를" +
+            " 멤버에 저장합니다. 건강 정보 최초 설정이 완료된 후 로딩 페이지에 적절한 API입니다.")
+    @GetMapping("/loading")
+    public ApiResponse<HealInfoResponseDto> calculateHealEat(@AuthenticationPrincipal Member member) {
+
+        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(member));
     }
 }
