@@ -10,29 +10,29 @@ import com.querydsl.core.types.Path;
 
 
 /**
- * QFoodCategory is a Querydsl query type for FoodCategory
+ * QDisease is a Querydsl query type for Disease
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QFoodCategory extends EntityPathBase<FoodCategory> {
+public class QDisease extends EntityPathBase<Disease> {
 
-    private static final long serialVersionUID = -1597236839L;
+    private static final long serialVersionUID = 270608703L;
 
-    public static final QFoodCategory foodCategory = new QFoodCategory("foodCategory");
+    public static final QDisease disease = new QDisease("disease");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath name = createString("name");
 
-    public QFoodCategory(String variable) {
-        super(FoodCategory.class, forVariable(variable));
+    public QDisease(String variable) {
+        super(Disease.class, forVariable(variable));
     }
 
-    public QFoodCategory(Path<? extends FoodCategory> path) {
+    public QDisease(Path<? extends Disease> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QFoodCategory(PathMetadata metadata) {
-        super(FoodCategory.class, metadata);
+    public QDisease(PathMetadata metadata) {
+        super(Disease.class, metadata);
     }
 
 }

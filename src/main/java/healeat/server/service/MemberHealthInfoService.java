@@ -2,6 +2,7 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthInfoHandler;
+import healeat.server.domain.Disease;
 import healeat.server.domain.Member;
 import healeat.server.domain.MemberHealQuestion;
 import healeat.server.domain.enums.Answer;
@@ -25,6 +26,8 @@ import java.util.List;
 public class MemberHealthInfoService {
 
     private final MemberHealQuestionRepository memberHealQuestionRepository;
+    private final MemberRepository memberRepository;
+    private final DiseaseRepository diseaseRepository;
 
     public Member chooseVegetarian(Member member, String choose) {
 
@@ -134,4 +137,21 @@ public class MemberHealthInfoService {
                 .healEatFoods(healEatFoods)
                 .build();
     }
+
+    // 질병 검색 기능
+    @Transactional(readOnly = true)
+    public List<Disease> searchDiseases(String keyword) {
+        return diseaseRepository.findByNameContaining(keyword);
+    }
+
+    // 회원이 선택한 질병 저장 기능
+    @Transactional
+    public void saveMemberDiseases(Member member, List<Long> diseaseIds) {
+
+        List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
+
+        member.setDiseases(diseases);
+        memberRepository.save(member);
+    }
+
 }
