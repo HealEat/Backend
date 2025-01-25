@@ -1,8 +1,7 @@
 package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
-import healeat.server.apiPayload.exception.handler.MemberHandler;
-import healeat.server.apiPayload.exception.handler.MemberHealthInfoHandler;
+import healeat.server.apiPayload.exception.handler.HealthInfoHandler;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.web.dto.MemberProfileRequestDto;
@@ -10,7 +9,6 @@ import healeat.server.web.dto.MemberProfileResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +67,7 @@ public class MemberService {
     @Transactional
     public void updateMemberDiseases(Long memberId, String searchText){
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHealthInfoHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new HealthInfoHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         // Feign Client 호출
         List<String> diseases = diseaseFeignClient.getDiseases(

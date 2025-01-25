@@ -1,8 +1,7 @@
 package healeat.server.web.dto;
 
-import healeat.server.domain.HealthInfoAnswer;
 import healeat.server.domain.Member;
-import healeat.server.domain.MemberHealQuestion;
+import healeat.server.domain.enums.Answer;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Question;
 import healeat.server.domain.enums.Vegetarian;
@@ -46,8 +45,6 @@ public class MemberProfileResponseDto {
     public static class MyProfileQnaDto {
 
         Question question;
-        List<HealthInfoAnswer> healthInfoAnswers;
+        List<Answer> answers;
     }
-
-
 }
