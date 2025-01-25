@@ -72,12 +72,18 @@ public class Member extends BaseEntity {
     private List<Bookmark> bookmarks = new ArrayList<>();
 
 
-    public void setVegetarian(Vegetarian vegetarian) {
+    public boolean setVegetAndCheckChanged(Vegetarian vegetarian) {
+        boolean isChanged = false;
+        if (this.vegetarian != vegetarian) isChanged = true;
         this.vegetarian = vegetarian;
+        return isChanged;
     }
 
-    public void setDiet(Diet diet) {
+    public boolean setDietAndCheckChanged(Diet diet) {
+        boolean isChanged = false;
+        if (this.diet != diet) isChanged = true;
         this.diet = diet;
+        return isChanged;
     }
 
     public void setHealEatFoods(List<String> healEatFoods) {

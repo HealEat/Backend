@@ -3,6 +3,7 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.HealthPlan;
 import healeat.server.domain.Member;
+import healeat.server.repository.MemberRepository;
 import healeat.server.service.HealthPlanService;
 import healeat.server.converter.HealthPlanConverter;
 import healeat.server.web.dto.HealthPlanResponseDto;
@@ -26,6 +27,7 @@ public class HealthPlanController {
 
     private final HealthPlanService healthPlanService;
     private final HealthPlanConverter healthPlanConverter;
+    private final MemberRepository memberRepository;
 
 
     /*
@@ -36,16 +38,10 @@ public class HealthPlanController {
     public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member) {
 
-        if (member == null || member.getId() == null) {
-            log.warn("Member is null, using default member ID for testing.");
-            Long defaultMemberId = 999L; // 테스트용 기본 Member ID
-            member = Member.builder()
-                    .id(defaultMemberId)
-                    .build();
-        }
+        Member testMember = memberRepository.findById(999L).get();
 
         //정상적으로 HealthPlan 조회
-        List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMemberId(member.getId());
+        List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMemberId(testMember.getId());
         List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
                 .map(healthPlanConverter::toHealthPlanOneDto)
                 .collect(Collectors.toList());
@@ -64,7 +60,10 @@ public class HealthPlanController {
     public ApiResponse<HealthPlanResponseDto.setResultDto> createHealthPlan(
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request,
             @AuthenticationPrincipal Member member) {
-        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request, member);
+
+        Member testMember = memberRepository.findById(999L).get();
+
+        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request, testMember);
 
         return ApiResponse.onSuccess(healthPlanConverter.toSetResultDto(createdHealthPlan));
     }
@@ -76,9 +75,9 @@ public class HealthPlanController {
             "(이미지와 메모는 아직 추가되지 않았음)")
     @PatchMapping("/{planId}")
     public ApiResponse<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlanPartial(
-            @AuthenticationPrincipal Member member,
             @PathVariable Long planId,
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest) {
+
         HealthPlan updatedHealthPlan = healthPlanService.updateHealthPlanPartial(planId, updateRequest);
         HealthPlanResponseDto.HealthPlanOneDto response = healthPlanConverter.toHealthPlanOneDto(updatedHealthPlan);
         return ApiResponse.onSuccess(response);
@@ -90,8 +89,8 @@ public class HealthPlanController {
     @Operation(summary = "건강 관리 목표 삭제", description = "건강 관리 목표를 삭제합니다.")
     @DeleteMapping("/{planId}")
     public ApiResponse<HealthPlanResponseDto.deleteResultDto> deleteHealthPlan(
-            @AuthenticationPrincipal Member member,
             @PathVariable Long planId) {
+
         HealthPlan deleteHealthPlan = healthPlanService.getHealthPlanById(planId);
         HealthPlanResponseDto.deleteResultDto response = healthPlanConverter.toDeleteResultDto(deleteHealthPlan);
 
