@@ -1,6 +1,7 @@
 package healeat.server.web.dto;
 
 import healeat.server.domain.enums.Answer;
+import healeat.server.domain.enums.Question;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class AnswerResponseDto {
-    private Long memberId;
-    private Integer questionId;
-    private List<Answer> selectedAnswers;
+
+    Long memberId;
+    Question question;
+    List<Answer> selectedAnswers;
 }
