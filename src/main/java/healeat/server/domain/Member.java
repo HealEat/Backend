@@ -34,9 +34,14 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
-    @JdbcTypeCode(SqlTypes.JSON)
+    @ManyToMany
+    @JoinTable(
+            name = "member_disease",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "disease_id")
+    )
     @Builder.Default
-    private List<String> diseases = new ArrayList<>();
+    private List<Disease> diseases = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -78,6 +83,8 @@ public class Member extends BaseEntity {
     public void setHealEatFoods(List<String> healEatFoods) {
         this.healEatFoods = healEatFoods;
     }
+
+    public void setDiseases(List<Disease> diseases) { this.diseases = diseases; }
 
     // 프로필을 위한 업데이트 메서드
     public void updateProfile(String name, String profileImageUrl) {
