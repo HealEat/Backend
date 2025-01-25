@@ -64,21 +64,21 @@ public class MyPageController {
     @Operation(summary = "베지테리언 선택 변경과 계산 API", description = "베지테리언 선택을 업데이트하고," +
             "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
     @PatchMapping("/health-info/veget")
-    public ApiResponse<HealInfoResponseDto.ChoseResultDto> chooseVegetarian(
+    public ApiResponse<HealInfoResponseDto.ChoseResultDto> updateVegetarian(
             @AuthenticationPrincipal Member member,
             @RequestParam String vegetarian) {
 
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(memberHealthInfoService.updateVegetarian(member, vegetarian));
     }
 
     @Operation(summary = "다이어트 선택 변경과 계산 API", description = "다이어트 선택을 업데이트하고," +
             "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
     @PatchMapping("/health-info/diet")
-    public ApiResponse<HealInfoResponseDto.ChoseResultDto> chooseDiet(
+    public ApiResponse<HealInfoResponseDto.ChoseResultDto> updateDiet(
             @AuthenticationPrincipal Member member,
             @RequestParam String diet) {
 
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(memberHealthInfoService.updateDiet(member, diet));
     }
 
     @Operation(summary = "기본 질문의 답변 변경과 계산 API", description = "기본 질문의 답변을 업데이트하고," +
