@@ -1,8 +1,5 @@
 package healeat.server.service;
 
-import healeat.server.apiPayload.code.status.ErrorStatus;
-import healeat.server.apiPayload.exception.handler.HealthInfoHandler;
-import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.web.dto.MemberProfileRequestDto;
@@ -11,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,7 +15,6 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final DiseaseFeignClient diseaseFeignClient;
 
     // 프로필 정보 조회 API
     @Transactional(readOnly = true)
@@ -63,27 +58,4 @@ public class MemberService {
         return existingMember.isEmpty();
     }
 
-
-    // 회원의 질병 설정
-    @Transactional
-    public void updateMemberDiseases(Long memberId, String searchText){
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new HealthInfoHandler(ErrorStatus.MEMBER_NOT_FOUND));
-
-        // Feign Client 호출
-        List<String> diseases = diseaseFeignClient.getDiseases(
-                10,
-                1,
-                1,
-                1,  // 양방
-                "SICK_NM",
-                searchText  // 내가 검색한 질병명
-        ).extractDiseaseNames();
-
-        // Member 도메인의 diseases 필드 업데이트
-        member.getDiseases().clear();
-        member.getDiseases().addAll(diseases);
-
-        memberRepository.save(member);
-    }
 }

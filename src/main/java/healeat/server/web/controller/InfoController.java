@@ -1,7 +1,10 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.converter.MemberHealQuestionConverter;
+import healeat.server.domain.Disease;
 import healeat.server.domain.Member;
+import healeat.server.service.DiseaseService;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
@@ -13,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import static healeat.server.converter.MemberHealQuestionConverter.*;
 
 @RestController
@@ -22,7 +26,9 @@ public class InfoController {
 
     private final MemberService memberService;
     private final MemberHealthInfoService memberHealthInfoService;
+    private final DiseaseService diseaseService;
     private final MemberRepository memberRepository;
+
 
     @Operation(summary = "프로필 설정 API")
     @PostMapping("/profile")
@@ -35,12 +41,28 @@ public class InfoController {
         return ApiResponse.onSuccess(memberService.createProfile(testMember, request));
     }
 
-    @Operation(summary = "질환 정보 저장 API")
-    @PostMapping("/disease")
-    public ApiResponse<Void> saveDiseases() {
+    @Operation(summary = "질병 검색 API")
+    @GetMapping("/disease/search")
+    public ApiResponse<List<Disease>> searchDiseases(@RequestParam String keyword) {
+        List<Disease> diseases = memberHealthInfoService.searchDiseases(keyword);
+        return ApiResponse.onSuccess(diseases);
+    }
 
-        Member testMember = memberRepository.findById(999L).get();
+    @Operation(summary = "회원 질병 저장 API")
+    @PostMapping("/disease/save")
+    public ApiResponse<Void> saveDiseases(
+            @AuthenticationPrincipal Member member,
+            @RequestBody MemberDiseaseRequestDto request
+    ) {
+        memberHealthInfoService.saveMemberDiseases(member, request.getDiseaseIds());
+        return ApiResponse.onSuccess(null);
+    }
 
+    @Operation(summary = "질환 정보 CSV 저장 API"
+            , description = "새로운 데이터 갱신이 필요할 경우, 이 메소드를 다시 호출하여 CSV 파일을 다시 업로드")
+    @PostMapping("/disease/upload")
+    public ApiResponse<Void> uploadDiseases(@RequestParam String filePath) {
+        diseaseService.saveDiseasesFromCSV(filePath);
         return ApiResponse.onSuccess(null);
     }
 
