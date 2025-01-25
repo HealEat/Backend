@@ -6,10 +6,11 @@ public enum Vegetarian {
 
     FLEXI,
     POLO_PESCET,
-    POLO,
     PESCET,
-    LACTO_OVO,
-    LACTO,
-    OVO,
+    POLO,
+
+    LACTO_OVO, // VEGAN과 동일
+    LACTO, // VEGAN과 동일
+    OVO, // VEGAN과 동일
     VEGAN
 }
