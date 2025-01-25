@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public enum Diet {
 
-    NONE(null),
+    NONE(""),
 
     LOSE_WEIGHT("체중 감량"),
     MAINTAIN("건강 유지");

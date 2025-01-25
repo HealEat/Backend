@@ -29,28 +29,49 @@ public class MemberHealthInfoService {
     private final MemberRepository memberRepository;
     private final DiseaseRepository diseaseRepository;
 
-    public HealInfoResponseDto.ChoseResultDto chooseVegetarian(Member member, String choose) {
+    public Member chooseVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
-        member.setVegetarian(vegetarian);
+        member.setVegetAndCheckChanged(vegetarian);
         String chooseName = vegetarian.name();
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
+    }
+    public Member updateVegetarian(Member member, String choose) {
+
+        Vegetarian vegetarian = Vegetarian.getByDescription(choose);
+        String chooseName = vegetarian.name();
+
+        // 변경 사항 있을 시 알고리즘 새로 계산
+        boolean isChanged = member.setVegetAndCheckChanged(vegetarian);
+        if (isChanged) {
+            makeHealEat(member);
+        }
+
+        return member;
     }
 
-    public HealInfoResponseDto.ChoseResultDto chooseDiet(Member member, String choose) {
+    public Member chooseDiet(Member member, String choose) {
 
         Diet diet = Diet.getByDescription(choose);
-        member.setDiet(diet);
+        member.setDietAndCheckChanged(diet);
         String chooseName = diet.name();
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
+    }
+    public Member updateDiet(Member member, String choose) {
+
+        Diet diet = Diet.getByDescription(choose);
+        member.setDietAndCheckChanged(diet);
+        String chooseName = diet.name();
+
+        // 변경 사항 있을 시 알고리즘 새로 계산
+        boolean isChanged = member.setDietAndCheckChanged(diet);
+        if (isChanged) {
+            makeHealEat(member);
+        }
+
+        return member;
     }
 
     // Question에 대한 회원의 답변 저장
@@ -72,7 +93,6 @@ public class MemberHealthInfoService {
 
         return memberHealQuestionRepository.save(memberHealQuestion);
     }
-
     // Question에 대한 회원의 답변 수정
     public MemberHealQuestion updateQuestion(Member member, Integer questionNum, AnswerRequestDto request) {
 
@@ -90,15 +110,14 @@ public class MemberHealthInfoService {
                 .findFirst().orElseThrow(() ->
                         new HealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
 
-        // 답변에 변경 사항이 없으면 리턴
-        boolean isSame = new HashSet<>(memberHealQuestion.getAnswers())
-                .equals(new HashSet<>(answers));
-        if (isSame)
-            return memberHealQuestion;
-
         // 변경 사항 있을 시 알고리즘 새로 계산
-        makeHealEat(member);
-        return memberHealQuestion.updateAnswers(answers);
+        boolean isChanged = !(new HashSet<>(memberHealQuestion.getAnswers()).equals(new HashSet<>(answers)));
+        if (isChanged) {
+            memberHealQuestion.setAnswers(answers);
+            makeHealEat(member);
+        }
+
+        return memberHealQuestion;
     }
 
     public HealInfoResponseDto makeHealEat(Member member) {

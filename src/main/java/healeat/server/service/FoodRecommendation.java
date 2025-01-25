@@ -35,7 +35,9 @@ public class FoodRecommendation {
                 .collect(Collectors.toSet());
 
         // 베지테리언 - 필요한 음식 추가
-        recommendedFoods.addAll(FoodMappingConfig.VEGETARIAN_FOOD_ASSIGNMENT.get(vegetarian));
+        if (vegetarian != Vegetarian.FLEXI){
+            recommendedFoods.addAll(FoodMappingConfig.VEGETARIAN_FOOD_ASSIGNMENT.get(vegetarian));
+        }
 
         // 다이어트 - 필요한 음식 추가
         recommendedFoods.addAll(FoodMappingConfig.DIET_FOOD_ASSIGNMENT.get(diet));
@@ -51,8 +53,10 @@ public class FoodRecommendation {
                 .filter(Objects::nonNull)
                 .flatMap(Collection::stream).collect(Collectors.toSet());
 
-        // 베지테리언 - 피해야 되는 음식 추가
-        avoidedFoods.addAll(FoodMappingConfig.VEGETARIAN_FOOD_AVOIDANCE.get(vegetarian));
+        // 폴로 베지테리언 - 피해야 되는 음식 추가
+        if (vegetarian == Vegetarian.POLO) {
+            avoidedFoods.addAll(FoodMappingConfig.VEGETARIAN_FOOD_AVOIDANCE.get(vegetarian));
+        }
 
         return new ArrayList<>(avoidedFoods);
     }

@@ -52,6 +52,12 @@ public class StoreQueryServiceImpl {
 
     private final SearchListenerService searchListenerService;
 
+    @Transactional
+    public void saveStore(Long kakaoStoreId) {
+
+
+    }
+
     /**
      * 핵심 로직 이후
      * 정렬 및 페이징 적용
