@@ -109,6 +109,8 @@ public class FoodMappingConfig {
                 "아시아음식 > 베트남음식", "분식", "샤브샤브", "샐러드"));
 
         //베지테리언에 대한 답변으로 필요한 음식 매핑
+        //플렉시테리언 - 없음
+
         //폴로-페스코
         VEGETARIAN_FOOD_ASSIGNMENT.put(Vegetarian.POLO_PESCET,Arrays.asList("한식 > 국수", "한식 > 육류,고기 > 닭요리",
                 "한식 > 육류,고기 > 오리", "한식 > 해물,생선", "한식 > 수제비", "한식 > 두부전문점",
