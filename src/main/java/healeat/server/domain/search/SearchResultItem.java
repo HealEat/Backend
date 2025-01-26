@@ -10,6 +10,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,9 @@ public class SearchResultItem extends BaseEntity {
 
     @Column(nullable = false)
     private String placeId;
+
+    @Column
+    private Boolean isInDB;
 
     @Column
     private String headForAPI;
@@ -65,7 +69,7 @@ public class SearchResultItem extends BaseEntity {
 
     // 다음 이미지 API
     @JdbcTypeCode(SqlTypes.JSON)
-    private List<String> imageUrlList = new ArrayList<>();
+    private List<String> imageUrlList = new LinkedList<>();
 
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> features = new ArrayList<>();
@@ -85,14 +89,26 @@ public class SearchResultItem extends BaseEntity {
     @Column
     private Float dietScore;
 
+
+    public void addReviewImgsToHead(List<String> reviewImgList) {
+        this.imageUrlList.addAll(0, reviewImgList);
+    }
+
+    public void setChangableData(String headForApi, Integer distance, List<String> features) {
+        this.headForAPI = headForApi;
+        this.distance = distance;
+        this.features = features;
+    }
+
     @Builder
-    public SearchResultItem(String placeId, String placeName, String categoryName, String phone,
+    public SearchResultItem(String placeId, Boolean isInDB, String placeName, String categoryName, String phone,
                             String addressName, String roadAddressName, String headForAPI,
                             String x, String y, String placeUrl, Integer distance,
                             List<String> imageUrlList, List<String> features,
                             Integer reviewCount, Float totalScore,
                             Float sickScore, Float vegetScore, Float dietScore) {
         this.placeId = placeId;
+        this.isInDB = isInDB;
         this.headForAPI = headForAPI;
         this.placeName = placeName;
         this.categoryName = categoryName;

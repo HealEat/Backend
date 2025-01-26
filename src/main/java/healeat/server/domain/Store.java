@@ -6,6 +6,8 @@ import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,22 @@ public class Store extends BaseEntity {
     private Long id;
 
     /**
+     * 가게 정보 (from Kakao Local API)
+     *  저장 trigger - 가게에 대한 최초 리뷰, 최초 북마크
+     */
+    private String placeName;
+    private String categoryName;
+    private String phone;
+    private String addressName;
+    private String roadAddressName;
+    private String x;
+    private String y;
+    private String placeUrl;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> daumImgUrlList = new ArrayList<>();
+
+    /**
      * 평점
      */
     private Float totalScore; // 전체 평점
@@ -44,7 +62,6 @@ public class Store extends BaseEntity {
     private Float cleanScore; // 평점(청결도)
     private Float freshScore; // 평점(신선도)
     private Float nutrScore; // 평점(영양 균형)
-
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
