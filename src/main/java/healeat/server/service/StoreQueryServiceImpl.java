@@ -136,7 +136,7 @@ public class StoreQueryServiceImpl {
             case SICK:
                 sorting = Sort.by(direction, "totalScore", "createdAt");
                 pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_DiseasesNotEmpty(store, pageable);
+                return reviewRepository.findAllByStoreAndMember_MemberDiseasesNotEmpty(store, pageable);
             case VEGET:
                 sorting = Sort.by(direction, "totalScore", "createdAt");
                 pageable = PageRequest.of(adjustedPage, 10, sorting);
