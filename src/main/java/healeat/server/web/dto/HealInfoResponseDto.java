@@ -22,10 +22,20 @@ public class HealInfoResponseDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ChoseResultDto {
+    public static class ChooseResultDto {
 
         Long memberId;
         String choose;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ChangeChoiceResultDto {
+
+        ChooseResultDto choseResult;
+        List<String> healEatFoods;
     }
 
     @Builder
@@ -37,5 +47,15 @@ public class HealInfoResponseDto {
         Long memberId;
         Question question;
         List<Answer> savedAnswers;
+    }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ChangeBaseResultDto {
+
+        BaseResultDto baseResultDto;
+        List<String> healEatFoods;
     }
 }

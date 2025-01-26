@@ -29,7 +29,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final EnumPath<healeat.server.domain.enums.Diet> diet = createEnum("diet", healeat.server.domain.enums.Diet.class);
 
-    public final ListPath<String, StringPath> diseases = this.<String, StringPath>createList("diseases", String.class, StringPath.class, PathInits.DIRECT2);
+    public final ListPath<Disease, QDisease> diseases = this.<Disease, QDisease>createList("diseases", Disease.class, QDisease.class, PathInits.DIRECT2);
 
     public final ListPath<String, StringPath> healEatFoods = this.<String, StringPath>createList("healEatFoods", String.class, StringPath.class, PathInits.DIRECT2);
 

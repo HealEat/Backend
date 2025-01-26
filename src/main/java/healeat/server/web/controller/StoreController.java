@@ -5,6 +5,7 @@ import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.mapping.Review;
+import healeat.server.repository.MemberRepository;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.ReviewRequestDto;
@@ -24,6 +25,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreQueryServiceImpl storeQueryServiceImpl;
+    private final MemberRepository memberRepository;
 
     @Operation(summary = "특정 가게의 이미지 조회 API", description = "리뷰 이미지가 먼저 옵니다.")
     @GetMapping("/{storeId}")
@@ -50,6 +52,8 @@ public class StoreController {
             @PathVariable Long storeId,
             @AuthenticationPrincipal Member member,
             @ModelAttribute ReviewRequestDto request) {
+
+        Member testMember = memberRepository.findById(999L).get();
 
 //        ReviewResponseDto.SetResultDto newReview = storeQueryServiceImpl.createReview(storeId, member);
         return ApiResponse.onSuccess(null);
