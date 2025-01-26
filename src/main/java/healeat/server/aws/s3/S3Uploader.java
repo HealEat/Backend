@@ -38,13 +38,12 @@ public class S3Uploader {
 
     private static String bucket;
     private static Region region;
-
-    private final String BUCKET_DOMAIN = "https://" + bucket +".s3." + region + ".amazonaws.com/";
-
+    private static String BUCKET_DOMAIN;
     @PostConstruct
     public void init(){
         bucket = bucketValue;
         region = regionValue;
+        BUCKET_DOMAIN = "https://" + bucket +".s3." + region + ".amazonaws.com/";
     }
 
     /**
@@ -82,6 +81,7 @@ public class S3Uploader {
                 .bucket(bucket)
                 .key(keyName)
                 .metadata(metadata)
+                .contentType(contentType)
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
