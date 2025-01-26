@@ -10,15 +10,14 @@ import healeat.server.repository.MemberRepository;
 import healeat.server.service.BookmarkService;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.validation.annotation.CheckPage;
-import healeat.server.web.dto.ReviewRequestDto;
-import healeat.server.web.dto.ReviewResponseDto;
-import healeat.server.web.dto.StoreRequestDto;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import static healeat.server.converter.BookmarkConverter.toSetResponseDto;
 
 @RestController
 @RequestMapping("/stores")
@@ -75,20 +74,19 @@ public class StoreController {
     @Operation(summary = "가게 북마크 저장 API", description = "회원의 가게 북마크에 저장합니다." +
             " 만약, DB에 존재하지 않았던 가게에 북마크를 하면 isNewStore 진리값을 true로 반환합니다.")
     @PostMapping("/{storeId}/bookmarks")
-    public ApiResponse<Void> saveBookmark(
+    public ApiResponse<BookmarkResponseDto> saveBookmark(
             @AuthenticationPrincipal Member member, @PathVariable Long storeId) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        bookmarkService.saveBookmark(testMember, storeId);
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(toSetResponseDto(
+                bookmarkService.saveBookmark(testMember, storeId)));
     }
 
     @Operation(summary = "가게 북마크 삭제 API", description = "회원의 가게 북마크에서 삭제합니다.")
-    @DeleteMapping("/{storeId}/bookmarks")
-    public ApiResponse<Void> deleteBookmark(
-            @AuthenticationPrincipal Member member, @PathVariable Long storeId) {
+    @DeleteMapping("/{storeId}/bookmarks/{bookmarkId}")
+    public ApiResponse<BookmarkResponseDto> deleteBookmark(@PathVariable Long bookmarkId) {
 
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(bookmarkService.deleteBookmark(bookmarkId));
     }
 }
