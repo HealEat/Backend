@@ -149,9 +149,7 @@ public class MemberHealthInfoService {
     public void saveMemberDiseases(Member member, List<Long> diseaseIds) {
 
         List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
-
         member.setDiseases(diseases);
-        memberRepository.save(member);
     }
 
 }
