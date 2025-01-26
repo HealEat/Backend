@@ -57,13 +57,14 @@ public class InfoController {
         return ApiResponse.onSuccess(null);
     }
 
-    @Operation(summary = "질환 정보 CSV 저장 API"
+// CSV 파일 갱신 시 사용
+/*    @Operation(summary = "질환 정보 CSV 저장 API"
             , description = "새로운 데이터 갱신이 필요할 경우, 이 메소드를 다시 호출하여 CSV 파일을 다시 업로드")
     @PostMapping("/disease/upload")
     public ApiResponse<Void> uploadDiseases(@RequestParam String filePath) {
         diseaseService.saveDiseasesFromCSV(filePath);
         return ApiResponse.onSuccess(null);
-    }
+    }*/
 
     @Operation(summary = "베지테리언 선택 API")
     @PatchMapping("/veget")
