@@ -13,6 +13,7 @@ import healeat.server.service.CustomOAuth2UserService;
 import healeat.server.apiPayload.exception.handler.OAuth2LoginSuccessHandler;
 import healeat.server.apiPayload.exception.handler.OAuth2LoginFailureHandler;
 
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -33,6 +34,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
+                                "/login/oauth2/code/**", // OAuth2 리다이렉트 경로 허용
                                 "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/auth/naver", "/auth/kakao", "/auth/apple").permitAll()
@@ -47,8 +49,9 @@ public class SecurityConfig {
                         })
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 )
+
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
@@ -59,14 +62,26 @@ public class SecurityConfig {
 
         return http.build();
     }
+    @Bean
+    @Order(0) // 우선순위를 가장 높게 설정
+    public SecurityFilterChain oauth2SecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/login/oauth2/**") // OAuth2 관련 경로에만 적용
+                .authorizeHttpRequests(authz -> authz
+                        .anyRequest().permitAll() // 모든 요청 허용
+                )
+                .csrf(csrf -> csrf.disable()); // CSRF 비활성화
+        return http.build();
+    }
+
 
     // SecurityFilterChain의 순서를 조정하기 위한 설정
     @Bean
     @Order(1)
     public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/plans/**", "/home/**", "/info/**", "/my-page/**", "/search/**", "/stores/**",
-                        "/swagger-ui/**", "/v3/api-docs/**")
+                .securityMatcher("/plans/**", "/home/**", "/info/**", "/my-page/**", "/search/**", "/stores/**","/bookmarks/**",
+                        "/swagger-ui/**", "/v3/api-docs/**", "/auth/**","/login/oauth2/code/**")
                 .authorizeHttpRequests(authz -> authz
                         .anyRequest().permitAll()
                 )
@@ -74,4 +89,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }

@@ -31,13 +31,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, oAuth2User.getAttributes());
         String name = oAuth2UserInfo.getName();
 
-        // 사용자 저장 또는 업데이트
+        // DB에서 사용자 찾기 또는 신규 사용자 생성
         Member member = memberRepository.findByProviderAndProviderId(provider, providerId)
-                .orElse(Member.builder()
-                        .provider(provider)
-                        .providerId(providerId)
-                        .name(name)
-                        .build());
+                .orElseGet(() -> {
+                    // 새로운 사용자일 경우 회원가입 처리
+                    Member newMember = Member.builder()
+                            .provider(provider)
+                            .providerId(providerId)
+                            .name(name)
+                            .build();
+                    return memberRepository.save(newMember);
+                });
 
         // 사용자 정보를 CustomUserPrincipal에 전달
         return new CustomUserPrincipal(member, oAuth2User.getAttributes());

@@ -1,25 +1,30 @@
 package healeat.server.user;
 
 import healeat.server.domain.Member;
+import lombok.Getter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-//import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-public class CustomUserPrincipal extends User implements OAuth2User {
-    private Member member;
-    private Map<String, Object> attributes;
+@Getter
+public class CustomUserPrincipal implements OAuth2User {
+
+    private final Member member;
+    private final Map<String, Object> attributes;
 
     public CustomUserPrincipal(Member member, Map<String, Object> attributes) {
-        super(member.getName(), "", new ArrayList<>());
         this.member = member;
         this.attributes = attributes;
     }
 
-    public Member getMember() {
-        return member;
+    @Override
+    public String getName() {
+        return member.getName();
     }
 
     @Override
@@ -27,8 +32,10 @@ public class CustomUserPrincipal extends User implements OAuth2User {
         return attributes;
     }
 
+    // 사용자의 권한 정보를 반환
     @Override
-    public String getName() {
-        return member.getName();
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        // 권한 정보가 필요 없으면 빈 리스트를 반환
+        return Collections.emptyList();
     }
 }
