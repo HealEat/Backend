@@ -1,5 +1,7 @@
 package healeat.server.service;
 
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
@@ -18,23 +20,24 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final StoreRepository storeRepository;
+    private final StoreQueryServiceImpl storeQueryServiceImpl;
 
     // 북마크를 회원에 저장
     @Transactional
     public void saveBookmark(Member member, Long storeId) {
 
         Optional<Store> optionalStore = storeRepository.findById(storeId);
-        if (optionalStore.isPresent()) {
-            Store store = optionalStore.get();
-            Bookmark bookmark = Bookmark.builder()
-                    .member(member)
-                    .store(store)
-                    .build();
-            bookmarkRepository.save(bookmark);
-        } else {
 
-
+        if (optionalStore.isEmpty()) {
+            throw new StoreHandler(ErrorStatus.STORE_NOT_FOUND);
         }
+
+        Store store = optionalStore.get();
+        Bookmark bookmark = Bookmark.builder()
+                .member(member)
+                .store(store)
+                .build();
+        bookmarkRepository.save(bookmark);
     }
 
 //    // 사용자가 북마크한 가게 리스트 조회
