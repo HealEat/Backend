@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.S3Handler;
 import healeat.server.web.dto.ImageResponseDto;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,21 @@ public class S3Uploader {
     private final S3Presigner s3Presigner;
 
     @Value("${cloud.aws.s3.bucket}")
-    private static String bucket;
+    private String bucketValue;
 
     @Value("${cloud.aws.region.static}")
+    private Region regionValue;
+
+    private static String bucket;
     private static Region region;
 
-    private static final String BUCKET_DOMAIN = "https://" + bucket +".s3." + region + ".amazonaws.com/";
+    private final String BUCKET_DOMAIN = "https://" + bucket +".s3." + region + ".amazonaws.com/";
+
+    @PostConstruct
+    public void init(){
+        bucket = bucketValue;
+        region = regionValue;
+    }
 
     /**
      * presigned URL을 생성하여 S3에 이미지 업로드를 지원하는 메소드
