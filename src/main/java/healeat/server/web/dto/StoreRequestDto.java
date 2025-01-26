@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Set;
 
 public class StoreRequestDto {
@@ -51,5 +52,6 @@ public class StoreRequestDto {
         String x;
         String y;
         String placeUrl;
+        List<String> daumImgUrlList; // Daum 이미지 API는 프론트엔드에서 호출
     }
 }

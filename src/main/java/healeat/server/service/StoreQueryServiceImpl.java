@@ -65,6 +65,7 @@ public class StoreQueryServiceImpl {
                 .x(request.getX())
                 .y(request.getY())
                 .placeUrl(request.getPlaceUrl())
+                .daumImgUrlList(request.getDaumImgUrlList()) // Daum 이미지 API는 프론트엔드에서 호출
                 .build();
 
         return storeRepository.save(store);
