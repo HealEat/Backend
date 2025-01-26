@@ -110,7 +110,7 @@ public class InfoController {
 
     @Operation(summary = "알고리즘 계산 API", description = "알고리즘을 통해 healEatFoods(추천 음식 카테고리 리스트)를" +
             " 멤버에 저장합니다. 건강 정보 최초 설정이 완료된 후 로딩 페이지에 적절한 API입니다.")
-    @GetMapping("/loading")
+    @PatchMapping("/loading")
     public ApiResponse<HealInfoResponseDto> calculateHealEat(@AuthenticationPrincipal Member member) {
 
         Member testMember = memberRepository.findById(999L).get();
