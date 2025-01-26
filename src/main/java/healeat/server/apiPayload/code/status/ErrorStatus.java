@@ -42,6 +42,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 건강 목표 설정 시 목표 횟수가 1 ~ 10 이 아닐 때
     HEALTH_PLAN_GOAL_NUMBER(HttpStatus.BAD_REQUEST, "HEALTH_PLAN4002", "유효하지 않은 목표 횟수입니다."),
 
+    // 건강 목표 이미지가 5개가 넘을 때
+    HEALTH_PLAN_TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "HEALTH_PLAN4003", "넣을 수 있는 이미지 개수를 초과하였습니다."),
+
     // 회원 관련 응답
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다."),
 
@@ -55,8 +58,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 음식 특징 관련 응답
     FOOD_FEATURE_NOT_FOUND(HttpStatus.BAD_REQUEST, "FOOD_FEATURE4001", "음식 특징이 없습니다."),
 
-    // 음식 특징 관련 응답
-    IMAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4001", "해당 이미지 종류가 없습니다.")
+    // 이미지 종류 관련 응답
+    IMAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4001", "해당 이미지 종류가 없습니다."),
+    IMAGE_INVALID_PUBLIC_URL(HttpStatus.BAD_REQUEST, "IMAGE4002", "해당 이미지의 PUBLIC URL이 유효하지 않습니다.")
     ;
 
     private final HttpStatus httpStatus;

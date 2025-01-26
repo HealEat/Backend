@@ -96,4 +96,14 @@ public class S3Uploader {
         amazonS3.deleteObject(bucket, key);
         log.info("Deleted object from S3: {}", key);
     }
+
+    //KeyName 추출 메서드
+    public String extractKeyFromUrl(String publicUrl) {
+        if (publicUrl.startsWith(BUCKET_DOMAIN)) {
+            return publicUrl.substring(BUCKET_DOMAIN.length());
+        } else {
+            throw new S3Handler(ErrorStatus.IMAGE_INVALID_PUBLIC_URL);
+        }
+    }
+
 }

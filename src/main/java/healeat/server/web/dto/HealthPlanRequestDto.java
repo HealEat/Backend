@@ -15,6 +15,17 @@ public class HealthPlanRequestDto {
     }
 
     @Getter
+    public static class HealthPlanMemoUpdateRequestDto {
+        private String memo;
+    }
+
+    @Getter
+    public static class HealthPlanImageRequestDto {
+        private String imageType;
+        private String imageExtension;
+    }
+
+    @Getter
     public class HealthPlanImageUpdateRequestDto {
         private List<Integer> indicesToUpdate; // 수정할 이미지 인덱스 리스트
         private List<String> newImageExtensions; // 새 이미지 확장자 리스트

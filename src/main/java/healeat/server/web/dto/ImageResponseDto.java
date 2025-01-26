@@ -17,4 +17,13 @@ public class ImageResponseDto {
         private String presignedUrl; // Presigned URL
         private String publicUrl;    // Public URL
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class publicUrlDto {
+        private String publicUrl;    // Public URL
+    }
+
 }
