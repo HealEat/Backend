@@ -114,7 +114,7 @@ public class HealthPlanController {
     }
 
     @Operation(summary = "건강 관리 목표 Memo 등록", description = "건강 관리 목표의 메모 글을 등록합니다.")
-    @PostMapping("/{planId}/memo")
+    @PatchMapping("/{planId}/memo")
     public ApiResponse<HealthPlanResponseDto.MemoResponseDto> uploadUrls(
             @PathVariable Long planId,
             @RequestBody HealthPlanRequestDto.HealthPlanMemoUpdateRequestDto request
