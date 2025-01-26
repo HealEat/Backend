@@ -16,7 +16,7 @@ public class DiseaseService {
 
     private final DiseaseRepository diseaseRepository;
 
-    @Transactional
+/*    @Transactional
     public void saveDiseasesFromCSV(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -32,5 +32,5 @@ public class DiseaseService {
             e.printStackTrace();
             throw new RuntimeException("CSV 파일을 읽는 중 오류 발생: \" + e.getMessage()");
         }
-    }
+    }*/
 }
