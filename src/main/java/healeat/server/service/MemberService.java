@@ -58,8 +58,7 @@ public class MemberService {
                         .build())
                 .collect(Collectors.toList());
 
-        member.getMemberDiseases().clear();
-        member.getMemberDiseases().addAll(memberDiseases);
+        member.setMemberDiseases(memberDiseases);
     }
 
     public List<Disease> getMemberDiseases(Member member) {
