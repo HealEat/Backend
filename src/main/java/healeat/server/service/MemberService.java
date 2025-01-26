@@ -51,22 +51,15 @@ public class MemberService {
     public void saveDiseasesToMember(Member member, List<Long> diseaseIds) {
 
         List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
-
-        // 중복 체크 후 새로운 질병만 추가
-        List<MemberDisease> currentDiseases = member.getMemberDiseases();
-        List<Disease> existingDiseases = currentDiseases.stream()
-                .map(MemberDisease::getDisease)
-                .collect(Collectors.toList());
-
-        List<MemberDisease> newMemberDiseases = diseases.stream()
-                .filter(disease -> !existingDiseases.contains(disease))
+        List<MemberDisease> memberDiseases = diseases.stream()
                 .map(disease -> MemberDisease.builder()
                         .member(member)
                         .disease(disease)
                         .build())
                 .collect(Collectors.toList());
 
-        member.getMemberDiseases().addAll(newMemberDiseases);
+        member.getMemberDiseases().clear();
+        member.getMemberDiseases().addAll(memberDiseases);
     }
 
     public List<Disease> getMemberDiseases(Member member) {
