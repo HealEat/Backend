@@ -41,6 +41,8 @@ public class StoreMappingService {
                 .sickScore(store.getSickScore())
                 .vegetScore(store.getVegetScore())
                 .dietScore(store.getDietScore())
+                .imageUrlList(store.getDaumImgUrlList())      // Daum 이미지 API는 프론트엔드에서 호출
+
                 .build();
     }
 

@@ -43,6 +43,8 @@ public class QSearchResultItem extends EntityPathBase<SearchResultItem> {
 
     public final ListPath<String, StringPath> imageUrlList = this.<String, StringPath>createList("imageUrlList", String.class, StringPath.class, PathInits.DIRECT2);
 
+    public final BooleanPath isInDB = createBoolean("isInDB");
+
     public final StringPath phone = createString("phone");
 
     public final StringPath placeId = createString("placeId");
