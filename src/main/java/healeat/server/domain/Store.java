@@ -63,7 +63,7 @@ public class Store extends BaseEntity {
 
         Member member = newReview.getMember();
         Float newReviewTotal = newReview.getTotalScore();
-        if (!member.getDiseases().isEmpty()) {
+        if (!member.getMemberDiseases().isEmpty()) {
             sickScore = (
                     sickScore * sickCount + newReviewTotal) / (sickCount + 1);
             sickCount++;
