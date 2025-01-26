@@ -144,12 +144,4 @@ public class MemberHealthInfoService {
         return diseaseRepository.findByNameContaining(keyword);
     }
 
-    // 회원이 선택한 질병 저장 기능
-    @Transactional
-    public void saveMemberDiseases(Member member, List<Long> diseaseIds) {
-
-        List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
-        member.setDiseases(diseases);
-    }
-
 }

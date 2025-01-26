@@ -9,7 +9,6 @@ import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
 import healeat.server.web.dto.*;
-import healeat.server.web.dto.HealInfoResponseDto.ChangeBaseResultDto;
 import healeat.server.web.dto.HealInfoResponseDto.ChooseResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -49,12 +48,12 @@ public class InfoController {
     }
 
     @Operation(summary = "회원 질병 저장 API")
-    @PostMapping("/disease/save")
-    public ApiResponse<Void> saveDiseases(
+    @PatchMapping("/member/disease")
+    public ApiResponse<Void> saveDiseasesToMember(
             @AuthenticationPrincipal Member member,
-            @RequestBody MemberDiseaseRequestDto request
-    ) {
-        memberHealthInfoService.saveMemberDiseases(member, request.getDiseaseIds());
+            @RequestBody MemberDiseaseRequestDto request) {
+
+        memberService.saveDiseasesToMember(member, request.getDiseaseIds());
         return ApiResponse.onSuccess(null);
     }
 
