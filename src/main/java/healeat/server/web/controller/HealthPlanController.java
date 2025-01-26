@@ -77,7 +77,7 @@ public class HealthPlanController {
      PATCH/plan/{planId} - 건강 관리 목표 수정
      */
     @Operation(summary = "건강 관리 목표 수정", description = "건강 관리 목표를 수정합니다." +
-            "(이미지와 메모는 아직 추가되지 않았음)")
+            "(이미지와 메모는 아직 추가되지 않았음)" + "Duration ENUM 값 : DAY, WEEK, DAY10, MONTH")
     @PatchMapping("/{planId}")
     public ApiResponse<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlanPartial(
             @PathVariable Long planId,
