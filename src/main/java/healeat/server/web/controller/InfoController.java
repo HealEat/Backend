@@ -1,10 +1,8 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
-import healeat.server.converter.MemberHealQuestionConverter;
 import healeat.server.domain.Disease;
 import healeat.server.domain.Member;
-import healeat.server.service.DiseaseService;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
@@ -25,7 +23,6 @@ public class InfoController {
 
     private final MemberService memberService;
     private final MemberHealthInfoService memberHealthInfoService;
-    private final DiseaseService diseaseService;
     private final MemberRepository memberRepository;
 
 
@@ -56,15 +53,6 @@ public class InfoController {
         memberService.saveDiseasesToMember(member, request.getDiseaseIds());
         return ApiResponse.onSuccess(null);
     }
-
-// CSV 파일 갱신 시 사용
-/*    @Operation(summary = "질환 정보 CSV 저장 API"
-            , description = "새로운 데이터 갱신이 필요할 경우, 이 메소드를 다시 호출하여 CSV 파일을 다시 업로드")
-    @PostMapping("/disease/upload")
-    public ApiResponse<Void> uploadDiseases(@RequestParam String filePath) {
-        diseaseService.saveDiseasesFromCSV(filePath);
-        return ApiResponse.onSuccess(null);
-    }*/
 
     @Operation(summary = "베지테리언 선택 API")
     @PatchMapping("/veget")
