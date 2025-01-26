@@ -2,6 +2,7 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthInfoHandler;
+import healeat.server.domain.Disease;
 import healeat.server.domain.Member;
 import healeat.server.domain.MemberHealQuestion;
 import healeat.server.domain.enums.Answer;
@@ -25,19 +26,18 @@ import java.util.List;
 public class MemberHealthInfoService {
 
     private final MemberHealQuestionRepository memberHealQuestionRepository;
+    private final MemberRepository memberRepository;
+    private final DiseaseRepository diseaseRepository;
 
-    public HealInfoResponseDto.ChoseResultDto chooseVegetarian(Member member, String choose) {
+    public Member chooseVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
         member.setVegetAndCheckChanged(vegetarian);
         String chooseName = vegetarian.name();
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
-    public HealInfoResponseDto.ChoseResultDto updateVegetarian(Member member, String choose) {
+    public Member updateVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
         String chooseName = vegetarian.name();
@@ -48,24 +48,18 @@ public class MemberHealthInfoService {
             makeHealEat(member);
         }
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
 
-    public HealInfoResponseDto.ChoseResultDto chooseDiet(Member member, String choose) {
+    public Member chooseDiet(Member member, String choose) {
 
         Diet diet = Diet.getByDescription(choose);
         member.setDietAndCheckChanged(diet);
         String chooseName = diet.name();
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
-    public HealInfoResponseDto.ChoseResultDto updateDiet(Member member, String choose) {
+    public Member updateDiet(Member member, String choose) {
 
         Diet diet = Diet.getByDescription(choose);
         member.setDietAndCheckChanged(diet);
@@ -77,10 +71,7 @@ public class MemberHealthInfoService {
             makeHealEat(member);
         }
 
-        return HealInfoResponseDto.ChoseResultDto.builder()
-                .memberId(member.getId())
-                .choose(chooseName)
-                .build();
+        return member;
     }
 
     // Question에 대한 회원의 답변 저장
@@ -146,4 +137,21 @@ public class MemberHealthInfoService {
                 .healEatFoods(healEatFoods)
                 .build();
     }
+
+    // 질병 검색 기능
+    @Transactional(readOnly = true)
+    public List<Disease> searchDiseases(String keyword) {
+        return diseaseRepository.findByNameContaining(keyword);
+    }
+
+    // 회원이 선택한 질병 저장 기능
+    @Transactional
+    public void saveMemberDiseases(Member member, List<Long> diseaseIds) {
+
+        List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
+
+        member.setDiseases(diseases);
+        memberRepository.save(member);
+    }
+
 }

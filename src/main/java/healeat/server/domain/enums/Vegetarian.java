@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum Vegetarian {
 
-    NONE(null),
+    NONE(""),
 
     FLEXI("플렉시테리언"),
     POLO_PESCET("폴로-페스코"),
