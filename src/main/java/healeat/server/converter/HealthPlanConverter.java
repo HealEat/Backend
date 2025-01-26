@@ -47,7 +47,14 @@ public class HealthPlanConverter {
     public HealthPlanResponseDto.MemoImageResponseDto toMemoImageResponseDto(HealthPlanImage healthPlanImage) {
         return HealthPlanResponseDto.MemoImageResponseDto.builder()
                 .id(healthPlanImage.getId())
-                .imageUrl(healthPlanImage.getFilePath())
+                .filePath(healthPlanImage.getFilePath())
+                .build();
+    }
+
+    public HealthPlanResponseDto.MemoResponseDto toMemoResponseDto(HealthPlan healthPlan) {
+        return HealthPlanResponseDto.MemoResponseDto.builder()
+                .id(healthPlan.getId())
+                .memo(healthPlan.getMemo())
                 .build();
     }
 }
