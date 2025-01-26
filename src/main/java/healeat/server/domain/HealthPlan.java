@@ -48,4 +48,10 @@ public class HealthPlan extends BaseEntity {
 
         return this;
     }
+
+    public HealthPlan updateMemo(String memo) {
+        this.memo = memo;
+
+        return this;
+    }
 }
