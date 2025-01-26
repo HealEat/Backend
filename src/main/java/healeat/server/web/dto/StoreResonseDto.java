@@ -14,6 +14,17 @@ public class StoreResonseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class SetResultDto {
+
+        Long storeId;
+        String placeName;
+        LocalDateTime createdAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class StorePreviewDtoList {
 
         // 가게 목록
@@ -35,6 +46,8 @@ public class StoreResonseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StorePreviewDto {
+
+        Boolean isInDB;
 
         Long placeId;
         String headForAPI;

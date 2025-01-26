@@ -53,15 +53,26 @@ public class StoreQueryServiceImpl {
     private final SearchListenerService searchListenerService;
 
     @Transactional
-    public void saveStore(Long kakaoStoreId) {
+    public Store saveStore(StoreRequestDto.ForSaveStoreDto request) {
 
+        Store store = Store.builder()
+                .id(Long.parseLong(request.getPlaceId()))
+                .placeName(request.getPlaceName())
+                .categoryName(request.getCategoryName())
+                .phone(request.getPhone())
+                .addressName(request.getAddressName())
+                .roadAddressName(request.getRoadAddressName())
+                .x(request.getX())
+                .y(request.getY())
+                .placeUrl(request.getPlaceUrl())
+                .build();
 
+        return storeRepository.save(store);
     }
 
     /**
      * 핵심 로직 이후
      * 정렬 및 페이징 적용
-     * -> 이후 컨트롤러에 위임
      */
     @Transactional
     public Pair<Page<StorePreviewDto>, SearchInfo> searchAndMapStores(
