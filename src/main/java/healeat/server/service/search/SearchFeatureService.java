@@ -2,20 +2,17 @@ package healeat.server.service.search;
 
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
-import healeat.server.domain.Store;
 import healeat.server.domain.mapping.FeatCategoryMap;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.FeatCategoryMapRepository.FeatCategoryMapRepository;
 import healeat.server.repository.FoodCategoryRepository;
 import healeat.server.repository.FoodFeatureRepository;
-import healeat.server.repository.StoreRepository;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +22,7 @@ public class SearchFeatureService {
 
     private final FeatCategoryMapRepository featCategoryMapRepository;
     private final FoodCategoryRepository foodCategoryRepository;
+    private final FoodFeatureRepository foodFeatureRepository;
 
     public Set<FoodFeature> extractFeaturesForDocument(Document document) {
         return foodCategoryRepository.findAll().stream()
@@ -37,31 +35,66 @@ public class SearchFeatureService {
                 .collect(Collectors.toSet());
     }
 
-    public List<Long> getFilteredPlaceIds(List<SearchResultItem> searchResultItems,
-                                          Set<Long> categoryIds,
-                                          Set<Long> featureIds) {
+    // 카테고리와 특징 기반으로 필터링
+    public List<Long> getFilteredItemIds(
+            List<SearchResultItem> items,
+            Set<Long> categoryIdList,
+            Set<Long> featureIdList) {
 
-        // feature -> category id Set으로 모음
-        Set<Long> idsForFilter = new HashSet<>(categoryIds);
-        idsForFilter.addAll(
-                featCategoryMapRepository.findCategoryIdsByFeatureIds(featureIds));
+        if ((categoryIdList == null || categoryIdList.isEmpty())
+                && (featureIdList == null || featureIdList.isEmpty())) {
+            return items.stream()
+                    .map(SearchResultItem::getId)
+                    .toList();
+        }
 
-        // 성능을 위해, 한 번에 모든 카테고리를 조회하여 Map 생성
-        Map<Long, String> categoryMap = foodCategoryRepository
-                .findAllById(idsForFilter).stream()
+        assert categoryIdList != null;
+        Map<Long, String> categoryIdToNameMap = foodCategoryRepository.findAllById(categoryIdList)
+                .stream()
                 .collect(Collectors.toMap(FoodCategory::getId, FoodCategory::getName));
-        // Map을 통해 id를 이름으로 매핑
-        List<String> categoryNamesForFilter = featureIds.stream()
-                .map(categoryMap::get)
-                .toList();
 
-        return searchResultItems.stream()
-                .filter(item ->
-                        categoryNamesForFilter.stream()
-                                .anyMatch(iterName ->
-                                        item.getCategoryName().contains(iterName))
+        Map<Long, Set<String>> featureIdToCategoryNameMap = foodFeatureRepository.findAllById(featureIdList)
+                .stream()
+                .collect(Collectors.toMap(
+                        FoodFeature::getId,
+                        feature -> featCategoryMapRepository.findAllByFoodFeature(feature).stream()
+                                .map(featCategoryMap -> featCategoryMap.getFoodCategory().getName())
+                                .collect(Collectors.toSet())
+                ));
+
+        return items.stream()
+                .filter(item -> matchesFilters(
+                        item.getCategoryName(),
+                        categoryIdList,
+                        categoryIdToNameMap,
+                        featureIdToCategoryNameMap)
                 )
                 .map(SearchResultItem::getId)
                 .toList();
+    }
+
+    private boolean matchesFilters(String categoryName,
+                                   Set<Long> categoryIdList,
+                                   Map<Long, String> categoryIdToNameMap,
+                                   Map<Long, Set<String>> featureIdToCategoryNamesMap) {
+        // 카테고리 필터링
+        if (categoryIdList != null && !categoryIdList.isEmpty()) {
+            boolean matchesCategory = categoryIdList.stream()
+                    .map(categoryIdToNameMap::get)
+                    .anyMatch(categoryName::contains);
+
+            if (!matchesCategory) return false;
+        }
+
+        if (featureIdToCategoryNamesMap != null && !featureIdToCategoryNamesMap.isEmpty()) {
+            Set<String> categoryFeatures = featureIdToCategoryNamesMap.values()
+                    .stream()
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet());
+
+            return categoryFeatures.stream().anyMatch(categoryName::contains);
+        }
+
+        return true;
     }
 }

@@ -23,7 +23,6 @@ import java.util.Set;
 public class StoreMappingService {
 
     private final StoreRepository storeRepository;
-    private final ReviewService reviewService;
 
     public SearchResultItem docToSearchResultItem(Document document,
                                                   Set<FoodFeature> features) {

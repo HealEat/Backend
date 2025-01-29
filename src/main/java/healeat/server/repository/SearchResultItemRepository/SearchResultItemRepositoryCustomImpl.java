@@ -32,13 +32,13 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
 
     @Override
     public Page<SearchResultItem> findSortedStores(
-            SearchResult searchResult, List<Long> placeIds, String sortBy, Float minRating, Pageable pageable) {
+            SearchResult searchResult, List<Long> itemIds, String sortBy, Float minRating, Pageable pageable) {
 
         // WHERE 조건 생성 (null 방지)
         BooleanBuilder whereClause = new BooleanBuilder();
         whereClause.and(searchResultItem.searchResult.eq(searchResult));
-        if (placeIds != null && !placeIds.isEmpty()) {
-            whereClause.and(searchResultItem.placeId.in(placeIds));
+        if (itemIds != null && !itemIds.isEmpty()) {
+            whereClause.and(searchResultItem.id.in(itemIds));
         }
         if (minRating != 0.0f) {
             whereClause.and(store.totalScore.goe(minRating));

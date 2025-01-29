@@ -94,14 +94,14 @@ public class StoreQueryServiceImpl {
                 .toSearchInfo(searchResult, newFeatureId, apiCallCount);
 
         // 2. category와 feature, minRating으로 필터링된 placeId 리스트
-        List<Long> filteredPlaceIds = searchFeatureService.getFilteredPlaceIds(
+        List<Long> filteredItemIds = searchFeatureService.getFilteredItemIds(
                 searchResult.getItems(),
                 request.getCategoryIdList(),
                 request.getFeatureIdList()
         );
-        System.out.println("Filtered Place IDs: " + filteredPlaceIds);
+        System.out.println("Filtered Place IDs: " + filteredItemIds);
 
-        if (filteredPlaceIds.isEmpty()) {
+        if (filteredItemIds.isEmpty()) {
 
             return Pair.of(Page.empty(), searchInfo);
 
@@ -113,7 +113,7 @@ public class StoreQueryServiceImpl {
             // 4. 정렬된 검색 결과 조회
             Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
                     searchResult,
-                    filteredPlaceIds,
+                    filteredItemIds,
                     request.getSortBy(),
                     request.getMinRating(),
                     pageable
