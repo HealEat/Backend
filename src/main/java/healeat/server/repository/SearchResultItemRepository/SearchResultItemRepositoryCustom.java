@@ -12,7 +12,7 @@ public interface SearchResultItemRepositoryCustom {
 
     Page<SearchResultItem> findSortedStores(
             SearchResult searchResult,
-            List<Long> placeIds,
+            List<Long> itemIds,
             String sortBy,
             Float minRating,
             Pageable pageable
