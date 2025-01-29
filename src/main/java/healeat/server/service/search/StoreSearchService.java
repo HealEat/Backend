@@ -36,7 +36,9 @@ public class StoreSearchService {
     public SearchResult searchAndSave(
             StoreRequestDto.SearchKeywordDto request) {
 
-        // 초기 검색 정보가 동일하면 캐시 반환
+        /**
+         * 초기 검색 정보가 동일하면 캐시 반환
+         */
         SearchResultKey initKey = SearchResultKey.builder()
                 .query(request.getQuery())
                 .x(request.getX())
@@ -64,15 +66,18 @@ public class StoreSearchService {
                 .y(realSearchInfo.getY())
                 .build();
 
-        // 캐시에서 먼저 찾음
+        /**
+         * 검색어 분석 후의
+         * 검색 정보가 동일하면 캐시 반환
+         */
         Optional<SearchResult> optionalSearchResult = searchResultRepository.findBySearchIdAndCreatedAtAfter(
                 searchKey.generateId(), LocalDateTime.now().minusMinutes(30));
-
-        if (optionalSearchResult.isPresent()) {     // 없다면 캐시에 저장
+        // 존재하면 캐시를 반환
+        if (optionalSearchResult.isPresent()) {
             System.out.println(LocalDateTime.now() + " 로직을 통해 알아낸 정보로 캐시가 반환됩니다.");
             return optionalSearchResult.get();
         }
-
+        // 없으면 캐시에 저장
         System.out.println(LocalDateTime.now() + " 캐시가 없으므로 새로 저장합니다.");
         List<Document> documents = getDocsOnLoopByQuery(searchKey);
 
@@ -105,8 +110,7 @@ public class StoreSearchService {
             Set<FoodFeature> features =
                     searchFeatureService.extractFeaturesForDocument(document);
             SearchResultItem item =
-                    storeMappingService.mapDocumentToSearchResultItem(
-                            realSearchInfo, document, features);
+                    storeMappingService.docToSearchResultItem(document, features);
             result.addItem(item);
         });
 
