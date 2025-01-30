@@ -17,7 +17,7 @@ public class SearchInfoService {
 
     private final SearchListenerService searchListenerService;
 
-    public RealSearchInfo getSearchInfoByHere(String x, String y, Long newFeatId) {
+    public RealSearchInfo getSearchInfoByHere(String x, String y) {
 
         if ((x != null && !x.isEmpty()) && (y != null && !y.isEmpty())) {
             KakaoAddressResponse apiResponse = storeApiClient.coord2Address(x, y);
@@ -25,7 +25,6 @@ public class SearchInfoService {
 
             KakaoAddressResponse.Address address = apiResponse.getDocuments().get(0).getAddress();
             String addressName = address.getAddress_name();
-            String region3depthName = address.getRegion_3depth_name();
 
             return RealSearchInfo.builder()
                     .keyword("")
@@ -33,8 +32,6 @@ public class SearchInfoService {
                     .y(y)
                     .selectedRegion(addressName)
                     .region(List.of(""))
-                    .location4ImgSearch(region3depthName)
-                    .newFeatureId(newFeatId)
                     .build();
         } else {
             return RealSearchInfo.builder()
@@ -43,23 +40,16 @@ public class SearchInfoService {
                     .y("")
                     .selectedRegion("")
                     .region(List.of(""))
-                    .location4ImgSearch("")
-                    .newFeatureId(newFeatId)
                     .build();
         }
     }
 
-    public RealSearchInfo getSearchInfoByRegion(String keyword, Long newFeatureId,
-                                                String selectedRegion, List<String> region) {
+    public RealSearchInfo getSearchInfoByRegion(String keyword, String selectedRegion, List<String> region) {
 
         KakaoCoordResponseDto apiResponse = storeApiClient.address2Coord(selectedRegion, 1, 1);
         searchListenerService.incrementApiCallCount();
 
         KakaoCoordResponseDto.Document document = apiResponse.getDocuments().get(0);
-
-        String location4ImgSearch = document.getAddress().getRegion_3depth_name();
-        if (location4ImgSearch == null || location4ImgSearch.isBlank())
-            location4ImgSearch = document.getAddress().getRegion_3depth_h_name();
 
         return RealSearchInfo.builder()
                 .keyword(keyword)
@@ -67,8 +57,6 @@ public class SearchInfoService {
                 .y(document.getY())
                 .selectedRegion(selectedRegion)
                 .region(region)
-                .location4ImgSearch(location4ImgSearch)
-                .newFeatureId(newFeatureId)
                 .build();
     }
 }

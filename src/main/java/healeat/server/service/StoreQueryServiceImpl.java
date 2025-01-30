@@ -3,6 +3,7 @@ package healeat.server.service;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
+import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.enums.Diet;
@@ -65,7 +66,7 @@ public class StoreQueryServiceImpl {
                 .x(request.getX())
                 .y(request.getY())
                 .placeUrl(request.getPlaceUrl())
-                .daumImgUrlList(request.getDaumImgUrlList()) // Daum 이미지 API는 프론트엔드에서 호출
+                .daumImgUrlList(request.getDaumImgUrlList()) // Daum 이미지 API
                 .build();
 
         return storeRepository.save(store);
@@ -86,31 +87,35 @@ public class StoreQueryServiceImpl {
         System.out.println("searchResult items size: " + searchResult.getItems().size());
         System.out.println("searchResult: " + searchResult);
 
-        int apiCallCount = searchListenerService.getAndResetApiCallCount();
-        long newFeatureId = searchListenerService.getAndResetFeatureId();
+        int apiCallCount = searchListenerService.getAndResetApiCallCount(); // API 호출 횟수 기록
+        long newFeatureId = searchListenerService.getAndResetFeatureId(); // 필터에 새로 추가된 feature ID 기록
 
-        // 2. category와 feature 기반으로 필터링할 placeId 목록 조회
-        Set<String> filteredPlaceIds = searchFeatureService.getFilteredPlaceIds(
+        SearchInfo searchInfo = StoreConverter
+                .toSearchInfo(searchResult, newFeatureId, apiCallCount);
+
+        // 2. category와 feature, minRating으로 필터링된 placeId 리스트
+        List<Long> filteredItemIds = searchFeatureService.getFilteredItemIds(
                 searchResult.getItems(),
                 request.getCategoryIdList(),
                 request.getFeatureIdList()
         );
-        System.out.println("Filtered Place IDs: " + filteredPlaceIds);
+        System.out.println("Filtered Place IDs: " + filteredItemIds);
 
-        if (filteredPlaceIds.isEmpty()) {
+        if (filteredItemIds.isEmpty()) {
 
-            return Pair.of(Page.empty(), searchResult.toSearchInfo(newFeatureId, apiCallCount));
+            return Pair.of(Page.empty(), searchInfo);
 
         } else {
+
             // 3. 페이지 요청 생성 (페이지는 0부터 시작하므로 page - 1)
             Pageable pageable = PageRequest.of(page - 1, 10);
 
             // 4. 정렬된 검색 결과 조회
             Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
                     searchResult,
-                    filteredPlaceIds,
-                    request.getMinRating(),
+                    filteredItemIds,
                     request.getSortBy(),
+                    request.getMinRating(),
                     pageable
             );
 
@@ -124,7 +129,7 @@ public class StoreQueryServiceImpl {
                         System.out.println("Mapped DTO: " + dto);
                         return dto;
                     }),
-                    searchResult.toSearchInfo(newFeatureId, apiCallCount)
+                    searchInfo
             );
         }
     }
@@ -148,7 +153,7 @@ public class StoreQueryServiceImpl {
             case SICK:
                 sorting = Sort.by(direction, "totalScore", "createdAt");
                 pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_DiseasesNotEmpty(store, pageable);
+                return reviewRepository.findAllByStoreAndMember_MemberDiseasesNotEmpty(store, pageable);
             case VEGET:
                 sorting = Sort.by(direction, "totalScore", "createdAt");
                 pageable = PageRequest.of(adjustedPage, 10, sorting);
