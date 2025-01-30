@@ -42,11 +42,6 @@ public class QueryAnalysisService {
 
         String selectedRegion;
         List<String> region;
-
-        String location4ImgSearch;  // region_3depth_name 또는 landmark의 이름 (Daum API 검색용)
-
-        // 기본값 0L (0L인 경우 무시 필요)
-        Long newFeatureId;
     }
 
     @Transactional
@@ -64,7 +59,7 @@ public class QueryAnalysisService {
         if (newFeatId != 0L || query == null || query.isBlank()) {
             System.out.println("빈 쿼리 및 음식 특징 처리\n"
             + "\" \", \"소화가 잘 되는 음식\"");
-            return searchInfoService.getSearchInfoByHere(x, y, newFeatId);
+            return searchInfoService.getSearchInfoByHere(x, y);
         }
 
         // 지역 인식 및 쿼리에 포함된 음식 특징 처리 로직
@@ -132,7 +127,7 @@ public class QueryAnalysisService {
 
             System.out.println("지역명이 인식되지 않는 케이스 (query == keyword)\n" +
                     "\"맛집\"");
-            RealSearchInfo searchInfo = searchInfoService.getSearchInfoByHere(x, y, 0L);
+            RealSearchInfo searchInfo = searchInfoService.getSearchInfoByHere(x, y);
             searchInfo.setKeyword(keyword);
             return searchInfo;
         }
@@ -208,11 +203,9 @@ public class QueryAnalysisService {
                     .y(landmark.getY())
                     .selectedRegion(landmark.getPlace_name())
                     .region(List.of(""))
-                    .location4ImgSearch(landmark.getPlace_name())
-                    .newFeatureId(newFeatureId)
                     .build();
         } else {
-            return searchInfoService.getSearchInfoByRegion(keyword, newFeatureId, selectedRegion, region);
+            return searchInfoService.getSearchInfoByRegion(keyword, selectedRegion, region);
         }
     }
 }

@@ -35,9 +35,7 @@ public class SearchResult extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> otherRegions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "searchResult",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @OneToMany(mappedBy = "searchResult", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SearchResultItem> items = new ArrayList<>();
 
     public void addItem(SearchResultItem item) {
@@ -61,18 +59,5 @@ public class SearchResult extends BaseEntity {
         this.query = query;
         this.selectedRegion = selectedRegion;
         this.otherRegions = otherRegions;
-    }
-
-    public StoreResonseDto.SearchInfo toSearchInfo(long newFeatureId, int apiCallCount) {
-
-        return StoreResonseDto.SearchInfo.builder()
-                .baseX(baseX)
-                .baseY(baseY)
-                .query(query)
-                .addedFeatureFilterId(newFeatureId)
-                .otherRegions(otherRegions)
-                .selectedRegion(selectedRegion)
-                .apiCallCount(apiCallCount)
-                .build();
     }
 }
