@@ -4,6 +4,7 @@ import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
+import healeat.server.web.dto.StoreResonseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -29,7 +30,8 @@ public class Store extends BaseEntity {
 
     /**
      * 가게 정보 (from Kakao Local API)
-     *  저장 trigger - 가게에 대한 최초 리뷰, 최초 북마크
+     *  : 저장 trigger
+     *      - 가게에 대해 최초로 리뷰 or 리뷰 없는데 북마크
      */
     private String placeName;
     private String categoryName;
@@ -80,7 +82,7 @@ public class Store extends BaseEntity {
 
         Member member = newReview.getMember();
         Float newReviewTotal = newReview.getTotalScore();
-        if (!member.getDiseases().isEmpty()) {
+        if (!member.getMemberDiseases().isEmpty()) {
             sickScore = (
                     sickScore * sickCount + newReviewTotal) / (sickCount + 1);
             sickCount++;
@@ -108,5 +110,18 @@ public class Store extends BaseEntity {
 
     private void calcTotalByAll() {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
+    }
+
+    public StoreResonseDto.IsInDBDto getIsInDBDto() {
+        return StoreResonseDto.IsInDBDto.builder()
+                .totalScore(totalScore)
+                .reviewCount(reviewCount)
+                .sickScore(sickScore)
+                .sickCount(sickCount)
+                .vegetScore(vegetScore)
+                .vegetCount(vegetCount)
+                .dietScore(dietScore)
+                .dietCount(dietCount)
+                .build();
     }
 }

@@ -12,7 +12,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findAllByStore(Store store, Pageable pageable);
 
-    Page<Review> findAllByStoreAndMember_DiseasesNotEmpty(Store store, Pageable pageable);
+    Page<Review> findAllByStoreAndMember_MemberDiseasesNotEmpty(Store store, Pageable pageable);
 
     Page<Review> findAllByStoreAndMember_Vegetarian(Store store, Vegetarian vegetarian, Pageable pageable);
 
