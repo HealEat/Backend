@@ -35,10 +35,12 @@ public class SearchController {
     private final CategoryFeatureService categoryFeatureService;
     private final MemberRepository memberRepository;
 
-    @Operation(summary = "요청과 검색 결과 API", description = "Request Body에 검색어와 사용자 x, y," +
-            " 검색 기준(ACCURACY, DISTANCE),\n" +
-            "필터 조건(음식 종류/특징 키워드 id 리스트, 최소 별점)\n," +
-            "동적 정렬 기준(TOTAL, SICK, VEGET, DIET)을 받아서 가게 목록을 조회합니다.")
+    @Operation(summary = "요청과 검색 결과 API", description =
+            """
+                    Request Body에 검색어와 사용자 x, y," +
+                    검색 기준(ACCURACY, DISTANCE)," +
+                    필터 조건(음식 종류/특징 키워드 id 리스트, 최소 별점)," +
+                    동적 정렬 기준(NONE, TOTAL, SICK, VEGET, DIET)을 받아서 가게 목록을 조회합니다.""")
     @PostMapping
     public ApiResponse<StoreResonseDto.StorePreviewDtoList> getSearchResults(
             @AuthenticationPrincipal Member member,
