@@ -40,35 +40,25 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
         if (itemIds != null && !itemIds.isEmpty()) {
             whereClause.and(searchResultItem.id.in(itemIds));
         }
-        if (minRating != 0.0f) {
+        if (minRating != null && minRating > 0.0f) {
             whereClause.and(store.totalScore.goe(minRating));
         }
 
-        List<SearchResultItem> results;
-
-        if (sortBy.equals("NEARBY")) {
-            results = queryFactory
-                    .selectFrom(searchResultItem)
-                    .where(whereClause)
-                    .orderBy(searchResultItem.distance.asc())
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .fetch();
-
-        } else {
-            // 동적 정렬 생성
-            List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(sortBy, searchResultItem);
-
-            // Query 실행
-            results = queryFactory
-                    .selectFrom(searchResultItem)
-                    .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
-                    .where(whereClause)
-                    .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .fetch();
+        // '선택 없음'이 아닐 경우 동적 정렬 생성
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        if (!sortBy.equals("NONE")) {
+            orderSpecifiers = getOrderSpecifiers(sortBy, searchResultItem);
         }
+
+        // Query 실행
+        List<SearchResultItem> results = queryFactory
+                .selectFrom(searchResultItem)
+                .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
+                .where(whereClause)
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         // 전체 카운트 쿼리
         Long total = Optional.ofNullable(queryFactory
@@ -103,7 +93,6 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
             default -> dynamicOrder = store.totalScore.desc();
         }
         orderSpecifiers.add(dynamicOrder);
-        orderSpecifiers.add(searchResultItem.distance.asc());
 
         return orderSpecifiers;
     }
