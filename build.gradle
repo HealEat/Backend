@@ -54,6 +54,9 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3control:2.27.3'
 	implementation 'software.amazon.awssdk:s3outposts:2.27.3'
 
+	//WebClient 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 	// QueryDSL 관련 의존성
 	implementation "com.querydsl:querydsl-jpa:5.1.0:jakarta"  // QueryDSL JPA 모듈
 	annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"  // Annotation Processor

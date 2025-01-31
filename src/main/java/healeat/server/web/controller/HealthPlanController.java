@@ -1,5 +1,6 @@
 package healeat.server.web.controller;
 
+import com.amazonaws.auth.policy.Resource;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.aws.s3.S3Uploader;
 import healeat.server.domain.HealthPlan;
@@ -12,9 +13,13 @@ import healeat.server.web.dto.HealthPlanRequestDto;
 import healeat.server.web.dto.ImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,19 +108,37 @@ public class HealthPlanController {
         return ApiResponse.onSuccess(response);
     }
 
-    @Operation(summary = "Presigned/Public URL 리스트 생성 및 HealthPlanImage 등록", description = "이미지를 업로드/조회하기 위한 Presigned/Public URL 을 생성합니다")
+    @Operation(summary = "이미지를 S3에 업로드", description = "HealthPlan의 이미지를 Presigned URL을 이용하여 S3에 업로드합니다.")
     @PostMapping("/{planId}/upload-images")
-    public ApiResponse<List<ImageResponseDto.PresignedUrlDto>> uploadUrls(
+    public ApiResponse<List<ImageResponseDto.PresignedUrlDto>> uploadImagesToS3(
             @PathVariable Long planId,
-            @RequestBody List<HealthPlanRequestDto.HealthPlanImageRequestDto> requests
+            @RequestPart List<MultipartFile> files,
+            @RequestPart List<HealthPlanRequestDto.HealthPlanImageRequestDto> requests
+    ) throws Exception {
+        return ApiResponse.onSuccess(healthPlanService.uploadImagesToS3(planId, files, requests));
+    }
+
+    @Operation(summary = "S3 이미지 조회", description = "S3에 저장된 이미지를 Public URL을 통해 조회합니다.")
+    @GetMapping("/{planId}/images")
+    public ApiResponse<List<String>> getHealthPlanImages(
+            @PathVariable Long planId
     ) {
-        // Service 호출: Presigned URL 및 Public URL 생성
-        return ApiResponse.onSuccess(healthPlanService.generateImageUrls(planId, requests));
+        return ApiResponse.onSuccess(healthPlanService.getHealthPlanImages(planId));
+    }
+
+    @Operation(summary = "S3 이미지 직접 표시", description = "S3에 저장된 이미지를 브라우저에서 바로 표시합니다.")
+    @GetMapping("/image")
+    public ResponseEntity<ByteArrayResource> viewImage(@RequestParam String imageUrl) {
+        ByteArrayResource resource = healthPlanService.getHealthPlanImageFile(imageUrl);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
     }
 
     @Operation(summary = "건강 관리 목표 Memo 등록", description = "건강 관리 목표의 메모 글을 등록합니다.")
     @PatchMapping("/{planId}/memo")
-    public ApiResponse<HealthPlanResponseDto.MemoResponseDto> uploadUrls(
+    public ApiResponse<HealthPlanResponseDto.MemoResponseDto> uploadMemo(
             @PathVariable Long planId,
             @RequestBody HealthPlanRequestDto.HealthPlanMemoUpdateRequestDto request
     ) {
