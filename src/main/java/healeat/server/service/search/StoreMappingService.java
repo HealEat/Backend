@@ -27,8 +27,12 @@ public class StoreMappingService {
     public SearchResultItem docToSearchResultItem(Document document,
                                                   Set<FoodFeature> features) {
 
+        String distance = document.getDistance();
+
         return SearchResultItem.builder()
-                .distance(Integer.valueOf(document.getDistance()))
+                .distance(Integer.valueOf(distance.isEmpty() ?
+                        "0" :
+                        distance))
                 .features(features.isEmpty() ?
                         List.of("") :
                         features.stream().map(FoodFeature::getName).toList())

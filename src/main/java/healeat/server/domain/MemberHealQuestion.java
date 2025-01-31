@@ -30,6 +30,7 @@ public class MemberHealQuestion extends BaseEntity {
     private Question question;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Builder.Default
     private List<Answer> answers = new ArrayList<>();
 
     public MemberHealQuestion setAnswers(List<Answer> answers) {
