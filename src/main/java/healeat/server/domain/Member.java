@@ -35,9 +35,9 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
-    @JdbcTypeCode(SqlTypes.JSON)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<String> diseases = new ArrayList<>();
+    private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -53,20 +53,47 @@ public class Member extends BaseEntity {
     private List<String> healEatFoods = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();  // 건강 정보 설정
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberTerm> memberTerms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<RecentSearch> recentSearches = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<HealthPlan> healthPlans = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Bookmark> bookmarks = new ArrayList<>();
 
+
+    public boolean setVegetAndCheckChanged(Vegetarian vegetarian) {
+        boolean isChanged = false;
+        if (this.vegetarian != vegetarian) isChanged = true;
+        this.vegetarian = vegetarian;
+        return isChanged;
+    }
+
+    public boolean setDietAndCheckChanged(Diet diet) {
+        boolean isChanged = false;
+        if (this.diet != diet) isChanged = true;
+        this.diet = diet;
+        return isChanged;
+    }
+
+    public void setHealEatFoods(List<String> healEatFoods) {
+        this.healEatFoods = healEatFoods;
+    }
+
+    public void setMemberDiseases(List<MemberDisease> memberDiseases) {
+        this.memberDiseases = memberDiseases;
+    }
 
     // 프로필을 위한 업데이트 메서드
     public void updateProfile(String name, String profileImageUrl) {

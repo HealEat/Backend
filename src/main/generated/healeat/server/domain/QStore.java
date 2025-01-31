@@ -22,10 +22,16 @@ public class QStore extends EntityPathBase<Store> {
 
     public final healeat.server.domain.common.QBaseEntity _super = new healeat.server.domain.common.QBaseEntity(this);
 
+    public final StringPath addressName = createString("addressName");
+
+    public final StringPath categoryName = createString("categoryName");
+
     public final NumberPath<Float> cleanScore = createNumber("cleanScore", Float.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
+    public final ListPath<String, StringPath> daumImgUrlList = this.<String, StringPath>createList("daumImgUrlList", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> dietCount = createNumber("dietCount", Integer.class);
 
@@ -37,9 +43,17 @@ public class QStore extends EntityPathBase<Store> {
 
     public final NumberPath<Float> nutrScore = createNumber("nutrScore", Float.class);
 
+    public final StringPath phone = createString("phone");
+
+    public final StringPath placeName = createString("placeName");
+
+    public final StringPath placeUrl = createString("placeUrl");
+
     public final NumberPath<Integer> reviewCount = createNumber("reviewCount", Integer.class);
 
     public final ListPath<healeat.server.domain.mapping.Review, healeat.server.domain.mapping.QReview> reviews = this.<healeat.server.domain.mapping.Review, healeat.server.domain.mapping.QReview>createList("reviews", healeat.server.domain.mapping.Review.class, healeat.server.domain.mapping.QReview.class, PathInits.DIRECT2);
+
+    public final StringPath roadAddressName = createString("roadAddressName");
 
     public final NumberPath<Integer> sickCount = createNumber("sickCount", Integer.class);
 
@@ -55,6 +69,10 @@ public class QStore extends EntityPathBase<Store> {
     public final NumberPath<Integer> vegetCount = createNumber("vegetCount", Integer.class);
 
     public final NumberPath<Float> vegetScore = createNumber("vegetScore", Float.class);
+
+    public final StringPath x = createString("x");
+
+    public final StringPath y = createString("y");
 
     public QStore(String variable) {
         super(Store.class, forVariable(variable));

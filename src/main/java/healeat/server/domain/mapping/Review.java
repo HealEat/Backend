@@ -53,13 +53,16 @@ public class Review extends BaseEntity {
     private Float nutrScore = 1.0f; // 영양 균형
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ReviewImage> reviewImageList = new ArrayList<>();
 
     @PrePersist
     public void initializeReviewAndStore() {
 
         // 현재 멤버의 건강 목적을 리뷰에 저장
-        currentPurposes.addAll(member.getDiseases());
+        for(MemberDisease memberDisease : member.getMemberDiseases()) {
+            currentPurposes.add(memberDisease.getDisease().getName());
+        }
         currentPurposes.add(member.getVegetarian().toString());
         currentPurposes.add(member.getDiet().toString());
 

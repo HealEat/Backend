@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableJpaAuditing	// BaseEntity
 @EnableFeignClients	// 외부 API 활용
-@EnableScheduling  // 스케줄러 활성화
 public class HealEatServerApplication {
 
 	public static void main(String[] args) {
