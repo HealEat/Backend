@@ -1,10 +1,12 @@
 package healeat.server.web.dto;
 
+import healeat.server.domain.Store;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Set;
 
 public class StoreRequestDto {
@@ -34,7 +36,25 @@ public class StoreRequestDto {
         @Min(value = 0, message = "최소 별점은 0 이상이어야 합니다")
         Float minRating;
 
-        @Pattern(regexp = "^(DEFAULT|SICK|VEGET|DIET)$", message = "정렬 기준이 올바르지 않습니다")
-        String sortBy = "DEFAULT";
+        @Pattern(regexp = "^(ACCURACY|DISTANCE)$", message = "검색 기준이 올바르지 않습니다")
+        String searchBy;
+
+        @Pattern(regexp = "^(NONE|TOTAL|SICK|VEGET|DIET)$", message = "정렬 기준이 올바르지 않습니다")
+        String sortBy;
+    }
+
+    @Getter
+    public static class ForSaveStoreDto {
+
+        String placeId;
+        String placeName;
+        String categoryName;
+        String phone;
+        String addressName;
+        String roadAddressName;
+        String x;
+        String y;
+        String placeUrl;
+        List<String> daumImgUrlList; // Daum 이미지 API
     }
 }

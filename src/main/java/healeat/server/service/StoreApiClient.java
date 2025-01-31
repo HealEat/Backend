@@ -1,13 +1,11 @@
 package healeat.server.service;
 
 import healeat.server.config.FeignConfig;
-import healeat.server.web.dto.DaumImageResponseDto;
 import healeat.server.web.dto.api_response.KakaoAddressResponse;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto;
 import healeat.server.web.dto.api_response.KakaoCoordResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "storeApiClient",
@@ -31,7 +29,6 @@ public interface StoreApiClient {
                                             @RequestParam(defaultValue = "") String x,
                                             @RequestParam(defaultValue = "") String y,
                                             @RequestParam(defaultValue = "1") Integer page,
-                                            @RequestParam(defaultValue = "15") Integer size,
                                             @RequestParam(defaultValue = "accuracy") String sort,
                                             @RequestParam(defaultValue = "FD6") String category_group_code);
 

@@ -22,6 +22,8 @@ public class QSearchResult extends EntityPathBase<SearchResult> {
 
     public final healeat.server.domain.common.QBaseEntity _super = new healeat.server.domain.common.QBaseEntity(this);
 
+    public final BooleanPath accuracy = createBoolean("accuracy");
+
     public final StringPath baseX = createString("baseX");
 
     public final StringPath baseY = createString("baseY");
@@ -29,9 +31,9 @@ public class QSearchResult extends EntityPathBase<SearchResult> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final StringPath initId = createString("initId");
-
     public final ListPath<SearchResultItem, QSearchResultItem> items = this.<SearchResultItem, QSearchResultItem>createList("items", SearchResultItem.class, QSearchResultItem.class, PathInits.DIRECT2);
+
+    public final StringPath keyword = createString("keyword");
 
     public final ListPath<String, StringPath> otherRegions = this.<String, StringPath>createList("otherRegions", String.class, StringPath.class, PathInits.DIRECT2);
 

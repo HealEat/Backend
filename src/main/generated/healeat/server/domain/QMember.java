@@ -29,13 +29,13 @@ public class QMember extends EntityPathBase<Member> {
 
     public final EnumPath<healeat.server.domain.enums.Diet> diet = createEnum("diet", healeat.server.domain.enums.Diet.class);
 
-    public final ListPath<String, StringPath> diseases = this.<String, StringPath>createList("diseases", String.class, StringPath.class, PathInits.DIRECT2);
-
     public final ListPath<String, StringPath> healEatFoods = this.<String, StringPath>createList("healEatFoods", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final ListPath<HealthPlan, QHealthPlan> healthPlans = this.<HealthPlan, QHealthPlan>createList("healthPlans", HealthPlan.class, QHealthPlan.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final ListPath<healeat.server.domain.mapping.MemberDisease, healeat.server.domain.mapping.QMemberDisease> memberDiseases = this.<healeat.server.domain.mapping.MemberDisease, healeat.server.domain.mapping.QMemberDisease>createList("memberDiseases", healeat.server.domain.mapping.MemberDisease.class, healeat.server.domain.mapping.QMemberDisease.class, PathInits.DIRECT2);
 
     public final ListPath<MemberHealQuestion, QMemberHealQuestion> memberHealQuestions = this.<MemberHealQuestion, QMemberHealQuestion>createList("memberHealQuestions", MemberHealQuestion.class, QMemberHealQuestion.class, PathInits.DIRECT2);
 

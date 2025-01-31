@@ -6,6 +6,7 @@ import healeat.server.converter.StoreConverter;
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Member;
+import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.SearchPageService;
@@ -32,24 +33,34 @@ public class SearchController {
     private final SearchPageService searchPageService;
     private final RecentSearchService recentSearchService;
     private final CategoryFeatureService categoryFeatureService;
+    private final MemberRepository memberRepository;
 
-    @Operation(summary = "검색 화면", description = "쿼리 스트링으로 검색어와 필터 조건" +
-            "(사용자 위치, 음식 종류/특징 키워드, 최소 별점)을 받아서 가게 목록을 조회합니다.")
+    @Operation(summary = "요청과 검색 결과 API", description =
+            """
+                    Request Body에 검색어와 사용자 x, y," +
+                    검색 기준(ACCURACY, DISTANCE)," +
+                    필터 조건(음식 종류/특징 키워드 id 리스트, 최소 별점)," +
+                    동적 정렬 기준(NONE, TOTAL, SICK, VEGET, DIET)을 받아서 가게 목록을 조회합니다.""")
     @PostMapping
     public ApiResponse<StoreResonseDto.StorePreviewDtoList> getSearchResults(
             @AuthenticationPrincipal Member member,
             @RequestParam Integer page,
             @Valid @RequestBody StoreRequestDto.SearchKeywordDto request) {
 
-        return ApiResponse.onSuccess(StoreConverter.toStorePreviewListDto(
-                storeQueryServiceImpl.searchAndMapStores(member, page, request)));
+        Member testMember = memberRepository.findById(999L).get();
+
+        return ApiResponse.onSuccess(storeQueryServiceImpl.searchAndMapStores(
+                testMember, page, request));
     }
 
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
     @GetMapping("/recent")
-    public ApiResponse<SearchPageResponseDto> getAllRecentSearches() {
+    public ApiResponse<SearchPageResponseDto> getAllRecentSearches(
+            @AuthenticationPrincipal Member member
+    ) {
 
-        return ApiResponse.onSuccess(searchPageService.getAllSearchPage());
+        Member testMember = memberRepository.findById(999L).get();
+        return ApiResponse.onSuccess(searchPageService.getAllSearchPage(testMember));
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")

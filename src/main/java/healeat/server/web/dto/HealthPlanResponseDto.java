@@ -58,7 +58,16 @@ public class HealthPlanResponseDto {
     @AllArgsConstructor
     public static class MemoImageResponseDto {
         private Long id;
-        private String imageUrl;
+        private String filePath;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemoResponseDto {
+        private Long id;
+        private String memo;
     }
 
 }

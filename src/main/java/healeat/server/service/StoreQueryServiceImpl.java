@@ -3,6 +3,7 @@ package healeat.server.service;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
+import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.enums.Diet;
@@ -13,7 +14,7 @@ import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.*;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
-import healeat.server.service.search.SearchListenerService;
+import healeat.server.service.search.ApiCallCountService;
 import healeat.server.service.search.SearchFeatureService;
 import healeat.server.service.search.StoreMappingService;
 import healeat.server.service.search.StoreSearchService;
@@ -50,63 +51,76 @@ public class StoreQueryServiceImpl {
     private final SearchFeatureService searchFeatureService;
     private final StoreMappingService storeMappingService;
 
-    private final SearchListenerService searchListenerService;
+    private final ApiCallCountService apiCallCountService;
+
+    @Transactional
+    public Store saveStore(StoreRequestDto.ForSaveStoreDto request) {
+
+        Store store = Store.builder()
+                .id(Long.parseLong(request.getPlaceId()))
+                .placeName(request.getPlaceName())
+                .categoryName(request.getCategoryName())
+                .phone(request.getPhone())
+                .addressName(request.getAddressName())
+                .roadAddressName(request.getRoadAddressName())
+                .x(request.getX())
+                .y(request.getY())
+                .placeUrl(request.getPlaceUrl())
+                .daumImgUrlList(request.getDaumImgUrlList()) // Daum 이미지 API
+                .build();
+
+        return storeRepository.save(store);
+    }
 
     /**
      * 핵심 로직 이후
      * 정렬 및 페이징 적용
-     * -> 이후 컨트롤러에 위임
      */
     @Transactional
-    public Pair<Page<StorePreviewDto>, SearchInfo> searchAndMapStores(
+    public StorePreviewDtoList searchAndMapStores(
             @AuthenticationPrincipal Member member,
             @CheckPage Integer page,
             @CheckSizeSum StoreRequestDto.SearchKeywordDto request) {
 
         // 1. 검색 및 결과 저장
         SearchResult searchResult = storeSearchService.searchAndSave(request);
-        System.out.println("searchResult items size: " + searchResult.getItems().size());
-        System.out.println("searchResult: " + searchResult);
 
-        int apiCallCount = searchListenerService.getAndResetApiCallCount();
-        long newFeatureId = searchListenerService.getAndResetFeatureId();
+        int apiCallCount = apiCallCountService.getAndResetApiCallCount(); // API 호출 횟수 기록
 
-        // 2. category와 feature 기반으로 필터링할 placeId 목록 조회
-        Set<String> filteredPlaceIds = searchFeatureService.getFilteredPlaceIds(
+        SearchInfo searchInfo = StoreConverter
+                .toSearchInfo(searchResult, apiCallCount);
+
+        // 2. category와 feature로 필터링된 placeId 리스트
+        List<Long> filteredItemIds = searchFeatureService.getFilteredItemIds(
                 searchResult.getItems(),
                 request.getCategoryIdList(),
                 request.getFeatureIdList()
         );
-        System.out.println("Filtered Place IDs: " + filteredPlaceIds);
 
-        if (filteredPlaceIds.isEmpty()) {
-
-            return Pair.of(Page.empty(), searchResult.toSearchInfo(newFeatureId, apiCallCount));
+        if (filteredItemIds.isEmpty()) {
+            return StoreConverter.toStorePreviewListDto(
+                    Page.empty(),
+                    searchInfo
+            );
 
         } else {
-            // 3. 페이지 요청 생성 (페이지는 0부터 시작하므로 page - 1)
-            Pageable pageable = PageRequest.of(page - 1, 10);
+            // 3. 페이지 요청 생성
+            int safePage = Math.max(0, page - 1);
+            Pageable pageable = PageRequest.of(safePage, 10);
 
             // 4. 정렬된 검색 결과 조회
             Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
                     searchResult,
-                    filteredPlaceIds,
-                    request.getMinRating(),
+                    filteredItemIds,
                     request.getSortBy(),
+                    request.getMinRating(),
                     pageable
             );
 
-            System.out.println("Page content size: " + items.getContent().size());
-            System.out.println("Page content: " + items.getContent());
-
             // 5. DTO 변환 및 결과 반환
-            return Pair.of(
-                    items.map(item -> {
-                        StorePreviewDto dto = storeMappingService.mapToDto(member, item);
-                        System.out.println("Mapped DTO: " + dto);
-                        return dto;
-                    }),
-                    searchResult.toSearchInfo(newFeatureId, apiCallCount)
+            return StoreConverter.toStorePreviewListDto(
+                    items.map(item -> storeMappingService.mapToDto(member, item)),
+                    searchInfo
             );
         }
     }
@@ -130,7 +144,7 @@ public class StoreQueryServiceImpl {
             case SICK:
                 sorting = Sort.by(direction, "totalScore", "createdAt");
                 pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_DiseasesNotEmpty(store, pageable);
+                return reviewRepository.findAllByStoreAndMember_MemberDiseasesNotEmpty(store, pageable);
             case VEGET:
                 sorting = Sort.by(direction, "totalScore", "createdAt");
                 pageable = PageRequest.of(adjustedPage, 10, sorting);
