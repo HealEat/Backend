@@ -46,7 +46,7 @@ public class HealthPlanController {
         Member testMember = memberRepository.findById(999L).get();
 
         //정상적으로 HealthPlan 조회
-        List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMemberId(testMember.getId());
+        List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMember(testMember);
         List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
                 .map(healthPlanConverter::toHealthPlanOneDto)
                 .collect(Collectors.toList());
