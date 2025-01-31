@@ -3,6 +3,7 @@ package healeat.server.service;
 import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
+import healeat.server.domain.Member;
 import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.web.dto.SearchPageResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,12 @@ public class SearchPageService {
     private final CategoryFeatureService categoryFeatureService;
     private final RecentSearchService recentSearchService;
 
-    public SearchPageResponseDto getAllSearchPage() {
+    public SearchPageResponseDto getAllSearchPage(Member member) {
 
         //음식 종류, 음식 특징, 최근 검색 리스트 모두 가져오기
         List<FoodCategory> foodCategories = categoryFeatureService.getAllFoodCategories();
         List<FoodFeature> foodFeatures = categoryFeatureService.getAllFoodFeatures();
-        List<RecentSearch> recentSearches = recentSearchService.getAllRecentSearches();
+        List<RecentSearch> recentSearches = recentSearchService.getAllRecentSearches(member);
 
         //음식 종류 DTO 에 맞게 변환 후 리스트로 만들기
         List<SearchPageResponseDto.FoodCategoryResponseDto> foodCategoryList = foodCategories.stream()

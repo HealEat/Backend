@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 public interface HealthPlanRepository extends JpaRepository<HealthPlan, Long> {
-    List<HealthPlan> findByMemberId(Long memberId);
+    List<HealthPlan> findByMember(Member member);
 }

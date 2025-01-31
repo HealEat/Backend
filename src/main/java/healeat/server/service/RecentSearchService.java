@@ -3,6 +3,7 @@ package healeat.server.service;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.RecentSearchHandler;
 import healeat.server.converter.SearchPageConverter;
+import healeat.server.domain.Member;
 import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.repository.RecentSearchRepository;
 import healeat.server.web.dto.SearchPageRequestDto;
@@ -21,8 +22,8 @@ public class RecentSearchService {
 
     private final RecentSearchRepository recentSearchRepository;
 
-    public List<RecentSearch> getAllRecentSearches() {
-        List<RecentSearch> recentSearches = recentSearchRepository.findAll();
+    public List<RecentSearch> getAllRecentSearches(Member member) {
+        List<RecentSearch> recentSearches = recentSearchRepository.findByMember(member);
 
         // 내림차순 정렬 (가장 최근 생성된 항목이 앞쪽)
         recentSearches.sort(Comparator.comparing(RecentSearch::getCreatedAt).reversed());

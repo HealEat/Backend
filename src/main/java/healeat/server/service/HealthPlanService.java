@@ -39,8 +39,8 @@ public class HealthPlanService {
                 new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
     }
 
-    public List<HealthPlan> getHealthPlanByMemberId(Long memberId) {
-        return healthPlanRepository.findByMemberId(memberId);
+    public List<HealthPlan> getHealthPlanByMember(Member member) {
+        return healthPlanRepository.findByMember(member);
     }
 
     @Transactional
@@ -88,8 +88,8 @@ public class HealthPlanService {
      *   HealthPlan Image Service
      */
 
-    public List<HealthPlanImage> getHealthPlanImageByPlanId(Long planId) {
-        return healthPlanImageRepository.findAllByHealthPlanId(planId);
+    public List<HealthPlanImage> getHealthPlanImageByPlanId(HealthPlan healthPlan) {
+        return healthPlanImageRepository.findAllByHealthPlanId(healthPlan);
     }
 
     @Transactional

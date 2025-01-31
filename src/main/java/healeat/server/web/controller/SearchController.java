@@ -51,9 +51,12 @@ public class SearchController {
 
     @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
     @GetMapping("/recent")
-    public ApiResponse<SearchPageResponseDto> getAllRecentSearches() {
+    public ApiResponse<SearchPageResponseDto> getAllRecentSearches(
+            @AuthenticationPrincipal Member member
+    ) {
 
-        return ApiResponse.onSuccess(searchPageService.getAllSearchPage());
+        Member testMember = memberRepository.findById(999L).get();
+        return ApiResponse.onSuccess(searchPageService.getAllSearchPage(testMember));
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")
