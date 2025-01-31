@@ -43,6 +43,7 @@ public class Store extends BaseEntity {
     private String placeUrl;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Builder.Default
     private List<String> daumImgUrlList = new ArrayList<>();
 
     /**
@@ -66,6 +67,7 @@ public class Store extends BaseEntity {
     private Float nutrScore; // 평점(영양 균형)
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
     //==비즈니스 로직==//

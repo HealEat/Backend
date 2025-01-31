@@ -10,9 +10,7 @@ import java.util.Optional;
 
 public interface SearchResultRepository extends JpaRepository<SearchResult, String> {
 
-    Optional<SearchResult> findByInitIdAndCreatedAtAfter(String initId, LocalDateTime time);
-
-    Optional<SearchResult> findBySearchIdAndCreatedAtAfter(String searchId, LocalDateTime time);
+    Optional<SearchResult> findBySearchId(String searchId);
 
     // 특정 시간 이전의 검색 결과 삭제
     @Modifying
