@@ -4,7 +4,7 @@ import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.mapping.FeatCategoryMap;
 import healeat.server.domain.search.SearchResultItem;
-import healeat.server.repository.FeatCategoryMapRepository.FeatCategoryMapRepository;
+import healeat.server.repository.FeatCategoryMapRepository;
 import healeat.server.repository.FoodCategoryRepository;
 import healeat.server.repository.FoodFeatureRepository;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;

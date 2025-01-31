@@ -13,16 +13,15 @@ import java.util.stream.Collectors;
 public class StoreConverter {
 
     public static StoreResonseDto.SearchInfo toSearchInfo(SearchResult searchResult,
-                                                   long newFeatureId,
                                                    int apiCallCount) {
 
         return StoreResonseDto.SearchInfo.builder()
                 .baseX(searchResult.getBaseX())
                 .baseY(searchResult.getBaseY())
                 .query(searchResult.getQuery())
-                .addedFeatureFilterId(newFeatureId)
                 .otherRegions(searchResult.getOtherRegions())
                 .selectedRegion(searchResult.getSelectedRegion())
+
                 .apiCallCount(apiCallCount)
                 .build();
     }
@@ -37,10 +36,7 @@ public class StoreConverter {
     }
 
     public static StoreResonseDto.StorePreviewDtoList toStorePreviewListDto(
-            Pair<Page<StoreResonseDto.StorePreviewDto>, StoreResonseDto.SearchInfo> pair) {
-
-        Page<StoreResonseDto.StorePreviewDto> storePage = pair.getFirst();
-        StoreResonseDto.SearchInfo searchInfo = pair.getSecond();
+            Page<StoreResonseDto.StorePreviewDto> storePage, StoreResonseDto.SearchInfo searchInfo) {
 
         return StoreResonseDto.StorePreviewDtoList.builder()
                 .storeList(storePage.getContent())

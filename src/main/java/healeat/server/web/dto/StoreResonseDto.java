@@ -106,7 +106,6 @@ public class StoreResonseDto {
         String baseY;
 
         String query;
-        Long addedFeatureFilterId; // 쿼리로부터 추가된 특징 id
 
         List<String> otherRegions;
         String selectedRegion;
