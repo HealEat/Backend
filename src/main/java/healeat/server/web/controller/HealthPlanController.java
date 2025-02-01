@@ -4,6 +4,7 @@ import com.amazonaws.auth.policy.Resource;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.aws.s3.S3Uploader;
 import healeat.server.domain.HealthPlan;
+import healeat.server.domain.HealthPlanImage;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.HealthPlanService;
@@ -12,6 +13,7 @@ import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import healeat.server.web.dto.ImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.annotation.MultipartConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -134,6 +136,16 @@ public class HealthPlanController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    /**
+     * 특정 건강 목표 이미지 삭제
+     */
+    @Operation(summary = "건강 목표 이미지 삭제", description = "특정 건강 목표 이미지를 S3에서 삭제합니다.")
+    @DeleteMapping("/images/{imageId}")
+    public ApiResponse<HealthPlanResponseDto.MemoImageResponseDto> deleteHealthPlanImage(@PathVariable Long imageId) {
+        HealthPlanImage image = healthPlanService.deleteHealthPlanImage(imageId);
+        return ApiResponse.onSuccess(healthPlanConverter.toMemoImageResponseDto(image));
     }
 
     @Operation(summary = "건강 관리 목표 Memo 등록", description = "건강 관리 목표의 메모 글을 등록합니다.")
