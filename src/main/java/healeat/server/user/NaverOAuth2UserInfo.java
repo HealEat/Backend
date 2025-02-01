@@ -9,8 +9,17 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    public String getProviderId() {
+        return (String) ((Map<String, Object>) attributes.get("response")).get("id");
+    }
+
+    @Override
     public String getName() {
-        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        return (String) response.get("name");
+        return (String) ((Map<String, Object>) attributes.get("response")).get("name");
+    }
+
+    @Override
+    public String getProvider() {
+        return "naver";
     }
 }
