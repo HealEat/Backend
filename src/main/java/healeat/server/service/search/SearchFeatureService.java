@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SearchFeatureService {
 
-    private final FoodFeatureRepository foodFeatureRepository;
     private final FeatCategoryMapRepository featCategoryMapRepository;
     private final FoodCategoryRepository foodCategoryRepository;
+    private final FoodFeatureRepository foodFeatureRepository;
 
     public Set<FoodFeature> extractFeaturesForDocument(Document document) {
         return foodCategoryRepository.findAll().stream()
@@ -36,7 +36,7 @@ public class SearchFeatureService {
     }
 
     // 카테고리와 특징 기반으로 필터링
-    public Set<String> getFilteredPlaceIds(
+    public List<Long> getFilteredItemIds(
             List<SearchResultItem> items,
             Set<Long> categoryIdList,
             Set<Long> featureIdList) {
@@ -44,10 +44,11 @@ public class SearchFeatureService {
         if ((categoryIdList == null || categoryIdList.isEmpty())
                 && (featureIdList == null || featureIdList.isEmpty())) {
             return items.stream()
-                    .map(SearchResultItem::getPlaceId)
-                    .collect(Collectors.toSet());
+                    .map(SearchResultItem::getId)
+                    .toList();
         }
 
+        assert categoryIdList != null;
         Map<Long, String> categoryIdToNameMap = foodCategoryRepository.findAllById(categoryIdList)
                 .stream()
                 .collect(Collectors.toMap(FoodCategory::getId, FoodCategory::getName));
@@ -68,8 +69,8 @@ public class SearchFeatureService {
                         categoryIdToNameMap,
                         featureIdToCategoryNameMap)
                 )
-                .map(SearchResultItem::getPlaceId)
-                .collect(Collectors.toSet());
+                .map(SearchResultItem::getId)
+                .toList();
     }
 
     private boolean matchesFilters(String categoryName,

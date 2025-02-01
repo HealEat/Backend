@@ -1,13 +1,17 @@
 package healeat.server.repository.SearchResultItemRepository;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.CollectionExpression;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import healeat.server.domain.QStore;
+import healeat.server.domain.Store;
 import healeat.server.domain.search.QSearchResultItem;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
-import healeat.server.repository.SearchResultRepository;
+import healeat.server.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,30 +21,39 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
-public class SearchResultItemRepositoryImpl implements SearchResultItemRepositoryCustom {
+public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     private final QSearchResultItem searchResultItem = QSearchResultItem.searchResultItem;
+    private final QStore store = QStore.store;
 
     @Override
     public Page<SearchResultItem> findSortedStores(
-            SearchResult searchResult, Set<String> placeIds, Float minRating, String sortBy, Pageable pageable) {
+            SearchResult searchResult, List<Long> itemIds, String sortBy, Float minRating, Pageable pageable) {
 
-        // WHERE 조건 생성
-        BooleanExpression whereClause = searchResultItem.searchResult.eq(searchResult)
-                .and(placeIds != null && !placeIds.isEmpty() ? searchResultItem.placeId.in(placeIds) : null)
-                .and(searchResultItem.totalScore.goe(minRating));
+        // WHERE 조건 생성 (null 방지)
+        BooleanBuilder whereClause = new BooleanBuilder();
+        whereClause.and(searchResultItem.searchResult.eq(searchResult));
+        if (itemIds != null && !itemIds.isEmpty()) {
+            whereClause.and(searchResultItem.id.in(itemIds));
+        }
+        if (minRating != null && minRating > 0.0f) {
+            whereClause.and(store.totalScore.goe(minRating));
+        }
 
-        // 동적 정렬 생성
-        List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(sortBy, searchResultItem);
+        // '선택 없음'이 아닐 경우 동적 정렬 생성
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        if (!sortBy.equals("NONE")) {
+            orderSpecifiers = getOrderSpecifiers(sortBy, searchResultItem);
+        }
 
         // Query 실행
         List<SearchResultItem> results = queryFactory
                 .selectFrom(searchResultItem)
+                .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
                 .where(whereClause)
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
                 .offset(pageable.getOffset())
@@ -51,6 +64,7 @@ public class SearchResultItemRepositoryImpl implements SearchResultItemRepositor
         Long total = Optional.ofNullable(queryFactory
                         .select(searchResultItem.count())
                         .from(searchResultItem)
+                        .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
                         .where(whereClause)
                         .fetchOne())
                 .orElse(0L);
@@ -63,9 +77,9 @@ public class SearchResultItemRepositoryImpl implements SearchResultItemRepositor
     private List<OrderSpecifier<?>> getOrderSpecifiers(String sortBy, QSearchResultItem searchResultItem) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
 
-        // 1. 리뷰 카운트가 0보다 큰 항목이 먼저
+        // 1. searchResultItem의 placeId와 같은 id를 가지는 Store가 존재하고, reviewCount가 0보다 큰지 확인
         orderSpecifiers.add(new CaseBuilder()
-                .when(searchResultItem.reviewCount.gt(0))
+                .when(store.id.eq(searchResultItem.placeId).and(store.reviewCount.gt(0)))
                 .then(1)
                 .otherwise(0)
                 .desc());
@@ -73,15 +87,12 @@ public class SearchResultItemRepositoryImpl implements SearchResultItemRepositor
         // 2. 동적 정렬 기준
         OrderSpecifier<?> dynamicOrder;
         switch (sortBy) {
-            case "SICK" -> dynamicOrder = searchResultItem.sickScore.desc();
-            case "VEGET" -> dynamicOrder = searchResultItem.vegetScore.desc();
-            case "DIET" -> dynamicOrder = searchResultItem.dietScore.desc();
-            default -> dynamicOrder = searchResultItem.totalScore.desc();
+            case "SICK" -> dynamicOrder = store.sickScore.desc();
+            case "VEGET" -> dynamicOrder = store.vegetScore.desc();
+            case "DIET" -> dynamicOrder = store.dietScore.desc();
+            default -> dynamicOrder = store.totalScore.desc();
         }
         orderSpecifiers.add(dynamicOrder);
-
-        // 3. 거리 기준 정렬
-        orderSpecifiers.add(searchResultItem.distance.asc());
 
         return orderSpecifiers;
     }

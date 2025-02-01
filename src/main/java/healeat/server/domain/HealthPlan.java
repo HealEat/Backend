@@ -5,6 +5,7 @@ import healeat.server.domain.enums.Duration;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,7 +40,8 @@ public class HealthPlan extends BaseEntity {
     private String memo;
 
     @OneToMany(mappedBy = "healthPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HealthPlanImage> healthPlanImages;
+    @Builder.Default
+    private List<HealthPlanImage> healthPlanImages = new ArrayList<>();
 
     public HealthPlan updateHealthPlan(Duration duration, Integer goalNumber, String goal) {
         this.duration = duration;

@@ -4,6 +4,7 @@ import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
+import healeat.server.web.dto.StoreResonseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -29,7 +30,8 @@ public class Store extends BaseEntity {
 
     /**
      * 가게 정보 (from Kakao Local API)
-     *  저장 trigger - 가게에 대한 최초 리뷰, 최초 북마크
+     *  : 저장 trigger
+     *      - 가게에 대해 최초로 리뷰 or 리뷰 없는데 북마크
      */
     private String placeName;
     private String categoryName;
@@ -41,6 +43,7 @@ public class Store extends BaseEntity {
     private String placeUrl;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Builder.Default
     private List<String> daumImgUrlList = new ArrayList<>();
 
     /**
@@ -64,6 +67,7 @@ public class Store extends BaseEntity {
     private Float nutrScore; // 평점(영양 균형)
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
     //==비즈니스 로직==//
@@ -108,5 +112,18 @@ public class Store extends BaseEntity {
 
     private void calcTotalByAll() {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
+    }
+
+    public StoreResonseDto.IsInDBDto getIsInDBDto() {
+        return StoreResonseDto.IsInDBDto.builder()
+                .totalScore(totalScore)
+                .reviewCount(reviewCount)
+                .sickScore(sickScore)
+                .sickCount(sickCount)
+                .vegetScore(vegetScore)
+                .vegetCount(vegetCount)
+                .dietScore(dietScore)
+                .dietCount(dietCount)
+                .build();
     }
 }

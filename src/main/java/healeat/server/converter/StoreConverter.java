@@ -1,6 +1,7 @@
 package healeat.server.converter;
 
 import healeat.server.domain.Store;
+import healeat.server.domain.search.SearchResult;
 import healeat.server.web.dto.StoreResonseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.Pair;
@@ -10,6 +11,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StoreConverter {
+
+    public static StoreResonseDto.SearchInfo toSearchInfo(SearchResult searchResult,
+                                                   int apiCallCount) {
+
+        return StoreResonseDto.SearchInfo.builder()
+                .baseX(searchResult.getBaseX())
+                .baseY(searchResult.getBaseY())
+                .query(searchResult.getQuery())
+                .otherRegions(searchResult.getOtherRegions())
+                .selectedRegion(searchResult.getSelectedRegion())
+
+                .apiCallCount(apiCallCount)
+                .build();
+    }
 
     public static StoreResonseDto.SetResultDto toSetResultDto(Store store) {
 
@@ -21,10 +36,7 @@ public class StoreConverter {
     }
 
     public static StoreResonseDto.StorePreviewDtoList toStorePreviewListDto(
-            Pair<Page<StoreResonseDto.StorePreviewDto>, StoreResonseDto.SearchInfo> pair) {
-
-        Page<StoreResonseDto.StorePreviewDto> storePage = pair.getFirst();
-        StoreResonseDto.SearchInfo searchInfo = pair.getSecond();
+            Page<StoreResonseDto.StorePreviewDto> storePage, StoreResonseDto.SearchInfo searchInfo) {
 
         return StoreResonseDto.StorePreviewDtoList.builder()
                 .storeList(storePage.getContent())

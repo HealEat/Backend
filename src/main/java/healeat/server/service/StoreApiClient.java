@@ -29,7 +29,6 @@ public interface StoreApiClient {
                                             @RequestParam(defaultValue = "") String x,
                                             @RequestParam(defaultValue = "") String y,
                                             @RequestParam(defaultValue = "1") Integer page,
-                                            @RequestParam(defaultValue = "15") Integer size,
                                             @RequestParam(defaultValue = "accuracy") String sort,
                                             @RequestParam(defaultValue = "FD6") String category_group_code);
 

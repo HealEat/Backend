@@ -47,7 +47,8 @@ public class StoreController {
                 storeQueryServiceImpl.saveStore(request)));
     }
 
-    @Operation(summary = "특정 가게의 리뷰 작성 API")
+    @Operation(summary = "특정 가게의 리뷰 작성 API", description = "isInDB가 ture인 " +
+            "검색 결과에 대해서만 사용하는 API입니다.")
     @PostMapping("/{storeId}/reviews")
     public ApiResponse<ReviewResponseDto.SetResultDto> createReview(
             @PathVariable Long storeId,
@@ -72,7 +73,7 @@ public class StoreController {
     }
 
     @Operation(summary = "가게 북마크 저장 API", description = "회원의 가게 북마크에 저장합니다." +
-            " 만약, DB에 존재하지 않았던 가게에 북마크를 하면 isNewStore 진리값을 true로 반환합니다.")
+            " isInDB가 ture인 검색 결과에 대해서만 사용하는 API입니다.")
     @PostMapping("/{storeId}/bookmarks")
     public ApiResponse<BookmarkResponseDto> saveBookmark(
             @AuthenticationPrincipal Member member, @PathVariable Long storeId) {

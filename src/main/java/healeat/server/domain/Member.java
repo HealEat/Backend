@@ -13,6 +13,7 @@ import java.util.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -35,6 +36,7 @@ public class Member extends BaseEntity {
     private String profileImageUrl;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberDisease> memberDiseases = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -51,18 +53,23 @@ public class Member extends BaseEntity {
     private List<String> healEatFoods = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();  // 건강 정보 설정
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberTerm> memberTerms = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<RecentSearch> recentSearches = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<HealthPlan> healthPlans = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Bookmark> bookmarks = new ArrayList<>();
 
 
