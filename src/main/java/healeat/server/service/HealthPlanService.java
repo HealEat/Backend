@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hibernate.query.sqm.tree.SqmNode.log;
@@ -160,6 +161,52 @@ public class HealthPlanService {
         } catch (Exception e) {
             throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_IMAGE_NOT_FOUND);
         }
+    }
+
+    /**
+     * HealthPlan 이미지 일부 변경 (기존 이미지 삭제 후 새 이미지 업로드) - 사용할지 미정
+     */
+//    public void updateHealthPlanImages(Long planId, List<String> deleteImageUrls, List<String> newImageUrls) {
+//        HealthPlan healthPlan = healthPlanRepository.findById(planId)
+//                .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
+//
+//        // 기존 이미지 삭제
+//        for (String imageUrl : deleteImageUrls) {
+//            Optional<HealthPlanImage> imageToDelete = healthPlan.getHealthPlanImages().stream()
+//                    .filter(image -> image.getFilePath().equals(imageUrl))
+//                    .findFirst();
+//
+//            imageToDelete.ifPresent(image -> {
+//                s3Uploader.deleteFile(image.getFileName());
+//                healthPlan.getHealthPlanImages().remove(image);
+//                healthPlanImageRepository.delete(image);
+//            });
+//        }
+//
+//        // 새 이미지 추가
+//        for (String imageUrl : newImageUrls) {
+//            String fileName = s3Uploader.extractKeyFromUrl(imageUrl);
+//            HealthPlanImage newImage = HealthPlanImage.builder()
+//                    .healthPlan(healthPlan)
+//                    .filePath(imageUrl)
+//                    .fileName(fileName)
+//                    .build();
+//            healthPlan.getHealthPlanImages().add(newImage);
+//            healthPlanImageRepository.save(newImage);
+//        }
+//    }
+
+    /**
+     * 건강 목표 이미지 삭제
+     */
+    public HealthPlanImage deleteHealthPlanImage(Long imageId) {
+        HealthPlanImage image = healthPlanImageRepository.findById(imageId)
+                .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_IMAGE_NOT_FOUND));
+
+        s3Uploader.deleteFile(image.getFileName());
+        healthPlanImageRepository.delete(image);
+
+        return image;
     }
 }
 
