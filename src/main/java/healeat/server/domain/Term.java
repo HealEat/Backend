@@ -5,6 +5,7 @@ import healeat.server.domain.mapping.MemberTerm;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,5 +32,6 @@ public class Term extends BaseEntity {
 
     //연관관계 매핑
     @OneToMany(mappedBy = "term", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberTerm> memberTerms;
+    @Builder.Default
+    private List<MemberTerm> memberTerms = new ArrayList<>();
 }

@@ -22,7 +22,6 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final StoreRepository storeRepository;
-    private final StoreQueryServiceImpl storeQueryServiceImpl;
 
     // 북마크를 회원에 저장
     @Transactional
@@ -52,6 +51,7 @@ public class BookmarkService {
                 .bookmarkId(bookmark.getId())
                 .memberId(bookmark.getMember().getId())
                 .placeName(bookmark.getStore().getPlaceName())
+                .createdAt(bookmark.getCreatedAt())
                 .deletedAt(LocalDateTime.now())
                 .build();
 

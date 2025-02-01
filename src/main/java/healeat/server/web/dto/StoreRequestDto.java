@@ -36,8 +36,11 @@ public class StoreRequestDto {
         @Min(value = 0, message = "최소 별점은 0 이상이어야 합니다")
         Float minRating;
 
-        @Pattern(regexp = "^(DEFAULT|SICK|VEGET|DIET)$", message = "정렬 기준이 올바르지 않습니다")
-        String sortBy = "DEFAULT";
+        @Pattern(regexp = "^(ACCURACY|DISTANCE)$", message = "검색 기준이 올바르지 않습니다")
+        String searchBy;
+
+        @Pattern(regexp = "^(NONE|TOTAL|SICK|VEGET|DIET)$", message = "정렬 기준이 올바르지 않습니다")
+        String sortBy;
     }
 
     @Getter
@@ -52,6 +55,6 @@ public class StoreRequestDto {
         String x;
         String y;
         String placeUrl;
-        List<String> daumImgUrlList; // Daum 이미지 API는 프론트엔드에서 호출
+        List<String> daumImgUrlList; // Daum 이미지 API
     }
 }

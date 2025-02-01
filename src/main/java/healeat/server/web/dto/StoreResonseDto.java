@@ -45,12 +45,9 @@ public class StoreResonseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class StorePreviewDto {
-
-        Boolean isInDB;
-
+    public static class StoreInfoDto {
+        Integer distance;
         Long placeId;
-        String headForAPI;
         String placeName;
         String categoryName;
         String phone;
@@ -59,14 +56,43 @@ public class StoreResonseDto {
         String x;
         String y;
         String placeUrl;
-        String distance;
-        List<String> imageUrlList;
         List<String> features;
-        Integer reviewCount;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class IsInDBDto {
         Float totalScore;
+        Integer reviewCount;
         Float sickScore;
+        Integer sickCount;
         Float vegetScore;
+        Integer vegetCount;
         Float dietScore;
+        Integer dietCount;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StorePreviewDto {
+
+        // 가게 공통 정보
+        StoreInfoDto storeInfoDto;
+
+        // Store_reviewImages + API 합친 정보
+        List<String> imageUrlList;
+
+        /// Response 전용 필드
+        Boolean isInDB;
+
+        // Store 필요
+        IsInDBDto isInDBDto;
+
+        // Member 필요
         Boolean isBookMarked;
     }
 
@@ -80,7 +106,6 @@ public class StoreResonseDto {
         String baseY;
 
         String query;
-        Long addedFeatureFilterId; // 쿼리로부터 추가된 특징 id
 
         List<String> otherRegions;
         String selectedRegion;

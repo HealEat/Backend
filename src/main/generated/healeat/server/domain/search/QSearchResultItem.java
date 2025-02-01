@@ -31,42 +31,28 @@ public class QSearchResultItem extends EntityPathBase<SearchResultItem> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final NumberPath<Float> dietScore = createNumber("dietScore", Float.class);
+    public final ListPath<String, StringPath> daumImageUrlList = this.<String, StringPath>createList("daumImageUrlList", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> distance = createNumber("distance", Integer.class);
 
     public final ListPath<String, StringPath> features = this.<String, StringPath>createList("features", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final StringPath headForAPI = createString("headForAPI");
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
-
-    public final ListPath<String, StringPath> imageUrlList = this.<String, StringPath>createList("imageUrlList", String.class, StringPath.class, PathInits.DIRECT2);
-
-    public final BooleanPath isInDB = createBoolean("isInDB");
 
     public final StringPath phone = createString("phone");
 
-    public final StringPath placeId = createString("placeId");
+    public final NumberPath<Long> placeId = createNumber("placeId", Long.class);
 
     public final StringPath placeName = createString("placeName");
 
     public final StringPath placeUrl = createString("placeUrl");
 
-    public final NumberPath<Integer> reviewCount = createNumber("reviewCount", Integer.class);
-
     public final StringPath roadAddressName = createString("roadAddressName");
 
     public final QSearchResult searchResult;
 
-    public final NumberPath<Float> sickScore = createNumber("sickScore", Float.class);
-
-    public final NumberPath<Float> totalScore = createNumber("totalScore", Float.class);
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
-
-    public final NumberPath<Float> vegetScore = createNumber("vegetScore", Float.class);
 
     public final StringPath x = createString("x");
 

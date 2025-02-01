@@ -10,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -26,6 +29,7 @@ import java.util.UUID;
 public class S3Uploader {
 
     private static AmazonS3 amazonS3;
+    private static S3Client s3Client;
 
     @Autowired
     private final S3Presigner s3Presigner;
@@ -102,9 +106,14 @@ public class S3Uploader {
                 .build();
     }
 
-    public void deleteObject(String key) {
-        amazonS3.deleteObject(bucket, key);
-        log.info("Deleted object from S3: {}", key);
+    public void deleteFile(String fileName) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(fileName)
+                .build();
+
+        s3Client.deleteObject(deleteObjectRequest);
+        log.info("Deleted file from S3: {}", fileName);
     }
 
     //KeyName 추출 메서드

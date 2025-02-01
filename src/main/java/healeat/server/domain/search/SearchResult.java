@@ -1,78 +1,68 @@
 package healeat.server.domain.search;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.web.dto.StoreResonseDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class SearchResult extends BaseEntity {
 
     @Id
-    private String searchId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(unique = true)
-    private String initId;
+    private String query;
 
     private String baseX;
 
     private String baseY;
 
-    private String query;
+    private Boolean accuracy;
+
+    private String keyword;
 
     private String selectedRegion;
 
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> otherRegions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "searchResult",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @OneToMany(mappedBy = "searchResult", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SearchResultItem> items = new ArrayList<>();
 
-    public void addItem(SearchResultItem item) {
-        this.items.add(item);
-        item.setSearchResult(this);
-    }
-
-    @PreRemove
-    private void preRemove() {
-        items.clear();
-    }
-
+    /**
+     * SearchResult 생성자
+     */
     @Builder
-    public SearchResult(String searchId, String initId,
-                        String baseX, String baseY, String query,
-                        String selectedRegion, List<String> otherRegions) {
-        this.searchId = searchId;
-        this.initId = initId;
+    public SearchResult(String query, String baseX, String baseY, Boolean accuracy) {
+        this.query = query;
         this.baseX = baseX;
         this.baseY = baseY;
-        this.query = query;
+        this.accuracy = accuracy;
+    }
+
+    /**
+     * Meta 데이터 입력
+     */
+    public void setMetaData(String keyword, String selectedRegion, List<String> otherRegions) {
+        this.keyword = keyword;
         this.selectedRegion = selectedRegion;
         this.otherRegions = otherRegions;
     }
 
-    public StoreResonseDto.SearchInfo toSearchInfo(long newFeatureId, int apiCallCount) {
-
-        return StoreResonseDto.SearchInfo.builder()
-                .baseX(baseX)
-                .baseY(baseY)
-                .query(query)
-                .addedFeatureFilterId(newFeatureId)
-                .otherRegions(otherRegions)
-                .selectedRegion(selectedRegion)
-                .apiCallCount(apiCallCount)
-                .build();
+    /**
+     * SearchResultItem <- Document 입력
+     */
+    public void addItem(SearchResultItem item) {
+        this.items.add(item);
+        item.setSearchResult(this);
     }
 }
