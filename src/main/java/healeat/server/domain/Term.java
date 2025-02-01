@@ -26,7 +26,7 @@ public class Term extends BaseEntity {
     @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String body;    // 약관 세부 내용
 
-    @Column(nullable = false)
+    @Column(name = "is_required", nullable = false)
     private boolean isRequired; // 필수/선택 - 자동 기본값 false
 
 
