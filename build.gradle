@@ -64,6 +64,10 @@ dependencies {
 
 	implementation 'org.hibernate.orm:hibernate-core:6.0.2.Final'  // Hibernate 6.0.2 이상
 	implementation 'mysql:mysql-connector-java:8.0.33'  // MySQL 드라이버 추가
+
+	// Caffeine 캐시 설정
+	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
 }
 
 dependencyManagement {
