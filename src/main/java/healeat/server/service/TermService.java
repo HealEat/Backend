@@ -26,7 +26,7 @@ public class TermService {
     // 약관 목록 조회 API
     @Transactional(readOnly = true)
     public List<TermResponse> getTerms() {
-        return termRepository.findAllOrderByIsRequired()
+        return termRepository.findAllByOrderByIsRequiredDesc()
                 .stream()
                 .map(TermResponse::from)
                 .collect(Collectors.toList());
