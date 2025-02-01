@@ -13,6 +13,7 @@ import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import healeat.server.web.dto.ImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.servlet.annotation.MultipartConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -110,7 +111,8 @@ public class HealthPlanController {
         return ApiResponse.onSuccess(response);
     }
 
-    @Operation(summary = "이미지를 S3에 업로드", description = "HealthPlan의 이미지를 Presigned URL을 이용하여 S3에 업로드합니다.")
+    @Operation(summary = "이미지를 S3에 업로드", description = "HealthPlan의 이미지를 Presigned URL을 이용하여 S3에 업로드합니다.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
     @PostMapping("/{planId}/upload-images")
     public ApiResponse<List<ImageResponseDto.PresignedUrlDto>> uploadImagesToS3(
             @PathVariable Long planId,
