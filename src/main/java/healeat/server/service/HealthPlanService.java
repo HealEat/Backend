@@ -1,7 +1,9 @@
 package healeat.server.service;
 
+import com.amazonaws.auth.policy.Resource;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
+import healeat.server.aws.s3.S3PresignedUploader;
 import healeat.server.aws.s3.S3Uploader;
 import healeat.server.domain.HealthPlan;
 import healeat.server.domain.HealthPlanImage;
@@ -11,12 +13,24 @@ import healeat.server.repository.HealthPlanRepository;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import healeat.server.web.dto.ImageResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.hibernate.query.sqm.tree.SqmNode.log;
 
@@ -26,6 +40,7 @@ import static org.hibernate.query.sqm.tree.SqmNode.log;
 public class HealthPlanService {
 
     private final S3Uploader s3Uploader;
+    private final S3PresignedUploader s3PresignedUploader;
     private final HealthPlanRepository healthPlanRepository;
     private final HealthPlanImageRepository healthPlanImageRepository;
 
@@ -93,42 +108,58 @@ public class HealthPlanService {
     }
 
     @Transactional
-    public List<ImageResponseDto.PresignedUrlDto> generateImageUrls(
-            Long planId,
-            List<HealthPlanRequestDto.HealthPlanImageRequestDto> requests
-    ) {
-        // HealthPlan 엔티티 가져오기
+    public List<ImageResponseDto.PresignedUrlDto> uploadImagesToS3(
+            Long planId, List<MultipartFile> files, List<HealthPlanRequestDto.HealthPlanImageRequestDto> requests
+    ) throws Exception {
         HealthPlan healthPlan = healthPlanRepository.findById(planId)
                 .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
 
-        // 기존 이미지가 5개를 초과하지 않도록 검증
         if (healthPlan.getHealthPlanImages().size() + requests.size() > 5) {
             throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_TOO_MANY_IMAGES);
         }
 
-        // 요청에 따라 Presigned URL 및 Public URL 생성
         List<ImageResponseDto.PresignedUrlDto> presignedUrls = new ArrayList<>();
-        for (HealthPlanRequestDto.HealthPlanImageRequestDto request : requests) {
+        for (int i = 0; i < requests.size(); i++) {
+            HealthPlanRequestDto.HealthPlanImageRequestDto request = requests.get(i);
+            MultipartFile file = files.get(i);
+
             ImageResponseDto.PresignedUrlDto urlMap = s3Uploader.createPresignedUrl(request.getImageType(), request.getImageExtension());
             presignedUrls.add(urlMap);
 
-            String fileName = s3Uploader.extractKeyFromUrl(urlMap.getPublicUrl());
+            Path tempFilePath = Files.createTempFile("upload-", "-" + file.getOriginalFilename());
+            file.transferTo(tempFilePath.toFile());
+            s3PresignedUploader.uploadFileToS3(urlMap.getPresignedUrl(), tempFilePath);
+            Files.delete(tempFilePath);
 
-            // HealthPlanImage 엔티티 생성
             HealthPlanImage healthPlanImage = HealthPlanImage.builder()
                     .healthPlan(healthPlan)
                     .filePath(urlMap.getPublicUrl())
-                    .fileName(fileName)
+                    .fileName(s3Uploader.extractKeyFromUrl(urlMap.getPublicUrl()))
                     .build();
-
-            // HealthPlan에 이미지 추가
             healthPlan.getHealthPlanImages().add(healthPlanImage);
         }
 
-        // DB에 수정된 HealthPlan 저장
         healthPlanRepository.save(healthPlan);
-
         return presignedUrls;
+    }
+
+    public List<String> getHealthPlanImages(Long planId) {
+        HealthPlan healthPlan = healthPlanRepository.findById(planId)
+                .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
+        return healthPlan.getHealthPlanImages().stream()
+                .map(HealthPlanImage::getFilePath)
+                .collect(Collectors.toList());
+    }
+
+    public ByteArrayResource getHealthPlanImageFile(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            InputStream inputStream = url.openStream();
+            byte[] imageBytes = inputStream.readAllBytes();
+            return new ByteArrayResource(imageBytes);
+        } catch (Exception e) {
+            throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_IMAGE_NOT_FOUND);
+        }
     }
 }
 
