@@ -9,6 +9,7 @@ import healeat.server.web.dto.api_response.KakaoPlaceResponseDto;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,31 +30,19 @@ public class StoreSearchService {
     private final ApiCallCountService apiCallCountService;
 
     @Transactional
+    @Cacheable(value = "searchResult", key = "T(java.lang.String).format('%s_%s_%s_%s', " +
+            "(#request.query != null and #request.query != '' ? #request.query : 'default_query'), " +
+            "(#request.x != null and #request.x != '' ? T(java.lang.Double).parseDouble(#request.x) : 0.0), " +
+            "(#request.y != null and #request.y != '' ? T(java.lang.Double).parseDouble(#request.y) : 0.0), " +
+            "(#request.searchBy eq 'ACCURACY'))")
     public SearchResult searchAndSave(
             StoreRequestDto.SearchKeywordDto request) {
 
-        String query = request.getQuery();
-        String x = request.getX();
-        String y = request.getY();
-        Boolean accuracy = request.getSearchBy().equals("ACCURACY");
-        String searchId = SearchResult.generateId(query, x, y, accuracy);
-        System.out.println("searchId: " + searchId);
-        /**
-         * 초기 검색 정보가 동일하면 캐시 반환
-         */
-        Optional<SearchResult> optionalInitResult = searchResultRepository.findBySearchId(searchId);
-        if (optionalInitResult.isPresent()) {
-            System.out.println("발견한 searchId: " + optionalInitResult.get().getSearchId());
-
-            return optionalInitResult.get();
-        }
-
         SearchResult searchResult = SearchResult.builder()
-                .searchId(searchId)
-                .query(query)
-                .baseX(x)
-                .baseY(y)
-                .accuracy(accuracy)
+                .query(request.getQuery())
+                .baseX(request.getX())
+                .baseY(request.getY())
+                .accuracy(request.getSearchBy().equals("ACCURACY"))
                 .build();
 
         List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesByQuery(searchResult);

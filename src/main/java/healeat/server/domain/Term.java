@@ -17,14 +17,18 @@ public class Term extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
-    @Column(nullable = false, length = 20)
-    private String title;
+    @Column(nullable = false, length = 50)
+    private String title;   // 약관 제목
 
     @Lob
     @Column(columnDefinition = "LONGTEXT", nullable = false)
-    private String body;
+    private String body;    // 약관 세부 내용
+
+    @Column(name = "is_required", nullable = false)
+    private boolean isRequired; // 필수/선택 - 자동 기본값 false
+
 
     //연관관계 매핑
     @OneToMany(mappedBy = "term", cascade = CascadeType.ALL, orphanRemoval = true)

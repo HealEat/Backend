@@ -13,7 +13,9 @@ import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import healeat.server.web.dto.ImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.annotation.MultipartConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -113,11 +115,13 @@ public class HealthPlanController {
 
     @Operation(summary = "이미지를 S3에 업로드", description = "HealthPlan의 이미지를 Presigned URL을 이용하여 S3에 업로드합니다.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
-    @PostMapping("/{planId}/upload-images")
+    @PostMapping(value = "/{planId}/upload-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<List<ImageResponseDto.PresignedUrlDto>> uploadImagesToS3(
             @PathVariable Long planId,
-            @RequestPart List<MultipartFile> files,
-            @RequestPart List<HealthPlanRequestDto.HealthPlanImageRequestDto> requests
+            @RequestPart(name = "files", required = true)
+            List<MultipartFile> files,
+            @RequestPart(name = "requests", required = true)
+            List<HealthPlanRequestDto.HealthPlanImageRequestDto> requests
     ) throws Exception {
         return ApiResponse.onSuccess(healthPlanService.uploadImagesToS3(planId, files, requests));
     }
