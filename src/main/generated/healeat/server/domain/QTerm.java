@@ -29,6 +29,8 @@ public class QTerm extends EntityPathBase<Term> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final BooleanPath isRequired = createBoolean("isRequired");
+
     public final ListPath<healeat.server.domain.mapping.MemberTerm, healeat.server.domain.mapping.QMemberTerm> memberTerms = this.<healeat.server.domain.mapping.MemberTerm, healeat.server.domain.mapping.QMemberTerm>createList("memberTerms", healeat.server.domain.mapping.MemberTerm.class, healeat.server.domain.mapping.QMemberTerm.class, PathInits.DIRECT2);
 
     public final StringPath title = createString("title");
