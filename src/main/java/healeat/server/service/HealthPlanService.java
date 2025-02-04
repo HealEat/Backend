@@ -1,6 +1,5 @@
 package healeat.server.service;
 
-import com.amazonaws.auth.policy.Resource;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
 import healeat.server.aws.s3.S3PresignedUploader;
@@ -14,26 +13,18 @@ import healeat.server.web.dto.HealthPlanRequestDto;
 import healeat.server.web.dto.ImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.hibernate.query.sqm.tree.SqmNode.log;
 
 @Service
 @Transactional(readOnly = true)
