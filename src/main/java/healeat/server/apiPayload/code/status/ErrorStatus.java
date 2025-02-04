@@ -61,7 +61,8 @@ public enum ErrorStatus implements BaseErrorCode {
     // 이미지 관련 응답
     IMAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4001", "해당 이미지 종류가 없습니다."),
     IMAGE_INVALID_PUBLIC_URL(HttpStatus.BAD_REQUEST, "IMAGE4002", "해당 이미지의 PUBLIC URL이 유효하지 않습니다."),
-    HEALTH_PLAN_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4003", "해당 이미지의 PUBLIC URL이 유효하지 않습니다.")
+    HEALTH_PLAN_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4003", "해당 건강 관리 목표 이미지가 없습니다."),
+    PROFILE_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4004", "해당 프로필 이미지가 없습니다.")
     ;
 
     private final HttpStatus httpStatus;
