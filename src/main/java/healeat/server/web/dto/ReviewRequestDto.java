@@ -20,4 +20,12 @@ public class ReviewRequestDto {
 
     List<String> imageUrls;
     String body;
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ReviewImageRequestDto {
+        String imageExtension; // 파일 확장자
+    }
 }
