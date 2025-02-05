@@ -7,7 +7,6 @@ import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.web.dto.ImageResponseDto;
 import healeat.server.web.dto.ProfileImageRequestDto;
-import healeat.server.web.dto.ProfileImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;

@@ -32,7 +32,7 @@ public class ProfileImageController {
     @Operation(summary = "프로필 이미지 업로드", description = "프로필 이미지를 Presigned URL을 이용하여 S3에도 업로드합니다."
             + " 이미지 확장자만 입력",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProfileImageResponseDto> uploadProfileImage(
             @AuthenticationPrincipal Member member,
             @RequestPart(name = "file", required = true)
@@ -54,7 +54,7 @@ public class ProfileImageController {
         return profileImageService.getProfileImage(testMember.getId());
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ApiResponse<ProfileImageResponseDto> deleteProfileImage(
             @AuthenticationPrincipal Member member) {
 

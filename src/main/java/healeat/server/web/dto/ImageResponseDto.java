@@ -23,7 +23,8 @@ public class ImageResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class publicUrlDto {
-        private String publicUrl;    // Public URL
+        private Long id;
+        private String imageUrl;    // Public URL
     }
 
 }
