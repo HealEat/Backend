@@ -66,26 +66,4 @@ public class MemberService {
         return memberDiseases.stream().map(MemberDisease::getDisease).collect(Collectors.toList());
     }
 
-/*
-    // 프로필 이미지 설정 API
-    @Transactional
-    public void setProfileImage(Member member, String profileImageUrl) {
-        member.updateProfileImageUrl(profileImageUrl);
-        memberRepository.save(member);
-    }
-
-    // 프로필 이미지 삭제 API
-    @Transactional
-    public void deleteProfileImage(Member member) {
-        member.updateProfileImageUrl(null);
-        memberRepository.save(member);
-    }
-
-    // 닉네임 중복 확인 API
-    public boolean checkNameAvailability(String name) {
-        Optional<Member> existingMember = memberRepository.findByName(name);
-        return existingMember.isEmpty();
-    }
-*/
-
 }
