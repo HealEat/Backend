@@ -1,7 +1,9 @@
 package healeat.server.converter;
 
 import healeat.server.domain.Member;
+import healeat.server.domain.ReviewImage;
 import healeat.server.domain.mapping.Review;
+import healeat.server.web.dto.ImageResponseDto;
 import healeat.server.web.dto.ReviewResponseDto;
 import org.springframework.data.domain.Page;
 
@@ -41,6 +43,14 @@ public class ReviewConverter {
                 .totalElements(reviewPage.getTotalElements())
                 .isFirst(reviewPage.isFirst())
                 .isLast(reviewPage.isLast())
+                .build();
+    }
+
+    public static ImageResponseDto.publicUrlDto toReviewImage(ReviewImage reviewImage) {
+
+        return ImageResponseDto.publicUrlDto.builder()
+                .id(reviewImage.getId())
+                .imageUrl(reviewImage.getFilePath())
                 .build();
     }
 }
