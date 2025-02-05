@@ -113,7 +113,8 @@ public class HealthPlanController {
         return ApiResponse.onSuccess(response);
     }
 
-    @Operation(summary = "이미지를 S3에 업로드", description = "HealthPlan의 이미지를 Presigned URL을 이용하여 S3에 업로드합니다.",
+    @Operation(summary = "이미지를 S3에 업로드", description = "HealthPlan의 이미지를 Presigned URL을 이용하여 S3에 업로드합니다."
+            + " image-type : reviews / profiles / health-plans" + " imageExtension : 확장자 명(ex.jpg)",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
     @PostMapping(value = "/{planId}/upload-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<List<ImageResponseDto.PresignedUrlDto>> uploadImagesToS3(

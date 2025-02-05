@@ -35,6 +35,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 리뷰 관련 응답
     REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW4001", "리뷰가 없습니다."),
+    REVIEW_TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "REVIEW4002", "등록할 수 있는 리뷰 이미지 개수를 초과하였습니다."),
+
 
     // 건강 목표 관련 응답
     HEALTH_PLAN_NOT_FOUND(HttpStatus.BAD_REQUEST, "HEALTH_PLAN4001", "건강 목표가 없습니다."),
@@ -61,7 +63,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 이미지 종류 관련 응답
     IMAGE_TYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4001", "해당 이미지 종류가 없습니다."),
     IMAGE_INVALID_PUBLIC_URL(HttpStatus.BAD_REQUEST, "IMAGE4002", "해당 이미지의 PUBLIC URL이 유효하지 않습니다."),
-    HEALTH_PLAN_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4003", "해당 이미지의 PUBLIC URL이 유효하지 않습니다."),
+    HEALTH_PLAN_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4003", "해당 건강 관리 목표 이미지가 없습니다."),
+    PROFILE_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4004", "해당 프로필 이미지가 없습니다."),
+    REVIEW_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE4005", "해당 리뷰 이미지가 없습니다."),
 
     // 약관 관련 응답
     INVALID_TERM_ID(HttpStatus.BAD_REQUEST, "TERM4001", "유효하지 않은 약관입니다.")
