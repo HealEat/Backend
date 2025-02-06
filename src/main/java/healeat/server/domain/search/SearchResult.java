@@ -26,6 +26,8 @@ public class SearchResult extends BaseEntity {
 
     private String baseY;
 
+    private Integer radius;
+
     private Boolean accuracy;
 
     private String keyword;
@@ -42,10 +44,11 @@ public class SearchResult extends BaseEntity {
      * SearchResult 생성자
      */
     @Builder
-    public SearchResult(String query, String baseX, String baseY, Boolean accuracy) {
+    public SearchResult(String query, String baseX, String baseY, Integer radius, Boolean accuracy) {
         this.query = query;
         this.baseX = baseX;
         this.baseY = baseY;
+        this.radius = radius;
         this.accuracy = accuracy;
     }
 
