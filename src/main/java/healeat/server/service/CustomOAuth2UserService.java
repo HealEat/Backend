@@ -25,7 +25,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     @Transactional // 트랜잭션 추가
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("✅ CustomOAuth2UserService.loadUser() 호출됨");
+        //System.out.println("CustomOAuth2UserService.loadUser() 호출됨");
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         System.out.println("✅ OAuth2User attributes: " + oAuth2User.getAttributes());
