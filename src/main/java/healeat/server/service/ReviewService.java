@@ -1,11 +1,9 @@
 package healeat.server.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.ReviewHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.aws.s3.AmazonS3Manager;
-import healeat.server.aws.s3.S3Uploader;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
@@ -33,7 +31,6 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final S3Uploader s3Uploader;
     private final AmazonS3Manager amazonS3Manager;
     private final ReviewImageRepository reviewImageRepository;
     private final StoreRepository storeRepository;
