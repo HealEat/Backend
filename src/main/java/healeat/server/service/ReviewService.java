@@ -94,8 +94,7 @@ public class ReviewService {
 
                 ReviewImage reviewImage = ReviewImage.builder()
                         .review(review)
-                        .filePath(uploadFileUrl)
-                        .fileName(file.getOriginalFilename())
+                        .imageUrl(uploadFileUrl)
                         .build();
 
                 reviewImageList.add(reviewImage);
@@ -119,7 +118,7 @@ public class ReviewService {
         // S3 저장 이미지 삭제
         List<ReviewImage> reviewImages = review.getReviewImageList();
         for(ReviewImage reviewImage : reviewImages) {
-            amazonS3Manager.deleteFile(reviewImage.getFilePath());
+            amazonS3Manager.deleteFile(reviewImage.getImageUrl());
             reviewImageRepository.delete(reviewImage);
         }
         // 리뷰 삭제

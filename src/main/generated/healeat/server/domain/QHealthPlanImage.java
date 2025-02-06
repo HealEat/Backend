@@ -27,13 +27,11 @@ public class QHealthPlanImage extends EntityPathBase<HealthPlanImage> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final StringPath fileName = createString("fileName");
-
-    public final StringPath filePath = createString("filePath");
-
     public final QHealthPlan healthPlan;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final StringPath imageUrl = createString("imageUrl");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
