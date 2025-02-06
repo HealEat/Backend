@@ -8,6 +8,7 @@ import healeat.server.web.dto.ReviewResponseDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ReviewConverter {
 
@@ -24,7 +25,9 @@ public class ReviewConverter {
                 .reviewerInfo(reviewerInfo)
                 .reviewId(review.getId())
                 .totalScore(review.getTotalScore())
-                .imageUrls(/*review.getReviewImageList()*/ null) // 이미지 CRUD 구현 필요
+                .imageUrls(review.getReviewImageList().stream()
+                        .map(ReviewImage::getFilePath)
+                        .collect(Collectors.toList())) // 이미지 CRUD 구현 필요
                 .body(review.getBody())
                 .createdAt(review.getCreatedAt())
                 .build();

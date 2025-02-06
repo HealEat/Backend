@@ -1,5 +1,6 @@
 package healeat.server.repository;
 
+import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
@@ -16,6 +17,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findAllByStoreAndMember_Vegetarian(Store store, Vegetarian vegetarian, Pageable pageable);
 
-
     Page<Review> findAllByStoreAndMember_Diet(Store store, Diet memberDiet, Pageable pageable);
+
+    Page<Review> findByMember(Member member,Pageable pageable);
 }
