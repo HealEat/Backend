@@ -16,7 +16,8 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("searchResult");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager(
+                "searchResult", "recommendResult");
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(10000)  // 최대 10,000개 저장
                 .expireAfterWrite(60, TimeUnit.MINUTES)  // 60분 후 만료
