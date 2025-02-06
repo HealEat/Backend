@@ -21,10 +21,12 @@ import java.net.URL;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ProfileImageService {
+public class ImageService {
 
     private final AmazonS3Manager amazonS3Manager;
     private final MemberRepository memberRepository;
+
+    /***************************** 프로필 이미지만을 위한 메서드 *****************************/
 
     @Transactional
     public Member uploadProfileImage(Long memberId, MultipartFile file) {
@@ -75,7 +77,6 @@ public class ProfileImageService {
             amazonS3Manager.deleteFile(profileImageUrl);
             member.updateProfileImageUrl(null);
             memberRepository.save(member);
-
         }
         return member;
     }

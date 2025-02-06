@@ -14,11 +14,14 @@ import healeat.server.web.dto.*;
 import healeat.server.web.dto.HealInfoResponseDto.ChangeBaseResultDto;
 import healeat.server.web.dto.HealInfoResponseDto.ChangeChoiceResultDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static healeat.server.converter.MemberHealQuestionConverter.*;
 
@@ -41,14 +44,20 @@ public class MyPageController {
         return ApiResponse.onSuccess(memberService.getProfileInfo(testMember));
     }
 
-    @Operation(summary = "프로필 수정 API")
-    @PatchMapping("/profile")
+    @Operation(summary = "프로필 수정 API",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
+    @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MemberProfileResponseDto> updateProfile(
-            @AuthenticationPrincipal Member member, @RequestBody MemberProfileRequestDto request) {
+            @AuthenticationPrincipal Member member,
+            @RequestPart(name = "file", required = false)
+            MultipartFile file,
+            @RequestPart(name = "request", required = true)
+            MemberProfileRequestDto request) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(memberService.updateProfile(testMember, request));
+        Member changedProfileMember = memberService.updateProfile(testMember, file, request);
+        return ApiResponse.onSuccess(MemberProfileResponseDto.from(changedProfileMember));
     }
 
     @Operation(summary = "내가 남긴 후기 목록 조회 API",
