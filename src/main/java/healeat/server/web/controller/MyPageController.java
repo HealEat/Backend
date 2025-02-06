@@ -1,8 +1,10 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.MemberHealQuestion;
+import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
@@ -72,8 +74,8 @@ public class MyPageController {
             @PathVariable Long reviewId) {
 
         Member testMember = memberRepository.findById(999L).get();
-        ReviewResponseDto.DeleteResultDto resultDto = reviewService.deleteReview(testMember, reviewId);
-        return ApiResponse.onSuccess(resultDto);
+        Review deleteReview = reviewService.deleteReview(testMember, reviewId);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewDeleteResultDto(deleteReview));
     }
 
     @Operation(summary = "마이페이지 나의 건강정보 조회 API",

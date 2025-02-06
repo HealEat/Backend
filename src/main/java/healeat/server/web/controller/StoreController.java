@@ -8,14 +8,20 @@ import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.BookmarkService;
+import healeat.server.service.ReviewService;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import static healeat.server.converter.BookmarkConverter.toSetResponseDto;
 
@@ -25,6 +31,7 @@ import static healeat.server.converter.BookmarkConverter.toSetResponseDto;
 public class StoreController {
 
     private final StoreQueryServiceImpl storeQueryServiceImpl;
+    private final ReviewService reviewService;
     private final MemberRepository memberRepository;
     private final BookmarkService bookmarkService;
 
@@ -48,17 +55,22 @@ public class StoreController {
     }
 
     @Operation(summary = "특정 가게의 리뷰 작성 API", description = "isInDB가 ture인 " +
-            "검색 결과에 대해서만 사용하는 API입니다.")
-    @PostMapping("/{storeId}/reviews")
+            "검색 결과에 대해서만 사용하는 API입니다.",
+    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
+    @PostMapping(value = "/{storeId}/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ReviewResponseDto.SetResultDto> createReview(
             @PathVariable Long storeId,
             @AuthenticationPrincipal Member member,
-            @ModelAttribute ReviewRequestDto request) {
+            @RequestPart(name = "files")
+            List<MultipartFile> files,
+            @RequestPart(name = "request", required = true)
+            ReviewRequestDto request) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-//        ReviewResponseDto.SetResultDto newReview = storeQueryServiceImpl.createReview(storeId, member);
-        return ApiResponse.onSuccess(null);
+        //로그인 연결되면 testMember만 나중에 member로 수정
+        Review newReview = reviewService.createReview(storeId, testMember, files, request);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewSetResultDto(newReview));
     }
 
     @Operation(summary = "특정 가게의 리뷰 페이지 조회 API", description = "리뷰 리스트는 페이징을 포함합니다.")

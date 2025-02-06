@@ -3,11 +3,8 @@ package healeat.server.service;
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.aws.s3.AmazonS3Manager;
-import healeat.server.aws.s3.S3Uploader;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
-import healeat.server.web.dto.ImageResponseDto;
-import healeat.server.web.dto.ProfileImageRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -26,7 +23,6 @@ import java.net.URL;
 @Transactional(readOnly = true)
 public class ProfileImageService {
 
-    private final S3Uploader s3Uploader;
     private final AmazonS3Manager amazonS3Manager;
     private final MemberRepository memberRepository;
 

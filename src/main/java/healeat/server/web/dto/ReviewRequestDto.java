@@ -18,7 +18,6 @@ public class ReviewRequestDto {
     Float freshScore;
     Float nutrScore;
 
-    List<String> imageUrls;
     String body;
 
     @Getter
