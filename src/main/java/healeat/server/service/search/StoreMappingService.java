@@ -3,10 +3,13 @@ package healeat.server.service.search;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
+import healeat.server.domain.mapping.Bookmark;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.StoreRepository;
 import healeat.server.service.ReviewService;
+import healeat.server.service.StoreApiClient;
 import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.StoreResonseDto.StorePreviewDto;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +55,16 @@ public class StoreMappingService {
     }
 
     public StorePreviewDto mapToDto(Member member, SearchResultItem item) {
-        boolean isBookMarked = false;
+
+        Long bookmarkId = null;
         if (member != null) {
-            isBookMarked = member.getBookmarks().stream()
-                    .anyMatch(bookmark -> item.getId().equals(bookmark.getStore().getId()));
+             Optional<Bookmark> optionalBookmark = member.getBookmarks().stream()
+                     .filter(bookmark -> bookmark.getStore().getId().equals(item.getId()))
+                     .findFirst();
+
+             if (optionalBookmark.isPresent()) {
+                 bookmarkId = optionalBookmark.get().getId();
+             }
         }
 
         Optional<Store> optionalStore = storeRepository.findById(item.getId());
@@ -84,7 +93,30 @@ public class StoreMappingService {
                 /// Store 필요
                 .isInDBDto(isInDBDto) // null일 수 있음.
                 // Member 필요
-                .isBookMarked(isBookMarked)
+                .bookmarkId(bookmarkId)
                 .build();
     }
+
+//    public List<String> searchDaumImages(SearchResultItem item) {
+//
+//        String addressName = document.getAddress_name();
+//        String placeName = document.getPlace_name();
+//
+//        boolean nameContainsRegion = placeName.contains(" ") && placeName.endsWith("점");
+//
+//        DaumImageResponseDto daumResponse;
+//        if (nameContainsRegion) {
+//            daumResponse = storeApiClient.getDaumByQuery(placeName, 1, 15);
+//        } else {
+//
+//            String region3DepthName = addressName.split(" ")[2];
+//            boolean isEmpty3Depth = (region3DepthName == null) || (region3DepthName.isEmpty());
+//            daumResponse = storeApiClient.getDaumByQuery(isEmpty3Depth ?
+//                            placeName :
+//                            region3DepthName + " " + placeName
+//                    , 1, 15);
+//        }
+//
+//        daumResponse.getDocuments().
+//    }
 }

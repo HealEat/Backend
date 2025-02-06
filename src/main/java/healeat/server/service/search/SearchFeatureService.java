@@ -48,19 +48,28 @@ public class SearchFeatureService {
                     .toList();
         }
 
-        assert categoryIdList != null;
-        Map<Long, String> categoryIdToNameMap = foodCategoryRepository.findAllById(categoryIdList)
-                .stream()
-                .collect(Collectors.toMap(FoodCategory::getId, FoodCategory::getName));
+        Map<Long, String> categoryIdToNameMap;
+        if ((categoryIdList != null && !categoryIdList.isEmpty())) {
+            categoryIdToNameMap = foodCategoryRepository.findAllById(categoryIdList)
+                    .stream()
+                    .collect(Collectors.toMap(FoodCategory::getId, FoodCategory::getName));
+        } else {
+            categoryIdToNameMap = Map.of();
+        }
 
-        Map<Long, Set<String>> featureIdToCategoryNameMap = foodFeatureRepository.findAllById(featureIdList)
-                .stream()
-                .collect(Collectors.toMap(
-                        FoodFeature::getId,
-                        feature -> featCategoryMapRepository.findAllByFoodFeature(feature).stream()
-                                .map(featCategoryMap -> featCategoryMap.getFoodCategory().getName())
-                                .collect(Collectors.toSet())
-                ));
+        Map<Long, Set<String>> featureIdToCategoryNameMap;
+        if (featureIdList != null && !featureIdList.isEmpty()) {
+            featureIdToCategoryNameMap = foodFeatureRepository.findAllById(featureIdList)
+                    .stream()
+                    .collect(Collectors.toMap(
+                            FoodFeature::getId,
+                            feature -> featCategoryMapRepository.findAllByFoodFeature(feature).stream()
+                                    .map(featCategoryMap -> featCategoryMap.getFoodCategory().getName())
+                                    .collect(Collectors.toSet())
+                    ));
+        } else {
+            featureIdToCategoryNameMap = Map.of();
+        }
 
         return items.stream()
                 .filter(item -> matchesFilters(
@@ -96,5 +105,21 @@ public class SearchFeatureService {
         }
 
         return true;
+    }
+
+    public List<Long> getHealEatItemIds(List<SearchResultItem> items, List<String> healEatFoods) {
+
+        if (healEatFoods == null || healEatFoods.isEmpty()) {
+            return items.stream()
+                    .map(SearchResultItem::getId)
+                    .toList();
+        }
+
+        return items.stream()
+                .filter(item -> healEatFoods.stream()
+                                    .anyMatch(item.getCategoryName()::contains)
+                )
+                .map(SearchResultItem::getId)
+                .toList();
     }
 }
