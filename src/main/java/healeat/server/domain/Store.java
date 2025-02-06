@@ -49,6 +49,7 @@ public class Store extends BaseEntity {
     /**
      * 평점
      */
+
     private Float totalScore; // 전체 평점
     private Integer reviewCount; // 전체 리뷰 수
 
@@ -71,6 +72,22 @@ public class Store extends BaseEntity {
     private List<Review> reviews = new ArrayList<>();
 
     //==비즈니스 로직==//
+
+    @PrePersist
+    public void initializeStore() {
+        totalScore = 0.0f;
+        reviewCount = 0;
+        sickScore = 0.0f;
+        sickCount = 0;
+        vegetScore = 0.0f;
+        vegetCount = 0;
+        dietScore = 0.0f;
+        dietCount = 0;
+        tastyScore = 0.0f;
+        cleanScore = 0.0f;
+        freshScore = 0.0f;
+        nutrScore = 0.0f;
+    }
 
     /**
      * 새로운 리뷰에 의한

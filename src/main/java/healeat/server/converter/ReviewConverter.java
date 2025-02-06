@@ -7,6 +7,7 @@ import healeat.server.web.dto.ImageResponseDto;
 import healeat.server.web.dto.ReviewResponseDto;
 import org.springframework.data.domain.Page;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,4 +57,25 @@ public class ReviewConverter {
                 .imageUrl(reviewImage.getFilePath())
                 .build();
     }
+
+    public static ReviewResponseDto.SetResultDto toReviewSetResultDto(Review review) {
+
+        return ReviewResponseDto.SetResultDto.builder()
+                .reviewId(review.getId())
+                .imageCount(review.getReviewImageList().size())
+                .createdAt(review.getCreatedAt())
+                .build();
+    }
+
+    public static ReviewResponseDto.DeleteResultDto toReviewDeleteResultDto(Review review) {
+        return ReviewResponseDto.DeleteResultDto.builder()
+                .deletedReviewId(review.getId())
+                .deletedReviewImageUrls(review.getReviewImageList().stream()
+                        .map(ReviewImage::getFilePath)
+                        .collect(Collectors.toList()))
+                .deletedAt(LocalDateTime.now())
+                .build();
+    }
+
+
 }
