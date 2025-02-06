@@ -76,4 +76,8 @@ public class Review extends BaseEntity {
     private void calcTotalByAll() {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
     }
+
+    public void updateReviewImageList(List<ReviewImage> reviewImageList) {
+        this.reviewImageList = reviewImageList;
+    }
 }

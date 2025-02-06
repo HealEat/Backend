@@ -27,11 +27,9 @@ public class QReviewImage extends EntityPathBase<ReviewImage> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final StringPath fileName = createString("fileName");
-
-    public final StringPath filePath = createString("filePath");
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final StringPath imageUrl = createString("imageUrl");
 
     public final healeat.server.domain.mapping.QReview review;
 
