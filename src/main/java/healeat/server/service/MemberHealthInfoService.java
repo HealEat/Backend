@@ -184,8 +184,12 @@ public class MemberHealthInfoService {
     private Map<Question, List<Answer>> getMemberHealthAnswer(Member member) {
         return memberHealQuestionRepository.findByMember(member).stream()
                 .collect(Collectors.toMap(
-                        MemberHealQuestion::getQuestion,
-                        MemberHealQuestion::getAnswers
+                        MemberHealQuestion::getQuestion,    // key: Question
+                        MemberHealQuestion::getAnswers,     // value: List<Answer>
+                        (existing, newValue) -> {       // 중복 키 문제 발생 시 값 병합
+                            existing.addAll(newValue);
+                            return existing;
+                        }
                 ));
     }
 
@@ -193,6 +197,7 @@ public class MemberHealthInfoService {
     private List<String> getAnswerDescription(Map<Question, List<Answer>> questionAnswers, Question question) {
         return questionAnswers.getOrDefault(question, List.of()).stream()
                 .map(Answer::getDescription)
+                .distinct() // 중복 제거
                 .collect(Collectors.toList());
     }
 }
