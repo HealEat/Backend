@@ -58,7 +58,7 @@ public class HealthPlanResponseDto {
     @AllArgsConstructor
     public static class MemoImageResponseDto {
         private Long id;
-        private String filePath;
+        private String imageUrl;
     }
 
     @Getter

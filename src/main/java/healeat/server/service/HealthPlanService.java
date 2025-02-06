@@ -2,6 +2,7 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
+import healeat.server.aws.s3.AmazonS3Manager;
 import healeat.server.aws.s3.S3PresignedUploader;
 import healeat.server.aws.s3.S3Uploader;
 import healeat.server.domain.HealthPlan;
@@ -35,6 +36,7 @@ public class HealthPlanService {
     private final S3PresignedUploader s3PresignedUploader;
     private final HealthPlanRepository healthPlanRepository;
     private final HealthPlanImageRepository healthPlanImageRepository;
+    private final AmazonS3Manager amazonS3Manager;
 
     public List<HealthPlan> getAllHealthPlans() {
         return healthPlanRepository.findAll();
@@ -125,8 +127,7 @@ public class HealthPlanService {
 
             HealthPlanImage healthPlanImage = HealthPlanImage.builder()
                     .healthPlan(healthPlan)
-                    .filePath(urlMap.getPublicUrl())
-                    .fileName(s3Uploader.extractKeyFromUrl(urlMap.getPublicUrl()))
+                    .imageUrl(urlMap.getPublicUrl())
                     .build();
             healthPlan.getHealthPlanImages().add(healthPlanImage);
         }
@@ -139,7 +140,7 @@ public class HealthPlanService {
         HealthPlan healthPlan = healthPlanRepository.findById(planId)
                 .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
         return healthPlan.getHealthPlanImages().stream()
-                .map(HealthPlanImage::getFilePath)
+                .map(HealthPlanImage::getImageUrl)
                 .collect(Collectors.toList());
     }
 
@@ -194,7 +195,7 @@ public class HealthPlanService {
         HealthPlanImage image = healthPlanImageRepository.findById(imageId)
                 .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_IMAGE_NOT_FOUND));
 
-        s3Uploader.deleteFile(image.getFileName());
+        amazonS3Manager.deleteFile(image.getImageUrl());
         healthPlanImageRepository.delete(image);
 
         return image;

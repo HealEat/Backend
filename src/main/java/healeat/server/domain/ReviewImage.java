@@ -23,8 +23,5 @@ public class ReviewImage extends BaseEntity {
     private Review review;
 
     @Column(nullable = false)
-    private String filePath; // 이미지 파일 경로
-
-    @Column(nullable = false)
-    private String fileName; // 원본 파일 이름
+    private String imageUrl; // 이미지 파일 경로
 }

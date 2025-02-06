@@ -27,7 +27,7 @@ public class ReviewConverter {
                 .reviewId(review.getId())
                 .totalScore(review.getTotalScore())
                 .imageUrls(review.getReviewImageList().stream()
-                        .map(ReviewImage::getFilePath)
+                        .map(ReviewImage::getImageUrl)
                         .collect(Collectors.toList())) // 이미지 CRUD 구현 필요
                 .body(review.getBody())
                 .createdAt(review.getCreatedAt())
@@ -54,7 +54,7 @@ public class ReviewConverter {
 
         return ImageResponseDto.publicUrlDto.builder()
                 .id(reviewImage.getId())
-                .imageUrl(reviewImage.getFilePath())
+                .imageUrl(reviewImage.getImageUrl())
                 .build();
     }
 
@@ -71,7 +71,7 @@ public class ReviewConverter {
         return ReviewResponseDto.DeleteResultDto.builder()
                 .deletedReviewId(review.getId())
                 .deletedReviewImageUrls(review.getReviewImageList().stream()
-                        .map(ReviewImage::getFilePath)
+                        .map(ReviewImage::getImageUrl)
                         .collect(Collectors.toList()))
                 .deletedAt(LocalDateTime.now())
                 .build();
