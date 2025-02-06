@@ -2,6 +2,7 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.MemberHandler;
+import healeat.server.aws.s3.AmazonS3Manager;
 import healeat.server.aws.s3.S3Uploader;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -25,16 +27,18 @@ import java.net.URL;
 public class ProfileImageService {
 
     private final S3Uploader s3Uploader;
+    private final AmazonS3Manager amazonS3Manager;
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Member uploadProfileImage(Long memberId, ProfileImageRequestDto request) {
+    public Member uploadProfileImage(Long memberId, MultipartFile file) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        ImageResponseDto.PresignedUrlDto presignedUrl = s3Uploader.createPresignedUrl("profiles", request.getImageExtension());
+        String keyName = amazonS3Manager.generateProfileKeyName();
+        String uploadFileUrl = amazonS3Manager.uploadFile(keyName, file);
 
-        member.updateProfileImageUrl(presignedUrl.getPublicUrl());
+        member.updateProfileImageUrl(uploadFileUrl);
         memberRepository.save(member);
 
         return member;
@@ -72,8 +76,7 @@ public class ProfileImageService {
 
         String profileImageUrl = member.getProfileImageUrl();
         if (profileImageUrl != null) {
-            String keyName = s3Uploader.extractKeyFromUrl(profileImageUrl);
-            s3Uploader.deleteFile(keyName);
+            amazonS3Manager.deleteFile(profileImageUrl);
             member.updateProfileImageUrl(null);
             memberRepository.save(member);
 
