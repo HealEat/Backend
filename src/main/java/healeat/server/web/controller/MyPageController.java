@@ -6,11 +6,15 @@ import healeat.server.domain.MemberHealQuestion;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
+import healeat.server.service.ReviewService;
+import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.*;
 import healeat.server.web.dto.HealInfoResponseDto.ChangeBaseResultDto;
 import healeat.server.web.dto.HealInfoResponseDto.ChangeChoiceResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +28,7 @@ public class MyPageController {
     private final MemberService memberService;
     private final MemberHealthInfoService memberHealthInfoService;
     private final MemberRepository memberRepository;
+    private final ReviewService reviewService;
 
     @Operation(summary = "프로필 정보 조회 API", description = "프로필 수정 화면에 사용합니다.")
     @GetMapping("/profile")
@@ -44,23 +49,31 @@ public class MyPageController {
         return ApiResponse.onSuccess(memberService.updateProfile(testMember, request));
     }
 
-    @Operation(summary = "내가 남긴 후기 목록 조회 API")
+    @Operation(summary = "내가 남긴 후기 목록 조회 API",
+            description = "내가 작성한 후기 목록을 페이징 처리하여 조회")
     @GetMapping("/reviews")
-    public ApiResponse<ReviewResponseDto.myPageReviewListDto> getMyReviews(@AuthenticationPrincipal Member member) {
+    public ApiResponse<ReviewResponseDto.myPageReviewListDto> getMyReviews(
+            @AuthenticationPrincipal Member member,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(null);
+        Pageable pageable = PageRequest.of(page - 1, size);
+        ReviewResponseDto.myPageReviewListDto responseDto = reviewService.getMyReviews(testMember, pageable);
+
+        return ApiResponse.onSuccess(responseDto);
     }
 
     @Operation(summary = "특정 리뷰 삭제 API")
     @DeleteMapping("/reviews/{reviewId}")
     public ApiResponse<ReviewResponseDto.DeleteResultDto> deleteReview(
-            @AuthenticationPrincipal Member member, @PathVariable Long reviewId) {
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long reviewId) {
 
         Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(null);
+        ReviewResponseDto.DeleteResultDto resultDto = reviewService.deleteReview(testMember, reviewId);
+        return ApiResponse.onSuccess(resultDto);
     }
 
     @Operation(summary = "마이페이지 나의 건강정보 조회 API",
