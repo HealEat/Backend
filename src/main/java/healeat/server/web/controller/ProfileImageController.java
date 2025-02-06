@@ -36,16 +36,16 @@ public class ProfileImageController {
     public ApiResponse<ProfileImageResponseDto> uploadProfileImage(
             @AuthenticationPrincipal Member member,
             @RequestPart(name = "file", required = true)
-            MultipartFile file,
-            @RequestPart(name = "request", required = true)
-            ProfileImageRequestDto request) {
+            MultipartFile file) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        Member uploadedMember = profileImageService.uploadProfileImage(testMember.getId(), request);
+        Member uploadedMember = profileImageService.uploadProfileImage(testMember.getId(), file);
         return ApiResponse.onSuccess(profileImageConverter.toResponseDto(uploadedMember));
     }
 
+    @Operation(summary = "프로필 이미지 조회", description = "해당 사용자의 프로필 이미지를 조회합니다."
+            + "(이미지 형태 그대로 반환)")
     @GetMapping
     public ResponseEntity<Resource> getProfileImage(
             @AuthenticationPrincipal Member member) {
@@ -54,6 +54,7 @@ public class ProfileImageController {
         return profileImageService.getProfileImage(testMember.getId());
     }
 
+    @Operation(summary = "프로필 이미지 삭제", description = "해당 사용자의 프로필 이미지를 삭제합니다.")
     @DeleteMapping
     public ApiResponse<ProfileImageResponseDto> deleteProfileImage(
             @AuthenticationPrincipal Member member) {
