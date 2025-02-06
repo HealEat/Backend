@@ -90,12 +90,13 @@ public class MyPageController {
     @Operation(summary = "마이페이지 나의 건강정보 조회 API",
             description = "마이페이지에서 나의 건강정보를 전체 조회할 수 있습니다.")
     @GetMapping("/health-info")
-    public ApiResponse<MemberProfileResponseDto.MyHealthProfileDto> getMyHealthInfo(
+    public ApiResponse<HealInfoResponseDto.MyHealthInfoDto> getMyHealthInfo(
             @AuthenticationPrincipal Member member) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(null);
+        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(testMember);
+        return ApiResponse.onSuccess(responseDto);
     }
 
 

@@ -58,4 +58,19 @@ public class HealInfoResponseDto {
         BaseResultDto baseResultDto;
         List<String> healEatFoods;
     }
+
+    /// 마이페이지 - 나의 건강 정보 조회 dto
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MyHealthInfoDto {
+
+        private List<String> healthGoals;   // 건강 목표 (질병 관리, 비건, 다이어트)
+        private String vegetarianType;      // 비건 종류
+        private List<String> healthIssues;  // 건강 상의 불편함
+        private List<String> requiredMeals; // 필요한 식사
+        private List<String> requiredNutrients;     // 필요한 영양소
+        private List<String> avoidedFoods;  // 피해야 하는 음식
+    }
 }
