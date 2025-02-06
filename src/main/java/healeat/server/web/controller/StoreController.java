@@ -38,7 +38,7 @@ public class StoreController {
     }
 
     @Operation(summary = "가게 저장 API", description = "가게를 DB에 저장하는 Trigger 주목: " +
-            "isInDB(response 필드)가 false인 가게를 대상으로 리뷰를 작성, 또는 회원의 북마크에 저장")
+            "isInDB(response 필드)가 false인 가게를 대상으로, 리뷰를 작성 또는 회원의 북마크에 저장")
     @PostMapping("/{storeId}")
     public ApiResponse<StoreResonseDto.SetResultDto> addStore(
             @RequestBody StoreRequestDto.ForSaveStoreDto request) {
