@@ -1,6 +1,6 @@
 package healeat.server.web.dto;
 
-import healeat.server.domain.Store;
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
@@ -55,6 +55,6 @@ public class StoreRequestDto {
         String x;
         String y;
         String placeUrl;
-        List<String> daumImgUrlList; // Daum 이미지 API
+        List<DaumImageResponseDto.Document> daumImgDocuments; // Daum 이미지 API
     }
 }

@@ -1,5 +1,6 @@
 package healeat.server.web.dto;
 
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,7 +55,7 @@ public class StoreResonseDto {
         StoreInfoDto storeInfoDto;
 
         // Store_reviewImages + API 합친 정보
-        List<String> imageUrlList;
+        StoreImageListDto storeImageListDto;
 
         /// Response 전용 필드
         Boolean isInDB;
@@ -130,7 +131,7 @@ public class StoreResonseDto {
         // 리뷰 이미지 정보
         List<ReviewImagePreviewDto> reviewImagePreviewDtoList;
         // 다음 이미지 API
-        List<String> daumImageUrls;
+        List<DaumImageResponseDto.Document> daumImgDocuments;
     }
 
     @Builder
@@ -143,6 +144,4 @@ public class StoreResonseDto {
         ReviewResponseDto.ReviewerInfo reviewerInfo;
         String firstImageUrl;
     }
-
-
 }

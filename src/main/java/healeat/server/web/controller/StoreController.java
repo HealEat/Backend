@@ -35,15 +35,6 @@ public class StoreController {
     private final MemberRepository memberRepository;
     private final BookmarkService bookmarkService;
 
-    @Operation(summary = "특정 가게의 세부정보(또는 이미지까지) 조회 API",
-            description = "필수 세부정보 : 맛-청결-신선-영양 점수")
-    @GetMapping("/{storeId}")
-    public ApiResponse<StoreResonseDto.StoreImageListDto> getStoreDetails(@PathVariable Long storeId) {
-        /*StoreResonseDto.StoreImageListDto images =
-                storeQueryServiceImpl.getReviewAndDaumImages(storeId);*/
-        return ApiResponse.onSuccess(null);
-    }
-
     @Operation(summary = "가게 저장 API", description = "가게를 DB에 저장하는 Trigger 주목: " +
             "isInDB(response 필드)가 false인 가게를 대상으로, 리뷰를 작성 또는 회원의 북마크에 저장")
     @PostMapping("/{storeId}")
@@ -52,6 +43,15 @@ public class StoreController {
 
         return ApiResponse.onSuccess(StoreConverter.toSetResultDto(
                 storeQueryServiceImpl.saveStore(request)));
+    }
+
+    @Operation(summary = "리뷰 페이지용- 특정 가게의 세부정보 조회 API",
+            description = "세부정보 : 맛-청결-신선-영양 점수")
+    @GetMapping("/{storeId}")
+    public ApiResponse<StoreResonseDto.StoreImageListDto> getStoreDetails(@PathVariable Long storeId) {
+        /*StoreResonseDto.StoreImageListDto images =
+                storeQueryServiceImpl.getReviewAndDaumImages(storeId);*/
+        return ApiResponse.onSuccess(null);
     }
 
     @Operation(summary = "특정 가게의 리뷰 작성 API", description = "isInDB가 ture인 " +

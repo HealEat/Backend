@@ -5,6 +5,7 @@ import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -44,7 +45,7 @@ public class Store extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
-    private List<String> daumImgUrlList = new ArrayList<>();
+    private List<DaumImageResponseDto.Document> daumImgDocuments = new ArrayList<>();
 
     /**
      * 평점
@@ -142,5 +143,22 @@ public class Store extends BaseEntity {
                 .dietScore(dietScore)
                 .dietCount(dietCount)
                 .build();
+    }
+
+    public List<StoreResonseDto.ReviewImagePreviewDto> getReviewImagePreviewDtoList() {
+        return reviews.stream()
+                .map(review -> {
+
+                    List<ReviewImage> reviewImageList = review.getReviewImageList();
+
+                    return StoreResonseDto.ReviewImagePreviewDto.builder()
+                            .reviewId(review.getId())
+                            .reviewerInfo(review.getReviewerInfo())
+                            .firstImageUrl(reviewImageList.isEmpty() ?
+                                    null :
+                                    reviewImageList.get(0).getImageUrl())
+                            .build();
+                })
+                .toList();
     }
 }

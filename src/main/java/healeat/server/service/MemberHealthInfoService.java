@@ -25,21 +25,18 @@ import java.util.stream.Collectors;
 public class MemberHealthInfoService {
 
     private final MemberHealQuestionRepository memberHealQuestionRepository;
-    private final MemberRepository memberRepository;
     private final DiseaseRepository diseaseRepository;
 
     public Member chooseVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
         member.setVegetAndCheckChanged(vegetarian);
-        String chooseName = vegetarian.name();
 
         return member;
     }
     public Member updateVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
-        String chooseName = vegetarian.name();
 
         // 변경 사항 있을 시 알고리즘 새로 계산
         boolean isChanged = member.setVegetAndCheckChanged(vegetarian);
@@ -54,7 +51,6 @@ public class MemberHealthInfoService {
 
         Diet diet = Diet.getByDescription(choose);
         member.setDietAndCheckChanged(diet);
-        String chooseName = diet.name();
 
         return member;
     }
@@ -62,7 +58,6 @@ public class MemberHealthInfoService {
 
         Diet diet = Diet.getByDescription(choose);
         member.setDietAndCheckChanged(diet);
-        String chooseName = diet.name();
 
         // 변경 사항 있을 시 알고리즘 새로 계산
         boolean isChanged = member.setDietAndCheckChanged(diet);
