@@ -26,13 +26,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static healeat.server.web.dto.StoreResonseDto.*;
 
@@ -65,7 +63,7 @@ public class StoreQueryServiceImpl {
                 .x(request.getX())
                 .y(request.getY())
                 .placeUrl(request.getPlaceUrl())
-                .daumImgUrlList(request.getDaumImgUrlList()) // Daum 이미지 API
+                .daumImgDocuments(request.getDaumImgDocuments()) // Daum 이미지 API
                 .build();
 
         return storeRepository.save(store);

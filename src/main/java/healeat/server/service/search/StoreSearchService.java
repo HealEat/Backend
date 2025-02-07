@@ -107,6 +107,7 @@ public class StoreSearchService {
     }
 
     private List<KakaoPlaceResponseDto> get3ResponsesByQuery(SearchResult searchResult) {
+
         String query = searchResult.getQuery();
         String x = searchResult.getBaseX();
         String y = searchResult.getBaseY();

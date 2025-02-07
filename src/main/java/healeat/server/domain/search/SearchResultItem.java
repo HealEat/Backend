@@ -75,11 +75,14 @@ public class SearchResultItem extends BaseEntity {
     }
 
     public StoreResonseDto.StoreInfoDto getStoreInfoDto() {
+
+        String[] categoryWords = categoryName.split(" > ");
+
         return StoreResonseDto.StoreInfoDto.builder()
                 .distance(distance)
                 .placeId(placeId)
                 .placeName(placeName)
-                .categoryName(categoryName)
+                .categoryName(categoryWords[categoryWords.length - 1])
                 .phone(phone)
                 .addressName(addressName)
                 .roadAddressName(roadAddressName)
