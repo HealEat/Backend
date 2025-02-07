@@ -55,13 +55,13 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             providerId = oauth2User.getAttributes().get("id").toString();
         }
 
-        System.out.println("✅ provider: " + provider + ", providerId: " + providerId);
+        System.out.println(" provider: " + provider + ", providerId: " + providerId);
 
         Optional<Member> memberOpt = memberRepository.findByProviderAndProviderId(provider, providerId);
 
         if (memberOpt.isPresent()) {
             Member member = memberOpt.get();
-            System.out.println("✅ 현재 로그인한 사용자: " + member.getName());
+            System.out.println(" 현재 로그인한 사용자: " + member.getName());
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     member, null, new ArrayList<>()
@@ -78,23 +78,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             String accessToken = authorizedClient.getAccessToken().getTokenValue();
             System.out.println("추출된 액세스 토큰: " + accessToken);
 
-            // JSON 응답 반환 (액세스 토큰 포함)
-            response.setContentType("application/json;charset=UTF-8");
-            response.setCharacterEncoding("UTF-8");
+            // 클라이언트 앱으로 리다이렉트 (커스텀 스킴 사용)
+            String redirectUrl = "com.umc7.healeat://?message=LoginSuccessful&accessToken=" + accessToken;
+            System.out.println("리다이렉트 URL: " + redirectUrl);
+            response.sendRedirect(redirectUrl);
 
-            Map<String, String> responseBody = new HashMap<>();
-            responseBody.put("message", "Login Successful");
-            responseBody.put("accessToken", accessToken);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            response.getWriter().write(objectMapper.writeValueAsString(responseBody));
         } else {
             System.out.println("액세스 토큰을 찾을 수 없음");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token not found");
         }
-        /* 액세스 토큰을 클라이언트에게 반환하는 것을 추가하면서 삭제
-        // 로그인 성공 후 처리 로직
-        String redirectUrl = "/home"; // 로그인 후 리다이렉트할 URL
-        getRedirectStrategy().sendRedirect(request, response, redirectUrl);*/
     }
 }
