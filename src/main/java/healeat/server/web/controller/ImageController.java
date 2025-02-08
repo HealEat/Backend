@@ -2,9 +2,12 @@ package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ProfileImageConverter;
+import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
+import healeat.server.domain.ReviewImage;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.ImageService;
+import healeat.server.web.dto.ImageResponseDto;
 import healeat.server.web.dto.ProfileImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,8 @@ public class ImageController {
     private final ProfileImageConverter profileImageConverter;
     //테스트용 멤버
     private final MemberRepository memberRepository;
+
+    /***************************** 프로필 이미지 *****************************/
 
     @Operation(summary = "프로필 이미지 조회", description = "해당 사용자의 프로필 이미지를 조회합니다."
             + "(이미지 형태 그대로 반환)")
@@ -42,5 +47,26 @@ public class ImageController {
         Member testMember = memberRepository.findById(999L).get();
         Member deleteImageMember = imageService.deleteProfileImage(testMember.getId());
         return ApiResponse.onSuccess(profileImageConverter.toResponseDto(deleteImageMember));
+    }
+
+    /***************************** 리뷰 이미지 *****************************/
+
+    @Operation(summary = "리뷰 이미지 조회", description = "해당 리뷰 이미지를 조회합니다."
+            + "(이미지 형태 그대로 반환)")
+    @GetMapping("/review-image/{imageId}")
+    public ResponseEntity<Resource> getReviewImage(
+            @PathVariable Long imageId) {
+
+        return imageService.getReviewImage(imageId);
+    }
+
+    @Operation(summary = "리뷰 이미지 삭제", description = "해당 리뷰 이미지를 삭제합니다."
+            + "리뷰 삭제 기능은 없는 걸로 알고 있는데 필요하면 쓰는 목적입니다.")
+    @DeleteMapping("/review-image/{imageId}")
+    public ApiResponse<ImageResponseDto.publicUrlDto> deleteReviewImage(
+            @PathVariable Long imageId) {
+
+        ReviewImage deleteReviewImage = imageService.deleteReviewImage(imageId);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewImage(deleteReviewImage));
     }
 }
