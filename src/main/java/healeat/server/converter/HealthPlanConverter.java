@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Component // 없으면 controller 에서 bean을 찾지 못하는 오류 발생
 public class HealthPlanConverter {
 
-    public HealthPlanResponseDto.setResultDto toSetResultDto(HealthPlan healthPlan) {
+    public static HealthPlanResponseDto.setResultDto toSetResultDto(HealthPlan healthPlan) {
 
         return HealthPlanResponseDto.setResultDto.builder()
                 .healthPlanId(healthPlan.getId())
@@ -20,16 +20,27 @@ public class HealthPlanConverter {
                 .build();
     }
 
-    public HealthPlanResponseDto.deleteResultDto toDeleteResultDto(HealthPlan healthPlan) {
+    public static HealthPlanResponseDto.deleteResultDto toDeleteResultDto(HealthPlan healthPlan) {
         return HealthPlanResponseDto.deleteResultDto.builder()
                 .healthPlanId(healthPlan.getId())
                 .build();
     }
 
-    public HealthPlanResponseDto.HealthPlanOneDto toHealthPlanOneDto(HealthPlan healthPlan) {
-        List<HealthPlanResponseDto.MemoImageResponseDto> memoImages = healthPlan.getHealthPlanImages()
+    public static HealthPlanResponseDto.HealthPlanListDto toHealthPlanListDto(List<HealthPlan> healthPlans) {
+        List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
+                .map(HealthPlanConverter::toHealthPlanOneDto)
+                .collect(Collectors.toList());
+
+        return  HealthPlanResponseDto.HealthPlanListDto.builder()
+                    .HealthPlanList(healthPlanDtoList)
+                    .build();
+
+    }
+
+    public static HealthPlanResponseDto.HealthPlanOneDto toHealthPlanOneDto(HealthPlan healthPlan) {
+        List<HealthPlanResponseDto.HealthPlanImageResponseDto> healthPlanImages = healthPlan.getHealthPlanImages()
                 .stream()
-                .map(this::toMemoImageResponseDto)
+                .map(HealthPlanConverter::toHealthPlanImageResponseDto)
                 .collect(Collectors.toList());
 
         return HealthPlanResponseDto.HealthPlanOneDto.builder()
@@ -37,24 +48,39 @@ public class HealthPlanConverter {
                 .name(healthPlan.getMember().getName()) // 로그인한 사용자의 이름 설정
                 .duration(healthPlan.getDuration())
                 .goalNumber(healthPlan.getGoalNumber())
-                .count(healthPlan.getCount())
+                .status(healthPlan.getStatus())
                 .goal(healthPlan.getGoal())
                 .memo(healthPlan.getMemo())
-                .memoImages(memoImages)
+                .healthPlanImages(healthPlanImages)
                 .build();
     }
 
-    public HealthPlanResponseDto.MemoImageResponseDto toMemoImageResponseDto(HealthPlanImage healthPlanImage) {
-        return HealthPlanResponseDto.MemoImageResponseDto.builder()
+    public static List<HealthPlanResponseDto.HealthPlanImageResponseDto> toHealthPlanImageListResponseDto(
+            List<HealthPlanImage> healthPlanImages) {
+
+        return healthPlanImages.stream()
+                .map(HealthPlanConverter::toHealthPlanImageResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public static HealthPlanResponseDto.HealthPlanImageResponseDto toHealthPlanImageResponseDto(HealthPlanImage healthPlanImage) {
+        return HealthPlanResponseDto.HealthPlanImageResponseDto.builder()
                 .id(healthPlanImage.getId())
                 .imageUrl(healthPlanImage.getImageUrl())
                 .build();
     }
 
-    public HealthPlanResponseDto.MemoResponseDto toMemoResponseDto(HealthPlan healthPlan) {
+    public static HealthPlanResponseDto.MemoResponseDto toMemoResponseDto(HealthPlan healthPlan) {
         return HealthPlanResponseDto.MemoResponseDto.builder()
                 .id(healthPlan.getId())
                 .memo(healthPlan.getMemo())
+                .build();
+    }
+
+    public static HealthPlanResponseDto.StatusResponseDto toStatusResponseDto(HealthPlan healthPlan) {
+        return HealthPlanResponseDto.StatusResponseDto.builder()
+                .id(healthPlan.getId())
+                .status(healthPlan.getStatus())
                 .build();
     }
 }
