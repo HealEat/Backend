@@ -2,6 +2,7 @@ package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.Duration;
+import healeat.server.domain.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,7 +32,7 @@ public class HealthPlan extends BaseEntity {
     private Integer goalNumber; // 목표 횟수
 
     @Builder.Default
-    private Integer count = 0; // 목표까지 카운트
+    private Status status = Status.PROGRESS;
 
     @Column(length = 30)
     private String goal;
@@ -53,7 +54,11 @@ public class HealthPlan extends BaseEntity {
 
     public HealthPlan updateMemo(String memo) {
         this.memo = memo;
+        return this;
+    }
 
+    public HealthPlan updateStatus(Status status) {
+        this.status = status;
         return this;
     }
 }
