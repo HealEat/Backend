@@ -5,24 +5,26 @@ import healeat.server.domain.HealthPlanImage;
 import healeat.server.web.dto.HealthPlanResponseDto;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component // 없으면 controller 에서 bean을 찾지 못하는 오류 발생
 public class HealthPlanConverter {
 
-    public static HealthPlanResponseDto.setResultDto toSetResultDto(HealthPlan healthPlan) {
+    public static HealthPlanResponseDto.SetResultDto toSetResultDto(HealthPlan healthPlan) {
 
-        return HealthPlanResponseDto.setResultDto.builder()
+        return HealthPlanResponseDto.SetResultDto.builder()
                 .healthPlanId(healthPlan.getId())
                 .memberName(healthPlan.getMember().getName())
                 .createdAt(healthPlan.getCreatedAt())
                 .build();
     }
 
-    public static HealthPlanResponseDto.deleteResultDto toDeleteResultDto(HealthPlan healthPlan) {
-        return HealthPlanResponseDto.deleteResultDto.builder()
+    public static HealthPlanResponseDto.DeleteResultDto toDeleteResultDto(HealthPlan healthPlan) {
+        return HealthPlanResponseDto.DeleteResultDto.builder()
                 .healthPlanId(healthPlan.getId())
+                .deletedAt(LocalDateTime.now())
                 .build();
     }
 
