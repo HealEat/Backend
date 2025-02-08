@@ -67,16 +67,6 @@ public class RecentSearchResponseDto {
         String name;
     }
 
-//    //검색창 - 최근 검색 리스트 DTO - 나중에 따로 필요하면 쓸듯
-//    @Getter
-//    @Builder
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class RecentSearchListResponseDto {
-//
-//        private List<RecentSearchResponseDto> recentSearchList;
-//    }
-
     //검색창 - 최근 검색
     @Getter
     @Builder
@@ -88,5 +78,15 @@ public class RecentSearchResponseDto {
         SearchType searchType;
         Long storeId;
         String query;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SetResultDto {
+
+        Long recentSearchId;
+        LocalDateTime createdAt;
     }
 }

@@ -4,6 +4,7 @@ import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.RecentSearchHandler;
 import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.Member;
+import healeat.server.domain.enums.SearchType;
 import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.repository.RecentSearchRepository;
 import healeat.server.web.dto.RecentSearchResponseDto;
@@ -36,18 +37,25 @@ public class RecentSearchService {
                 new RecentSearchHandler(ErrorStatus.RECENT_SEARCH_NOT_FOUND));
     }
 
-//    //최근 검색 생성
-//    @Transactional
-//    public RecentSearch createRecentSearch(SearchPageRequestDto.SearchPageCreateRequestDto request) {
-//
-//        RecentSearch recentSearch = RecentSearch.builder()
-//                .searchType(request.getSearchType())
-//                .store(request.getStore_id())
-//                .query(request.getQuery())
-//                .build();
-//
-//        return recentSearchRepository.save(recentSearch);
-//    }
+    //최근 검색 생성
+    @Transactional
+    public void saveRecentQuery(Member member, String query) {
+
+        RecentSearch recentSearch = RecentSearch.builder()
+                .member(member)
+                .searchType(SearchType.QUERY)
+                .store(null)
+                .query(query)
+                .build();
+
+        recentSearchRepository.save(recentSearch);
+    }
+
+    @Transactional
+    public RecentSearchResponseDto.SetResultDto saveRecentStore(Member member, Long storeId) {
+
+        return null;
+    }
 
     //최근 검색 기록 삭제
     @Transactional

@@ -48,6 +48,8 @@ public class SearchController {
 
         Member testMember = memberRepository.findById(999L).get();
 
+        recentSearchService.saveRecentQuery(testMember, request.getQuery());
+
         return ApiResponse.onSuccess(storeQueryServiceImpl.searchAndMapStores(
                 testMember, page, request));
     }
@@ -60,6 +62,15 @@ public class SearchController {
 
         Member testMember = memberRepository.findById(999L).get();
         return ApiResponse.onSuccess(searchPageService.getRecentSearch(testMember));
+    }
+
+    @Operation(summary = "가게 타입 검색 기록 저장 API", description = "'검색 결과 목록에서 가게에 접근'할 때에만 해당 API를" +
+            " 사용하시면 됩니다.")
+    @PostMapping("/{storeId}")
+    public ApiResponse<RecentSearchResponseDto.SetResultDto> saveRecentStore(
+            @AuthenticationPrincipal Member member, @PathVariable Long storeId) {
+
+        return ApiResponse.onSuccess(null);
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")
