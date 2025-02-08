@@ -1,6 +1,7 @@
 package healeat.server.web.dto;
 
 import healeat.server.domain.enums.Duration;
+import healeat.server.domain.enums.Status;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -46,17 +47,17 @@ public class HealthPlanResponseDto {
         private String name;
         private Duration duration;
         private Integer goalNumber;
-        private Integer count;
+        private Status status;
         private String goal;
         private String memo;
-        private List<MemoImageResponseDto> memoImages;
+        private List<HealthPlanImageResponseDto> healthPlanImages;
     }
 
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MemoImageResponseDto {
+    public static class HealthPlanImageResponseDto {
         private Long id;
         private String imageUrl;
     }
@@ -70,4 +71,12 @@ public class HealthPlanResponseDto {
         private String memo;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StatusResponseDto {
+        private Long id;
+        private Status status;
+    }
 }
