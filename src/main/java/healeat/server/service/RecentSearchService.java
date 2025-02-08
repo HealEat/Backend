@@ -6,8 +6,7 @@ import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.repository.RecentSearchRepository;
-import healeat.server.web.dto.SearchPageRequestDto;
-import healeat.server.web.dto.SearchPageResponseDto;
+import healeat.server.web.dto.RecentSearchResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,9 +53,9 @@ public class RecentSearchService {
     @Transactional
     public void deleteRecentSearch(Long id) {recentSearchRepository.deleteById(id); }
 
-    public SearchPageResponseDto.toDeleteResultDto toDeleteRecentSearch(Long recentId) {
+    public RecentSearchResponseDto.DeleteResultDto toDeleteRecentSearch(Long recentId) {
         RecentSearch deleteRecentSearch = getRecentSearchById(recentId);
-        SearchPageResponseDto.toDeleteResultDto response = SearchPageConverter.toDeleteResultDto(deleteRecentSearch);
+        RecentSearchResponseDto.DeleteResultDto response = SearchPageConverter.toDeleteResultDto(deleteRecentSearch);
 
         deleteRecentSearch(recentId);
 

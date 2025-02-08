@@ -2,7 +2,6 @@ package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.SearchPageConverter;
-import healeat.server.converter.StoreConverter;
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Member;
@@ -10,15 +9,13 @@ import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.SearchPageService;
-import healeat.server.web.dto.SearchPageResponseDto;
+import healeat.server.web.dto.RecentSearchResponseDto;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.StoreResonseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.util.Pair;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,19 +52,19 @@ public class SearchController {
                 testMember, page, request));
     }
 
-    @Operation(summary = "검색창 구현", description = "검색창을 조회합니다.(음식 종류, 음식 특징, 최근 검색 목록 포함된 페이지)")
+    @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
     @GetMapping("/recent")
-    public ApiResponse<SearchPageResponseDto> getAllRecentSearches(
+    public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
             @AuthenticationPrincipal Member member
     ) {
 
         Member testMember = memberRepository.findById(999L).get();
-        return ApiResponse.onSuccess(searchPageService.getAllSearchPage(testMember));
+        return ApiResponse.onSuccess(searchPageService.getRecentSearch(testMember));
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")
     @GetMapping("/categories")
-    public ApiResponse<SearchPageResponseDto.FoodCategoryListResponseDto> getFoodCategoryLists() {
+    public ApiResponse<RecentSearchResponseDto.FoodCategoryListResponseDto> getFoodCategoryLists() {
 
         List<FoodCategory> foodCategoryList = categoryFeatureService.getAllFoodCategories();
 
@@ -76,7 +73,7 @@ public class SearchController {
 
     @Operation(summary = "음식 특징 조회", description = "음식 특징을 전체 조회합니다.")
     @GetMapping("/features")
-    public ApiResponse<SearchPageResponseDto.FoodFeatureListResponseDto> getFoodFeatureLists() {
+    public ApiResponse<RecentSearchResponseDto.FoodFeatureListResponseDto> getFoodFeatureLists() {
 
         List<FoodFeature> foodFeatureList = categoryFeatureService.getAllFoodFeatures();
 
@@ -85,7 +82,7 @@ public class SearchController {
 
     @Operation(summary = "최근 검색 기록 삭제", description = "최근 검색 기록을 삭제합니다.")
     @DeleteMapping("/recent/{recentId}")
-    public ApiResponse<SearchPageResponseDto.toDeleteResultDto> deleteRecentSearch(@PathVariable Long recentId) {
+    public ApiResponse<RecentSearchResponseDto.DeleteResultDto> deleteRecentSearch(@PathVariable Long recentId) {
 
         return ApiResponse.onSuccess(recentSearchService.toDeleteRecentSearch(recentId));
     }

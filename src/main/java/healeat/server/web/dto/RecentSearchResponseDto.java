@@ -1,37 +1,29 @@
 package healeat.server.web.dto;
 
-import healeat.server.domain.Member;
-import healeat.server.domain.Store;
 import healeat.server.domain.enums.SearchType;
-import healeat.server.domain.mapping.RecentSearch;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
-public class SearchPageResponseDto {
+public class RecentSearchResponseDto {
 
-        List<FoodFeatureResponseDto> foodFeatureList;
-        List<FoodCategoryResponseDto> foodCategoryList;
-        List<RecentSearchResponseDto> recentSearchList;
+        List<RecentSearchDto> recentSearchList;
 
     //검색창 - 최근 검색 기록 삭제 DTO
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class toDeleteResultDto {
+    public static class DeleteResultDto {
 
-        Long memberId;
         Long recentSearchId;
-        SearchType searchType;
-        Long storeId;
-        String query;
+        LocalDateTime deletedAt;
     }
 
     //검색 키워드 보기 - 음식 종류 리스트 DTO
@@ -90,14 +82,11 @@ public class SearchPageResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RecentSearchResponseDto {
+    public static class RecentSearchDto {
 
         Long recentSearchId;
         SearchType searchType;
         Long storeId;
         String query;
     }
-
-
-
 }

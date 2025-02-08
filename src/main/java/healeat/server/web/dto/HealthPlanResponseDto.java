@@ -5,7 +5,6 @@ import healeat.server.domain.enums.Status;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HealthPlanResponseDto {
@@ -14,7 +13,7 @@ public class HealthPlanResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class setResultDto {
+    public static class SetResultDto {
 
         private String memberName;
         private Long healthPlanId;
@@ -25,8 +24,9 @@ public class HealthPlanResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class deleteResultDto {
+    public static class DeleteResultDto {
         private Long healthPlanId;
+        private LocalDateTime deletedAt;
     }
 
     @Getter
