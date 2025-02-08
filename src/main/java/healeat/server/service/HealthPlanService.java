@@ -163,7 +163,7 @@ public class HealthPlanService {
 
             return ResponseEntity.ok()
                     .contentType(MediaType.IMAGE_JPEG) // 필요하면 다른 MIME 타입으로 변경 가능
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"profile-image.jpg\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"health-plan-image.jpg\"")
                     .body(resource);
         } catch (Exception e) {
             throw new RuntimeException("이미지를 불러오는 중 오류가 발생했습니다.", e);
