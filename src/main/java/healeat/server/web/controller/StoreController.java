@@ -45,12 +45,11 @@ public class StoreController {
                 storeQueryServiceImpl.saveStore(request)));
     }
 
-    @Operation(summary = "리뷰 페이지용- 특정 가게의 세부정보 조회 API",
-            description = "세부정보 : 맛-청결-신선-영양 점수")
+    @Operation(summary = "힐릿 데이터 가게 단건 조회 - 특히 4가지 점수 조회 API",
+            description = "맛-청결-신선-영양 점수를 조회합니다.")
     @GetMapping("/{storeId}")
     public ApiResponse<StoreResonseDto.StoreImageListDto> getStoreDetails(@PathVariable Long storeId) {
-        /*StoreResonseDto.StoreImageListDto images =
-                storeQueryServiceImpl.getReviewAndDaumImages(storeId);*/
+
         return ApiResponse.onSuccess(null);
     }
 
