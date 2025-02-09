@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # OS환경
+    runs-on: ubuntu-latest # OS 환경
 
     steps:
       - uses: actions/checkout@v3  # 저장소 코드 체크아웃
@@ -22,6 +22,9 @@ jobs:
           cd ./src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
         shell: bash
+
+      - name: Decode and Save Apple Auth Key  # 🔹 GitHub Secrets에서 `.p8` 파일 복원
+        run: echo "${{ secrets.APPLE_AUTH_KEY }}" | base64 --decode > src/main/resources/AuthKey_22ZPPCRN8T.p8
 
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
         run: chmod +x gradlew
