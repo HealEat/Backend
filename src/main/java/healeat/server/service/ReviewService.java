@@ -64,7 +64,7 @@ public class ReviewService {
     @Transactional
     public Review createReview(Long storeId, Member member, List<MultipartFile> files, ReviewRequestDto request) {
 
-        Store store = storeRepository.findById(storeId).orElseThrow(() ->
+        Store store = storeRepository.findByKakaoPlaceId(storeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
 
         Review review = Review.builder()
@@ -111,6 +111,10 @@ public class ReviewService {
     public Review deleteReview(Member member, Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
+
+        if (!review.getMember().equals(member)) {
+            throw new ReviewHandler(ErrorStatus.IS_NOT_REVIEW_AUTHOR);
+        }
 
         // S3 저장 이미지 삭제
         List<ReviewImage> reviewImages = review.getReviewImageList();

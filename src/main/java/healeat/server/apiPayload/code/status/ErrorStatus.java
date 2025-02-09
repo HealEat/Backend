@@ -18,8 +18,6 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 검색 관련 응답
     FILTERS_LESS_EQUAL_THAN_5(HttpStatus.BAD_REQUEST, "SEARCH4001", "페이지 번호는 1 이상이어야 합니다."),
-    INVALID_SEARCH_CASE(HttpStatus.BAD_REQUEST, "SEARCH4002", "검색 결과가 없음으로 처리해주세요." +
-            "(질문사항이 있으면 성우에게 연락주세요)"),
 
     // 페이징 관련 응답
     PAGE_NUM_NOT_NATURAL(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),
@@ -36,6 +34,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // 리뷰 관련 응답
     REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW4001", "리뷰가 없습니다."),
     REVIEW_TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "REVIEW4002", "등록할 수 있는 리뷰 이미지 개수를 초과하였습니다."),
+    IS_NOT_REVIEW_AUTHOR(HttpStatus.BAD_REQUEST, "REVIEW4003", "리뷰 작성자가 아니므로 삭제할 권한이 없습니다."),
 
 
     // 건강 목표 관련 응답
