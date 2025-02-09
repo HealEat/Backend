@@ -54,12 +54,13 @@ public class InfoController {
 
     @Operation(summary = "회원 질병 저장 API")
     @PatchMapping("/member/disease")
-    public ApiResponse<Void> saveDiseasesToMember(
+    public ApiResponse<MemberDiseaseResponseDto> saveDiseasesToMember(
             @AuthenticationPrincipal Member member,
             @RequestBody MemberDiseaseRequestDto request) {
 
-        memberService.saveDiseasesToMember(member, request.getDiseaseIds());
-        return ApiResponse.onSuccess(null);
+        Member testMember = memberRepository.findById(999L).get();
+        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(testMember, request.getDiseaseIds());
+        return ApiResponse.onSuccess(responseDto);
     }
 
     @Operation(summary = "베지테리언 선택 API")
