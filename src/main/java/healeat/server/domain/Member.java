@@ -98,10 +98,6 @@ public class Member extends BaseEntity {
         this.healEatFoods = healEatFoods;
     }
 
-    public void setMemberDiseases(List<MemberDisease> memberDiseases) {
-        this.memberDiseases = memberDiseases;
-    }
-
     // 프로필을 위한 업데이트 메서드
     public void updateProfile(String name, String profileImageUrl) {
         if(name != null) this.name = name;

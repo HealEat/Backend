@@ -13,22 +13,22 @@ import java.util.List;
 @Builder
 public class RecentSearchResponseDto {
 
-        List<FoodFeatureResponseDto> foodFeatureList;
-        List<FoodCategoryResponseDto> foodCategoryList;
-        List<RecentSearchDto> recentSearchList;
+    List<RecentSearchDto> recentSearchList;
+    Integer listSize;
+    Integer totalPage;
+    Long totalElements;
+    Boolean isFirst;
+    Boolean isLast;
 
     //검색창 - 최근 검색 기록 삭제 DTO
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class toDeleteResultDto {
+    public static class DeleteResultDto {
 
-        Long memberId;
         Long recentSearchId;
-        SearchType searchType;
-        Long storeId;
-        String query;
+        LocalDateTime deletedAt;
     }
 
     //검색 키워드 보기 - 음식 종류 리스트 DTO
