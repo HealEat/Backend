@@ -32,6 +32,9 @@ public class Member extends BaseEntity {
     @Column(nullable = true, unique = true)
     private String providerId; // 소셜 로그인 제공자로부터 받은 사용자 ID
 
+    @Column(nullable = true)  // 애플 로그인 리프레시 토큰
+    private String refreshToken;
+
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
@@ -72,6 +75,10 @@ public class Member extends BaseEntity {
     @Builder.Default
     private List<Bookmark> bookmarks = new ArrayList<>();
 
+    // 애플 로그인 리프레시 토큰 업데이트 메서드
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
     public boolean setVegetAndCheckChanged(Vegetarian vegetarian) {
         boolean isChanged = false;
