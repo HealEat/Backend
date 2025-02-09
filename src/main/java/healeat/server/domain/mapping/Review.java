@@ -2,6 +2,7 @@ package healeat.server.domain.mapping;
 
 import healeat.server.domain.*;
 import healeat.server.domain.common.BaseEntity;
+import healeat.server.web.dto.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -75,5 +76,17 @@ public class Review extends BaseEntity {
 
     private void calcTotalByAll() {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
+    }
+
+    public void updateReviewImageList(List<ReviewImage> reviewImageList) {
+        this.reviewImageList = reviewImageList;
+    }
+
+    public ReviewResponseDto.ReviewerInfo getReviewerInfo() {
+        return ReviewResponseDto.ReviewerInfo.builder()
+                .name(member.getName())
+                .profileImageUrl(member.getProfileImageUrl())
+                .currentPurposes(currentPurposes)
+                .build();
     }
 }

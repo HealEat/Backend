@@ -2,17 +2,28 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
+import healeat.server.apiPayload.exception.handler.ReviewHandler;
+import healeat.server.aws.s3.AmazonS3Manager;
 import healeat.server.aws.s3.S3PresignedUploader;
 import healeat.server.aws.s3.S3Uploader;
+import healeat.server.converter.HealthPlanConverter;
 import healeat.server.domain.HealthPlan;
 import healeat.server.domain.HealthPlanImage;
 import healeat.server.domain.Member;
+import healeat.server.domain.ReviewImage;
+import healeat.server.domain.mapping.Review;
 import healeat.server.repository.HealthPlanImageRepository;
 import healeat.server.repository.HealthPlanRepository;
 import healeat.server.web.dto.HealthPlanRequestDto;
+import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.ImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,10 +42,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HealthPlanService {
 
-    private final S3Uploader s3Uploader;
-    private final S3PresignedUploader s3PresignedUploader;
     private final HealthPlanRepository healthPlanRepository;
     private final HealthPlanImageRepository healthPlanImageRepository;
+    private final AmazonS3Manager amazonS3Manager;
+
+    /***************************** 건강관리목표를 위한 메서드 *****************************/
 
     public List<HealthPlan> getAllHealthPlans() {
         return healthPlanRepository.findAll();
@@ -69,6 +81,11 @@ public class HealthPlanService {
     @Transactional
     public HealthPlan updateHealthPlanPartial(Long id, HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest) {
         HealthPlan existingHealthPlan = getHealthPlanById(id);
+
+        if(updateRequest.getNumber() < 1 || updateRequest.getNumber() > 10) {
+            throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_GOAL_NUMBER);
+        }
+
         return existingHealthPlan.updateHealthPlan(
                 updateRequest.getDuration(),
                 updateRequest.getNumber(),
@@ -77,11 +94,22 @@ public class HealthPlanService {
     }
 
     @Transactional
-    public void deleteHealthPlan(Long id) {healthPlanRepository.deleteById(id);}
+    public HealthPlan deleteHealthPlan(Long planId) {
+        HealthPlan healthPlan = healthPlanRepository.findById(planId)
+                .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
 
-    /*
-     *   HealthPlan Memo Service
-     */
+        // S3 저장 이미지 삭제
+        List<HealthPlanImage> healthPlanImages = healthPlan.getHealthPlanImages();
+        for(HealthPlanImage healthPlanImage : healthPlanImages) {
+            amazonS3Manager.deleteFile(healthPlanImage.getImageUrl());
+            healthPlanImageRepository.delete(healthPlanImage);
+        }
+        // 리뷰 삭제
+        healthPlanRepository.delete(healthPlan);
+        return healthPlan;
+    }
+
+    /***************************** 건강관리목표 메모를 위한 메서드 *****************************/
 
     @Transactional
     public HealthPlan updateHealthPlanMemo(Long id, HealthPlanRequestDto.HealthPlanMemoUpdateRequestDto updateRequest) {
@@ -91,113 +119,76 @@ public class HealthPlanService {
         );
     }
 
-    /*
-     *   HealthPlan Image Service
-     */
-
-    public List<HealthPlanImage> getHealthPlanImageByPlanId(HealthPlan healthPlan) {
-        return healthPlanImageRepository.findAllByHealthPlanId(healthPlan);
-    }
+    /***************************** 건강관리목표 이미지를 위한 메서드 *****************************/
 
     @Transactional
-    public List<ImageResponseDto.PresignedUrlDto> uploadImagesToS3(
-            Long planId, List<MultipartFile> files, List<HealthPlanRequestDto.HealthPlanImageRequestDto> requests
-    ) throws Exception {
+    public HealthPlanImage createHealthPlanImage(Long planId, MultipartFile file) {
+
         HealthPlan healthPlan = healthPlanRepository.findById(planId)
                 .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
 
-        if (healthPlan.getHealthPlanImages().size() + requests.size() > 5) {
+        if(healthPlan.getHealthPlanImages().size() + 1 > 5) {
             throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_TOO_MANY_IMAGES);
         }
 
-        List<ImageResponseDto.PresignedUrlDto> presignedUrls = new ArrayList<>();
-        for (int i = 0; i < requests.size(); i++) {
-            HealthPlanRequestDto.HealthPlanImageRequestDto request = requests.get(i);
-            MultipartFile file = files.get(i);
+        String keyName = amazonS3Manager.generateProfileKeyName();
+        String uploadFileUrl = amazonS3Manager.uploadFile(keyName, file);
 
-            ImageResponseDto.PresignedUrlDto urlMap = s3Uploader.createPresignedUrl(request.getImageType(), request.getImageExtension());
-            presignedUrls.add(urlMap);
+        HealthPlanImage healthPlanImage = HealthPlanImage.builder()
+                .healthPlan(healthPlan)
+                .imageUrl(uploadFileUrl)
+                .build();
 
-            Path tempFilePath = Files.createTempFile("upload-", "-" + file.getOriginalFilename());
-            file.transferTo(tempFilePath.toFile());
-            s3PresignedUploader.uploadFileToS3(urlMap.getPresignedUrl(), tempFilePath);
-            Files.delete(tempFilePath);
-
-            HealthPlanImage healthPlanImage = HealthPlanImage.builder()
-                    .healthPlan(healthPlan)
-                    .filePath(urlMap.getPublicUrl())
-                    .fileName(s3Uploader.extractKeyFromUrl(urlMap.getPublicUrl()))
-                    .build();
-            healthPlan.getHealthPlanImages().add(healthPlanImage);
-        }
-
-        healthPlanRepository.save(healthPlan);
-        return presignedUrls;
+        return healthPlanImageRepository.save(healthPlanImage);
     }
 
-    public List<String> getHealthPlanImages(Long planId) {
+    public List<HealthPlanImage> getHealthPlanImages(Long planId) {
         HealthPlan healthPlan = healthPlanRepository.findById(planId)
                 .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
-        return healthPlan.getHealthPlanImages().stream()
-                .map(HealthPlanImage::getFilePath)
-                .collect(Collectors.toList());
+        return healthPlan.getHealthPlanImages();
     }
 
-    public ByteArrayResource getHealthPlanImageFile(String imageUrl) {
+    @Transactional
+    public ResponseEntity<Resource> getHealthPlanImageFiles(Long imageId) {
+        HealthPlanImage healthPlanImage = healthPlanImageRepository.findById(imageId)
+                .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_IMAGE_NOT_FOUND));
+
+        String healthPlanImageUrl = healthPlanImage.getImageUrl();
+
         try {
-            URL url = new URL(imageUrl);
+            URL url = new URL(healthPlanImageUrl);
             InputStream inputStream = url.openStream();
             byte[] imageBytes = inputStream.readAllBytes();
-            return new ByteArrayResource(imageBytes);
+            ByteArrayResource resource = new ByteArrayResource(imageBytes);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG) // 필요하면 다른 MIME 타입으로 변경 가능
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"health-plan-image.jpg\"")
+                    .body(resource);
         } catch (Exception e) {
-            throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_IMAGE_NOT_FOUND);
+            throw new RuntimeException("이미지를 불러오는 중 오류가 발생했습니다.", e);
         }
     }
 
-    /**
-     * HealthPlan 이미지 일부 변경 (기존 이미지 삭제 후 새 이미지 업로드) - 사용할지 미정
-     */
-//    public void updateHealthPlanImages(Long planId, List<String> deleteImageUrls, List<String> newImageUrls) {
-//        HealthPlan healthPlan = healthPlanRepository.findById(planId)
-//                .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
-//
-//        // 기존 이미지 삭제
-//        for (String imageUrl : deleteImageUrls) {
-//            Optional<HealthPlanImage> imageToDelete = healthPlan.getHealthPlanImages().stream()
-//                    .filter(image -> image.getFilePath().equals(imageUrl))
-//                    .findFirst();
-//
-//            imageToDelete.ifPresent(image -> {
-//                s3Uploader.deleteFile(image.getFileName());
-//                healthPlan.getHealthPlanImages().remove(image);
-//                healthPlanImageRepository.delete(image);
-//            });
-//        }
-//
-//        // 새 이미지 추가
-//        for (String imageUrl : newImageUrls) {
-//            String fileName = s3Uploader.extractKeyFromUrl(imageUrl);
-//            HealthPlanImage newImage = HealthPlanImage.builder()
-//                    .healthPlan(healthPlan)
-//                    .filePath(imageUrl)
-//                    .fileName(fileName)
-//                    .build();
-//            healthPlan.getHealthPlanImages().add(newImage);
-//            healthPlanImageRepository.save(newImage);
-//        }
-//    }
-
-    /**
-     * 건강 목표 이미지 삭제
-     */
+    @Transactional
     public HealthPlanImage deleteHealthPlanImage(Long imageId) {
         HealthPlanImage image = healthPlanImageRepository.findById(imageId)
                 .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_IMAGE_NOT_FOUND));
 
-        s3Uploader.deleteFile(image.getFileName());
+        amazonS3Manager.deleteFile(image.getImageUrl());
         healthPlanImageRepository.delete(image);
 
         return image;
+    }
+
+    /***************************** 건강관리목표 메모를 위한 메서드 *****************************/
+
+    @Transactional
+    public HealthPlan updateHealthPlanStatus(Long planId , HealthPlanRequestDto.HealthPlanStatusUpdateRequestDto updateRequest) {
+        HealthPlan healthPlan = healthPlanRepository.findById(planId)
+                .orElseThrow(() -> new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
+
+        return healthPlan.updateStatus(updateRequest.getStatus());
     }
 }
 

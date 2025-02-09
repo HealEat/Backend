@@ -20,8 +20,5 @@ public class HealthPlanImage extends BaseEntity {
     private HealthPlan healthPlan;
 
     @Column(nullable = false)
-    private String filePath; // 이미지 파일 경로 public Url
-
-    @Column(nullable = false)
-    private String fileName; // 원본 파일 이름 KeyName
+    private String imageUrl; // 이미지 파일 경로
 }

@@ -1,23 +1,26 @@
 package healeat.server.converter;
 
+import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.web.dto.StoreResonseDto;
 import org.springframework.data.domain.Page;
-import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StoreConverter {
 
-    public static StoreResonseDto.SearchInfo toSearchInfo(SearchResult searchResult,
-                                                   int apiCallCount) {
-
+    public static StoreResonseDto.SearchInfo toSearchInfo(Member member,
+                                                          SearchResult searchResult,
+                                                          int apiCallCount) {
+        List<String> healEatFoods = member.getHealEatFoods();
+        boolean hasHealthInfo = (healEatFoods != null) && (!healEatFoods.isEmpty());
         return StoreResonseDto.SearchInfo.builder()
+                .memberName(member.getName())
+                .hasHealthInfo(hasHealthInfo)
                 .baseX(searchResult.getBaseX())
                 .baseY(searchResult.getBaseY())
+                .radius(searchResult.getRadius())
                 .query(searchResult.getQuery())
                 .otherRegions(searchResult.getOtherRegions())
                 .selectedRegion(searchResult.getSelectedRegion())
