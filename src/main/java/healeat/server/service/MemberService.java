@@ -9,6 +9,7 @@ import healeat.server.domain.mapping.MemberDisease;
 import healeat.server.repository.DiseaseRepository;
 import healeat.server.repository.MemberDiseaseRepository;
 import healeat.server.repository.MemberRepository;
+import healeat.server.web.dto.MemberDiseaseResponseDto;
 import healeat.server.web.dto.MemberProfileRequestDto;
 import healeat.server.web.dto.MemberProfileResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -79,14 +80,11 @@ public class MemberService {
 
     // 회원이 선택한 질병들을 저장하는 API
     @Transactional
-    public void saveDiseasesToMember(Member member, List<Long> diseaseIds) {
+    public MemberDiseaseResponseDto saveDiseasesToMember(Member member, List<Long> diseaseIds) {
 
         List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
-
-        // 기존 질병 목록 가져오기
-        List<MemberDisease> existingMemberDiseases = memberDiseaseRepository.findByMember(member);
-        // 기존 질병 목록 삭제
-        memberDiseaseRepository.deleteAll(existingMemberDiseases);
+        // 기존 질병 데이터 삭제
+        memberDiseaseRepository.deleteAllByMember(member);
         // 새로운 질병 데이터 추가
         List<MemberDisease> newMemberDiseases = diseases.stream()
                 .map(disease -> MemberDisease.builder()
@@ -96,14 +94,11 @@ public class MemberService {
                 .collect(Collectors.toList());
         // 새로운 데이터 저장
         memberDiseaseRepository.saveAll(newMemberDiseases);
+        // 최신 질병 목록 가져오기
+        List<MemberDiseaseResponseDto.DiseaseInfo> diseaseInfoList = newMemberDiseases.stream()
+                .map(md -> new MemberDiseaseResponseDto.DiseaseInfo(md.getDisease().getId(), md.getDisease().getName()))
+                .collect(Collectors.toList());
 
-        member.getMemberDiseases().clear();
-        member.getMemberDiseases().addAll(newMemberDiseases);
+        return MemberDiseaseResponseDto.from(member.getId(), diseaseInfoList);
     }
-
-    public List<Disease> getMemberDiseases(Member member) {
-        List<MemberDisease> memberDiseases = memberDiseaseRepository.findByMember(member);
-        return memberDiseases.stream().map(MemberDisease::getDisease).collect(Collectors.toList());
-    }
-
 }
