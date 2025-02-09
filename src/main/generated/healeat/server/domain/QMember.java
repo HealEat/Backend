@@ -51,6 +51,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<healeat.server.domain.mapping.RecentSearch, healeat.server.domain.mapping.QRecentSearch> recentSearches = this.<healeat.server.domain.mapping.RecentSearch, healeat.server.domain.mapping.QRecentSearch>createList("recentSearches", healeat.server.domain.mapping.RecentSearch.class, healeat.server.domain.mapping.QRecentSearch.class, PathInits.DIRECT2);
 
+    public final StringPath refreshToken = createString("refreshToken");
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
