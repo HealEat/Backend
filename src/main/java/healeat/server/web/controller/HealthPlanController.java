@@ -48,7 +48,7 @@ public class HealthPlanController {
     @Operation(summary = "건강 관리 목표 추가", description = "건강 관리 목표를 추가합니다." +
             "(이미지와 메모는 아직 추가되지 않았음)")
     @PostMapping
-    public ApiResponse<HealthPlanResponseDto.setResultDto> createHealthPlan(
+    public ApiResponse<HealthPlanResponseDto.SetResultDto> createHealthPlan(
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request,
             @AuthenticationPrincipal Member member) {
 
@@ -72,7 +72,7 @@ public class HealthPlanController {
 
     @Operation(summary = "건강 관리 목표 삭제", description = "건강 관리 목표를 삭제합니다.")
     @DeleteMapping("/{planId}")
-    public ApiResponse<HealthPlanResponseDto.deleteResultDto> deleteHealthPlan(
+    public ApiResponse<HealthPlanResponseDto.DeleteResultDto> deleteHealthPlan(
             @PathVariable Long planId) {
 
         HealthPlan deletedHealthPlan= healthPlanService.deleteHealthPlan(planId);

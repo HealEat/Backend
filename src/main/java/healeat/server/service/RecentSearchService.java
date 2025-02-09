@@ -1,16 +1,23 @@
 package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.apiPayload.exception.handler.RecentSearchHandler;
 import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.enums.SearchType;
 import healeat.server.domain.mapping.RecentSearch;
+import healeat.server.repository.MemberRepository;
 import healeat.server.repository.RecentSearchRepository;
+import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.RecentSearchResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Comparator;
 import java.util.List;
@@ -18,17 +25,23 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Validated
 public class RecentSearchService {
 
     private final RecentSearchRepository recentSearchRepository;
+    private final MemberRepository memberRepository;
 
-    public List<RecentSearch> getAllRecentSearches(Member member) {
-        List<RecentSearch> recentSearches = recentSearchRepository.findByMember(member);
+    public Page<RecentSearch> getRecentSearchPage(Long memberId, @CheckPage Integer page) {
 
-        // 내림차순 정렬 (가장 최근 생성된 항목이 앞쪽)
-        recentSearches.sort(Comparator.comparing(RecentSearch::getCreatedAt).reversed());
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return recentSearches;
+        // 프론트 입장에서 1 로 입력하면 첫 페이지가 나올 수 있도록
+        int safePage = Math.max(0, page - 1);
+        Page<RecentSearch> recentSearchPage = recentSearchRepository
+                .findAllByMember(member, PageRequest.of(safePage, 20, Sort.by(Sort.Direction.DESC, "createdAt")));
+
+        return recentSearchPage;
     }
 
     //혹시나 필요하면 쓸 getById
@@ -61,9 +74,9 @@ public class RecentSearchService {
     @Transactional
     public void deleteRecentSearch(Long id) {recentSearchRepository.deleteById(id); }
 
-    public RecentSearchResponseDto.toDeleteResultDto toDeleteRecentSearch(Long recentId) {
+    public RecentSearchResponseDto.DeleteResultDto toDeleteRecentSearch(Long recentId) {
         RecentSearch deleteRecentSearch = getRecentSearchById(recentId);
-        RecentSearchResponseDto.toDeleteResultDto response = SearchPageConverter.toDeleteResultDto(deleteRecentSearch);
+        RecentSearchResponseDto.DeleteResultDto response = SearchPageConverter.toDeleteResultDto(deleteRecentSearch);
 
         deleteRecentSearch(recentId);
 
