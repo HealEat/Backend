@@ -5,10 +5,11 @@ import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Member;
+import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
-import healeat.server.service.SearchPageService;
+import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.RecentSearchResponseDto;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.web.dto.StoreRequestDto;
@@ -16,6 +17,7 @@ import healeat.server.web.dto.StoreResonseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +29,6 @@ import java.util.List;
 public class SearchController {
 
     private final StoreQueryServiceImpl storeQueryServiceImpl;
-    private final SearchPageService searchPageService;
     private final RecentSearchService recentSearchService;
     private final CategoryFeatureService categoryFeatureService;
     private final MemberRepository memberRepository;
@@ -57,11 +58,14 @@ public class SearchController {
     @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
     @GetMapping("/recent")
     public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
-            @AuthenticationPrincipal Member member
+            @AuthenticationPrincipal Member member,
+            @CheckPage @RequestParam(name = "page") Integer page
     ) {
 
         Member testMember = memberRepository.findById(999L).get();
-        return ApiResponse.onSuccess(searchPageService.getRecentSearch(testMember));
+        Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId(), page);
+
+        return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }
 
     @Operation(summary = "가게 타입 검색 기록 저장 API", description = "'검색 결과 목록에서 가게에 접근'할 때에만 해당 API를" +
