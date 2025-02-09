@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MemberDiseaseRepository extends JpaRepository<MemberDisease, Long> {
-    List<MemberDisease> findByMember(Member member);
+    List<MemberDisease> deleteAllByMember(Member member);
 }
