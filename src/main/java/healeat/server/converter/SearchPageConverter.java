@@ -1,13 +1,20 @@
 package healeat.server.converter;
 
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
+import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
+import healeat.server.domain.Store;
 import healeat.server.domain.mapping.RecentSearch;
+import healeat.server.repository.StoreRepository;
 import healeat.server.web.dto.RecentSearchResponseDto;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SearchPageConverter {
@@ -59,13 +66,38 @@ public class SearchPageConverter {
                 .build();
     }
 
+    public static RecentSearchResponseDto toRecentSearchResponseDto(Page<RecentSearch> recentSearches) {
+
+        List<RecentSearchResponseDto.RecentSearchDto> recentSearchList = recentSearches.stream()
+                .map(SearchPageConverter::toRecentSearchDto)
+                .collect(Collectors.toList());
+
+
+        return RecentSearchResponseDto.builder()
+                .recentSearchList(recentSearchList)
+                .listSize(recentSearchList.size())
+                .totalPage(recentSearches.getTotalPages())
+                .totalElements(recentSearches.getTotalElements())
+                .isFirst(recentSearches.isFirst())
+                .isLast(recentSearches.isLast())
+                .build();
+    }
+
     public static RecentSearchResponseDto.RecentSearchDto toRecentSearchDto(RecentSearch recentSearch) {
 
+        // searchType = STORE
+        if(recentSearch.getStore() != null) {
+            return RecentSearchResponseDto.RecentSearchDto.builder()
+                    .recentSearchId(recentSearch.getId())
+                    .searchType(recentSearch.getSearchType())
+                    .storeId(recentSearch.getStore().getId())
+                    .build();
+        }
+        // searchType = QUERY
         return RecentSearchResponseDto.RecentSearchDto.builder()
-                .recentSearchId(recentSearch.getId())
-                .searchType(recentSearch.getSearchType())
-                .storeId(recentSearch.getStore().getId())
-                .query(recentSearch.getQuery())
-                .build();
+                    .recentSearchId(recentSearch.getId())
+                    .searchType(recentSearch.getSearchType())
+                    .query(recentSearch.getQuery())
+                    .build();
     }
 }
