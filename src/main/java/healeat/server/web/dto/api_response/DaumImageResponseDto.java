@@ -1,5 +1,6 @@
 package healeat.server.web.dto.api_response;
 
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public class DaumImageResponseDto {
     Meta meta;
 
     @Getter
+    @Builder
     public static class Document {
         String image_url;        //https://postfiles.pstatic.net/MjAxNzEyMDlfMjkg/MDAxNTEyODA4MjM2NDUz.c6ciRvtlpBjsq9SwQnm8K2VgfChNdqPGrdVloOQo4KMg._wqwlf2mIiJyC9hHlHRVoQ1YWSykZrHVMbITeqk-WTsg.JPEG.nono1114/1.jpg?type=w966
         String width;           //880,
