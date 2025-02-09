@@ -40,3 +40,6 @@ out/
 ### application.yml ###
 src/main/resources/application.yml
 src/test/resources/application.yml
+
+### Apple private key 파일 무시 ###
+src/main/resources/*.p8
