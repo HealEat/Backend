@@ -1,6 +1,7 @@
 package healeat.server.service.search;
 
 import healeat.server.domain.FoodFeature;
+import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.SearchResultRepository;
@@ -47,6 +48,8 @@ public class StoreSearchService {
                 .accuracy(request.getSearchBy().equals("ACCURACY"))
                 .build();
 
+        searchResultRepository.save(searchResult);
+
         List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesByQuery(searchResult);
 
         return saveSearchResultAndItems(searchResult, kakaoResponses);
@@ -73,6 +76,8 @@ public class StoreSearchService {
                 .radius(radius)
                 .accuracy(false)
                 .build();
+
+        searchResultRepository.save(searchResult);
 
         List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesForHome(x, y, radius);
 
