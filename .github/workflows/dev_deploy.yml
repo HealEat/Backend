@@ -27,9 +27,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Clean and Build with Gradle  # Gradle clean build 실행
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: clean build
+          cache-read-only: false  # Gradle 빌드 캐시 활성화 (빌드 속도 최적화)
 
       - name: Upload build artifact  # 빌드된 아티팩트 업로드
         uses: actions/upload-artifact@v4
