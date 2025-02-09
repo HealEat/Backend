@@ -10,6 +10,7 @@ import healeat.server.web.dto.*;
 import healeat.server.web.dto.HealInfoResponseDto.ChooseResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -58,7 +59,8 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestBody MemberDiseaseRequestDto request) {
 
-        memberService.saveDiseasesToMember(member, request.getDiseaseIds());
+        Member testMember = memberRepository.findById(999L).get();
+        memberService.saveDiseasesToMember(testMember, request.getDiseaseIds());
         return ApiResponse.onSuccess(null);
     }
 
