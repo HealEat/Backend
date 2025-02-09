@@ -82,14 +82,23 @@ public class MemberService {
     public void saveDiseasesToMember(Member member, List<Long> diseaseIds) {
 
         List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
-        List<MemberDisease> memberDiseases = diseases.stream()
+
+        // 기존 질병 목록 가져오기
+        List<MemberDisease> existingMemberDiseases = memberDiseaseRepository.findByMember(member);
+        // 기존 질병 목록 삭제
+        memberDiseaseRepository.deleteAll(existingMemberDiseases);
+        // 새로운 질병 데이터 추가
+        List<MemberDisease> newMemberDiseases = diseases.stream()
                 .map(disease -> MemberDisease.builder()
                         .member(member)
                         .disease(disease)
                         .build())
                 .collect(Collectors.toList());
+        // 새로운 데이터 저장
+        memberDiseaseRepository.saveAll(newMemberDiseases);
 
-        member.setMemberDiseases(memberDiseases);
+        member.getMemberDiseases().clear();
+        member.getMemberDiseases().addAll(newMemberDiseases);
     }
 
     public List<Disease> getMemberDiseases(Member member) {
