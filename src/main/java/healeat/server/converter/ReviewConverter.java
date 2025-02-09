@@ -7,6 +7,7 @@ import healeat.server.web.dto.ImageResponseDto;
 import healeat.server.web.dto.ReviewResponseDto;
 import org.springframework.data.domain.Page;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class ReviewConverter {
                 .reviewId(review.getId())
                 .totalScore(review.getTotalScore())
                 .imageUrls(review.getReviewImageList().stream()
-                        .map(ReviewImage::getFilePath)
+                        .map(ReviewImage::getImageUrl)
                         .collect(Collectors.toList())) // 이미지 CRUD 구현 필요
                 .body(review.getBody())
                 .createdAt(review.getCreatedAt())
@@ -53,7 +54,28 @@ public class ReviewConverter {
 
         return ImageResponseDto.publicUrlDto.builder()
                 .id(reviewImage.getId())
-                .imageUrl(reviewImage.getFilePath())
+                .imageUrl(reviewImage.getImageUrl())
                 .build();
     }
+
+    public static ReviewResponseDto.SetResultDto toReviewSetResultDto(Review review) {
+
+        return ReviewResponseDto.SetResultDto.builder()
+                .reviewId(review.getId())
+                .imageCount(review.getReviewImageList().size())
+                .createdAt(review.getCreatedAt())
+                .build();
+    }
+
+    public static ReviewResponseDto.DeleteResultDto toReviewDeleteResultDto(Review review) {
+        return ReviewResponseDto.DeleteResultDto.builder()
+                .deletedReviewId(review.getId())
+                .deletedReviewImageUrls(review.getReviewImageList().stream()
+                        .map(ReviewImage::getImageUrl)
+                        .collect(Collectors.toList()))
+                .deletedAt(LocalDateTime.now())
+                .build();
+    }
+
+
 }

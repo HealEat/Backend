@@ -1,8 +1,10 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.MemberHealQuestion;
+import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
@@ -12,11 +14,14 @@ import healeat.server.web.dto.*;
 import healeat.server.web.dto.HealInfoResponseDto.ChangeBaseResultDto;
 import healeat.server.web.dto.HealInfoResponseDto.ChangeChoiceResultDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static healeat.server.converter.MemberHealQuestionConverter.*;
 
@@ -39,14 +44,20 @@ public class MyPageController {
         return ApiResponse.onSuccess(memberService.getProfileInfo(testMember));
     }
 
-    @Operation(summary = "프로필 수정 API")
-    @PatchMapping("/profile")
+    @Operation(summary = "프로필 수정 API",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
+    @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MemberProfileResponseDto> updateProfile(
-            @AuthenticationPrincipal Member member, @RequestBody MemberProfileRequestDto request) {
+            @AuthenticationPrincipal Member member,
+            @RequestPart(name = "file", required = false)
+            MultipartFile file,
+            @RequestPart(name = "request", required = true)
+            MemberProfileRequestDto request) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(memberService.updateProfile(testMember, request));
+        Member changedProfileMember = memberService.updateProfile(testMember, file, request);
+        return ApiResponse.onSuccess(MemberProfileResponseDto.from(changedProfileMember));
     }
 
     @Operation(summary = "내가 남긴 후기 목록 조회 API",
@@ -72,19 +83,20 @@ public class MyPageController {
             @PathVariable Long reviewId) {
 
         Member testMember = memberRepository.findById(999L).get();
-        ReviewResponseDto.DeleteResultDto resultDto = reviewService.deleteReview(testMember, reviewId);
-        return ApiResponse.onSuccess(resultDto);
+        Review deleteReview = reviewService.deleteReview(testMember, reviewId);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewDeleteResultDto(deleteReview));
     }
 
     @Operation(summary = "마이페이지 나의 건강정보 조회 API",
             description = "마이페이지에서 나의 건강정보를 전체 조회할 수 있습니다.")
     @GetMapping("/health-info")
-    public ApiResponse<MemberProfileResponseDto.MyHealthProfileDto> getMyHealthInfo(
+    public ApiResponse<HealInfoResponseDto.MyHealthInfoDto> getMyHealthInfo(
             @AuthenticationPrincipal Member member) {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(null);
+        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(testMember);
+        return ApiResponse.onSuccess(responseDto);
     }
 
 

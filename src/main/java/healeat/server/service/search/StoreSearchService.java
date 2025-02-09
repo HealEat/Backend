@@ -13,7 +13,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -31,9 +30,12 @@ public class StoreSearchService {
 
     @Transactional
     @Cacheable(value = "searchResult", key = "T(java.lang.String).format('%s_%s_%s_%s', " +
-            "(#request.query != null and #request.query != '' ? #request.query : 'default_query'), " +
-            "(#request.x != null and #request.x != '' ? T(java.lang.Double).parseDouble(#request.x) : 0.0), " +
-            "(#request.y != null and #request.y != '' ? T(java.lang.Double).parseDouble(#request.y) : 0.0), " +
+            "(#request.query != null and #request.query != '' ? " +
+                "#request.query : 'default_query'), " +
+            "(#request.x != null and #request.x != '' ? " +               // 약 200m 오차 허용 (/ 111320)
+                "T(java.lang.Math).round(T(java.lang.Double).parseDouble(#request.x) / 0.0018) : 0), " +
+            "(#request.y != null and #request.y != '' ? " +               // 약 200m 오차 허용 (/ 111320)
+                "T(java.lang.Math).round(T(java.lang.Double).parseDouble(#request.y) / 0.0018) : 0), " +
             "(#request.searchBy eq 'ACCURACY'))")
     public SearchResult searchAndSave(
             StoreRequestDto.SearchKeywordDto request) {
@@ -51,12 +53,42 @@ public class StoreSearchService {
     }
 
     @Transactional
+    @Cacheable(value = "recommendResult", key = "T(java.lang.String).format('%s_%s_%s', " +
+            "(#request.x != null and #request.x != '' ? " +               // 약 200m 오차 허용 (/ 111320)
+                "T(java.lang.Math).round(T(java.lang.Double).parseDouble(#request.x) / 0.0018) : 0), " +
+            "(#request.y != null and #request.y != '' ? " +               // 약 200m 오차 허용 (/ 111320)
+                "T(java.lang.Math).round(T(java.lang.Double).parseDouble(#request.y) / 0.0018) : 0), " +
+            "(#request.radius != null ? " +            // 약 200m 오차 허용
+                "T(java.lang.Math).round(#request.radius / 200.0) : 0))")
+    public SearchResult recommendAndSave(
+            StoreRequestDto.HealEatRequestDto request) {
+
+        String x = request.getX();
+        String y = request.getY();
+        int radius = request.getRadius();
+        SearchResult searchResult = SearchResult.builder()
+                .query("for-home-recommend")
+                .baseX(x)
+                .baseY(y)
+                .radius(radius)
+                .accuracy(false)
+                .build();
+
+        List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesForHome(x, y, radius);
+
+        return saveSearchResultAndItems(searchResult, kakaoResponses);
+    }
+
+    @Transactional
     protected SearchResult saveSearchResultAndItems(
             SearchResult searchResult,
             List<KakaoPlaceResponseDto> kakaoResponses) {
 
         KakaoPlaceResponseDto.SameName metaData = kakaoResponses.get(0).getMeta().getSame_name();
-        searchResult.setMetaData(metaData.getKeyword(), metaData.getSelected_region(), metaData.getRegion());
+        if (metaData != null) {
+            searchResult.setMetaData(
+                    metaData.getKeyword(), metaData.getSelected_region(), metaData.getRegion());
+        }
 
         List<Document> documents = new ArrayList<>();
         kakaoResponses.forEach(response -> documents.addAll(response.getDocuments()));
@@ -75,6 +107,7 @@ public class StoreSearchService {
     }
 
     private List<KakaoPlaceResponseDto> get3ResponsesByQuery(SearchResult searchResult) {
+
         String query = searchResult.getQuery();
         String x = searchResult.getBaseX();
         String y = searchResult.getBaseY();
@@ -105,6 +138,22 @@ public class StoreSearchService {
 
             KakaoPlaceResponseDto kakaoResponse = storeApiClient.getKakaoByLocation(
                     x, y, pageIter++, sort, "FD6");
+            apiCallCountService.incrementApiCallCount();
+
+            responses.add(kakaoResponse);
+            if (kakaoResponse.getMeta().getIs_end())
+                break;
+        }
+        return responses;
+    }
+
+    private List<KakaoPlaceResponseDto> get3ResponsesForHome(String x, String y, Integer radius) {
+        List<KakaoPlaceResponseDto> responses = new ArrayList<>();
+        int pageIter = 1;
+        while (pageIter <= 3) {
+
+            KakaoPlaceResponseDto kakaoResponse = storeApiClient.getKakaoForHome(
+                    x, y, radius, pageIter++, "distance", "FD6");
             apiCallCountService.incrementApiCallCount();
 
             responses.add(kakaoResponse);

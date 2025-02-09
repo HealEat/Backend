@@ -15,11 +15,13 @@ import java.util.List;
 @Getter
 public class MemberProfileResponseDto {
 
+    private Long id;
     private String name;
     private String profileImage;
 
     public static MemberProfileResponseDto from(Member member) {
         MemberProfileResponseDto response = new MemberProfileResponseDto();
+        response.id = member.getId();
         response.name = member.getName();
         response.profileImage = member.getProfileImageUrl();
         return response;

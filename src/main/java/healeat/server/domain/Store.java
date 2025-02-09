@@ -5,6 +5,7 @@ import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -44,11 +45,12 @@ public class Store extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
-    private List<String> daumImgUrlList = new ArrayList<>();
+    private List<DaumImageResponseDto.Document> daumImgDocuments = new ArrayList<>();
 
     /**
      * 평점
      */
+
     private Float totalScore; // 전체 평점
     private Integer reviewCount; // 전체 리뷰 수
 
@@ -71,6 +73,22 @@ public class Store extends BaseEntity {
     private List<Review> reviews = new ArrayList<>();
 
     //==비즈니스 로직==//
+
+    @PrePersist
+    public void initializeStore() {
+        totalScore = 0.0f;
+        reviewCount = 0;
+        sickScore = 0.0f;
+        sickCount = 0;
+        vegetScore = 0.0f;
+        vegetCount = 0;
+        dietScore = 0.0f;
+        dietCount = 0;
+        tastyScore = 0.0f;
+        cleanScore = 0.0f;
+        freshScore = 0.0f;
+        nutrScore = 0.0f;
+    }
 
     /**
      * 새로운 리뷰에 의한
@@ -125,5 +143,22 @@ public class Store extends BaseEntity {
                 .dietScore(dietScore)
                 .dietCount(dietCount)
                 .build();
+    }
+
+    public List<StoreResonseDto.ReviewImagePreviewDto> getReviewImagePreviewDtoList() {
+        return reviews.stream()
+                .map(review -> {
+
+                    List<ReviewImage> reviewImageList = review.getReviewImageList();
+
+                    return StoreResonseDto.ReviewImagePreviewDto.builder()
+                            .reviewId(review.getId())
+                            .reviewerInfo(review.getReviewerInfo())
+                            .firstImageUrl(reviewImageList.isEmpty() ?
+                                    null :
+                                    reviewImageList.get(0).getImageUrl())
+                            .build();
+                })
+                .toList();
     }
 }

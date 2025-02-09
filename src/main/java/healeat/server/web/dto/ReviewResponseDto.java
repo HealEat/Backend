@@ -1,5 +1,6 @@
 package healeat.server.web.dto;
 
+import healeat.server.domain.ReviewImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class ReviewResponseDto {
     public static class DeleteResultDto {
 
         private Long deletedReviewId;
+        private List<String> deletedReviewImageUrls;
         private LocalDateTime deletedAt;
     }
 
@@ -59,6 +61,7 @@ public class ReviewResponseDto {
     public static class SetResultDto {
 
         Long reviewId;
+        int imageCount;
         LocalDateTime createdAt;
     }
 
