@@ -4,9 +4,7 @@ import healeat.server.domain.Store;
 import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.service.StoreApiClient;
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
-import healeat.server.web.dto.api_response.KakaoPlaceResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -18,7 +16,6 @@ public class DaumImageService {
 
     private final StoreApiClient storeApiClient;
 
-    @Cacheable(value = "itemDaumImages", key = "#store.kakaoPlaceId")
     public List<ItemDaumImage> getDaumImgDocuments(Store store) {
 
         if (store == null || store.getPlaceName() == null || store.getAddressName() == null) {
