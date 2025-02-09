@@ -22,7 +22,6 @@ public class Term extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String title;   // 약관 제목
 
-    @Lob
     @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String body;    // 약관 세부 내용
 

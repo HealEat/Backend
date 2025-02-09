@@ -83,6 +83,7 @@ public class MyPageController {
             @PathVariable Long reviewId) {
 
         Member testMember = memberRepository.findById(999L).get();
+
         Review deleteReview = reviewService.deleteReview(testMember, reviewId);
         return ApiResponse.onSuccess(ReviewConverter.toReviewDeleteResultDto(deleteReview));
     }
@@ -99,49 +100,52 @@ public class MyPageController {
         return ApiResponse.onSuccess(responseDto);
     }
 
+    // 기획안 수정됨 : 건강 정보 각각에 대한 정보 수정 X -> 건강 정보 전체에 대한 정보 수정 O (프론트에서 Info 도메인 재사용한다고 함)
 
-    // 질환 정보 수정은 저장 API와 일치: 프론트에 알려주기
-
-
-    @Operation(summary = "베지테리언 선택 변경과 계산 API", description = "베지테리언 선택을 업데이트하고," +
-            "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
-    @PatchMapping("/health-info/veget")
-    public ApiResponse<ChangeChoiceResultDto> updateVegetarian(
-            @AuthenticationPrincipal Member member,
-            @RequestParam String vegetarian) {
-
-        Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(toChangeVegetResult(
-                memberHealthInfoService.updateVegetarian(testMember, vegetarian)));
-    }
-
-    @Operation(summary = "다이어트 선택 변경과 계산 API", description = "다이어트 선택을 업데이트하고," +
-            "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
-    @PatchMapping("/health-info/diet")
-    public ApiResponse<ChangeChoiceResultDto> updateDiet(
-            @AuthenticationPrincipal Member member,
-            @RequestParam String diet) {
-
-        Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(toChangeDietResult(
-                memberHealthInfoService.updateDiet(testMember, diet)));
-    }
-
-    @Operation(summary = "기본 질문의 답변 변경과 계산 API", description = "기본 질문의 답변을 업데이트하고," +
-            "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
-    @PatchMapping("/health-info/{questionNum}")
-    public ApiResponse<ChangeBaseResultDto> updateAnswer(
-            @AuthenticationPrincipal Member member,
-            @PathVariable Integer questionNum,
-            @RequestBody AnswerRequestDto request) {
-
-        Member testMember = memberRepository.findById(999L).get();
-
-        MemberHealQuestion memberHealQuestion = memberHealthInfoService
-                .updateQuestion(testMember, questionNum, request);
-
-        return ApiResponse.onSuccess(toChangeBaseResult(memberHealQuestion));
-    }
+//
+//
+//    // 질환 정보 수정은 저장 API와 일치: 프론트에 알려주기
+//
+//
+//    @Operation(summary = "베지테리언 선택 변경과 계산 API", description = "베지테리언 선택을 업데이트하고," +
+//            "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
+//    @PatchMapping("/health-info/veget")
+//    public ApiResponse<ChangeChoiceResultDto> updateVegetarian(
+//            @AuthenticationPrincipal Member member,
+//            @RequestParam String vegetarian) {
+//
+//        Member testMember = memberRepository.findById(999L).get();
+//
+//        return ApiResponse.onSuccess(toChangeVegetResult(
+//                memberHealthInfoService.updateVegetarian(testMember, vegetarian)));
+//    }
+//
+//    @Operation(summary = "다이어트 선택 변경과 계산 API", description = "다이어트 선택을 업데이트하고," +
+//            "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
+//    @PatchMapping("/health-info/diet")
+//    public ApiResponse<ChangeChoiceResultDto> updateDiet(
+//            @AuthenticationPrincipal Member member,
+//            @RequestParam String diet) {
+//
+//        Member testMember = memberRepository.findById(999L).get();
+//
+//        return ApiResponse.onSuccess(toChangeDietResult(
+//                memberHealthInfoService.updateDiet(testMember, diet)));
+//    }
+//
+//    @Operation(summary = "기본 질문의 답변 변경과 계산 API", description = "기본 질문의 답변을 업데이트하고," +
+//            "멤버의 새로운 healEatFoods(추천 음식 카테고리 리스트)를 계산 후 수정합니다.")
+//    @PatchMapping("/health-info/{questionNum}")
+//    public ApiResponse<ChangeBaseResultDto> updateAnswer(
+//            @AuthenticationPrincipal Member member,
+//            @PathVariable Integer questionNum,
+//            @RequestBody AnswerRequestDto request) {
+//
+//        Member testMember = memberRepository.findById(999L).get();
+//
+//        MemberHealQuestion memberHealQuestion = memberHealthInfoService
+//                .updateQuestion(testMember, questionNum, request);
+//
+//        return ApiResponse.onSuccess(toChangeBaseResult(memberHealQuestion));
+//    }
 }

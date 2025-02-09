@@ -4,8 +4,8 @@ import healeat.server.domain.common.BaseEntity;
 import healeat.server.domain.enums.Diet;
 import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
+import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.web.dto.StoreResonseDto;
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -22,12 +22,16 @@ import java.util.List;
 public class Store extends BaseEntity {
 
     /**
-     * 최초 리뷰가 발생할 때
-     * DB에 Store 데이터 저장
+     * 1. DB에 없는데 조회
+     * 2. DB에 없는데 북마크
+     *  -> Store 데이터 저장
      */
     @Id
-    // 카카오 API의 가게 ID 값을 직접 할당
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
+    private Long kakaoPlaceId;  // 카카오 API의 Place ID를 저장
 
     /**
      * 가게 정보 (from Kakao Local API)
@@ -45,7 +49,7 @@ public class Store extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
-    private List<DaumImageResponseDto.Document> daumImgDocuments = new ArrayList<>();
+    private List<String> features = new ArrayList<>();
 
     /**
      * 평점
@@ -68,9 +72,14 @@ public class Store extends BaseEntity {
     private Float freshScore; // 평점(신선도)
     private Float nutrScore; // 평점(영양 균형)
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ItemDaumImage> itemDaumImages = new ArrayList<>();
+
 
     //==비즈니스 로직==//
 
@@ -145,20 +154,54 @@ public class Store extends BaseEntity {
                 .build();
     }
 
-    public List<StoreResonseDto.ReviewImagePreviewDto> getReviewImagePreviewDtoList() {
-        return reviews.stream()
-                .map(review -> {
+    public StoreResonseDto.StoreInfoDto getStoreInfoDto() {
 
-                    List<ReviewImage> reviewImageList = review.getReviewImageList();
+        String[] categoryWords = categoryName.split(" > ");
 
-                    return StoreResonseDto.ReviewImagePreviewDto.builder()
-                            .reviewId(review.getId())
-                            .reviewerInfo(review.getReviewerInfo())
-                            .firstImageUrl(reviewImageList.isEmpty() ?
-                                    null :
-                                    reviewImageList.get(0).getImageUrl())
-                            .build();
-                })
-                .toList();
+        return StoreResonseDto.StoreInfoDto.builder()
+                .placeId(kakaoPlaceId)
+                .placeName(placeName)
+                .categoryName(categoryWords[categoryWords.length - 1])
+                .phone(phone)
+                .addressName(addressName)
+                .roadAddressName(roadAddressName)
+                .x(x)
+                .y(y)
+                .placeUrl(placeUrl)
+                .features(features)
+                .build();
     }
+
+    public StoreResonseDto.StoreHomeDto getStoreHomeDto() {
+
+        return StoreResonseDto.StoreHomeDto.builder()
+                .storeId(id)
+                .createdAt(getCreatedAt())
+                .storeInfoDto(getStoreInfoDto())
+                .build();
+    }
+
+    public void addItemDaumImage(ItemDaumImage itemDaumImage) {
+        itemDaumImages.add(itemDaumImage);
+        itemDaumImage.setStore(this);
+    }
+
+    //    public List<StoreResonseDto.ReviewImagePreviewDto> getReviewImagePreviewDtoList() {
+//        return reviews.stream()
+//                .map(review -> {
+//
+//                    List<ReviewImage> reviewImageList = review.getReviewImageList().stream()
+//                            .sorted(Comparator.comparing(ReviewImage::getCreatedAt).reversed()) // 최신순 정렬
+//                            .toList();
+//
+//                    return StoreResonseDto.ReviewImagePreviewDto.builder()
+//                            .reviewId(review.getId())
+//                            .reviewerInfo(review.getReviewerInfo())
+//                            .firstImageUrl(reviewImageList.isEmpty() ?
+//                                    null :
+//                                    reviewImageList.get(0).getImageUrl())
+//                            .build();
+//                })
+//                .toList();
+//    }
 }

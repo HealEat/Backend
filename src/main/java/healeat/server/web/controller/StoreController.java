@@ -2,8 +2,8 @@ package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ReviewConverter;
-import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
+import healeat.server.domain.Store;
 import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
@@ -12,6 +12,7 @@ import healeat.server.service.ReviewService;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.*;
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
@@ -35,22 +36,54 @@ public class StoreController {
     private final MemberRepository memberRepository;
     private final BookmarkService bookmarkService;
 
-    @Operation(summary = "가게 저장 API", description = "가게를 DB에 저장하는 Trigger 주목: " +
-            "isInDB(response 필드)가 false인 가게를 대상으로, 리뷰를 작성 또는 회원의 북마크에 저장")
-    @PostMapping("/{storeId}")
-    public ApiResponse<StoreResonseDto.SetResultDto> addStore(
-            @RequestBody StoreRequestDto.ForSaveStoreDto request) {
+    /**
+     * 가게 정보/이미지 조회
+     */
+    @Operation(summary = "가게 단건 조회 (이미지 제외)",
+            description = "이미지를 제외한 모든 정보를 조회합니다.")
+    @GetMapping("/{storeId}")
+    public ApiResponse<StoreResonseDto.StoreHomeDto> getStoreDetails(
+            @PathVariable Long storeId,
+            @AuthenticationPrincipal Member member) {
 
-        return ApiResponse.onSuccess(StoreConverter.toSetResultDto(
-                storeQueryServiceImpl.saveStore(request)));
+        Member testMember = memberRepository.findById(999L).get();
+
+        return ApiResponse.onSuccess(storeQueryServiceImpl.getStoreHome(storeId, testMember));
     }
 
-    @Operation(summary = "힐릿 데이터 가게 단건 조회 - 특히 4가지 점수 조회 API",
-            description = "맛-청결-신선-영양 점수를 조회합니다.")
-    @GetMapping("/{storeId}")
-    public ApiResponse<StoreResonseDto.StoreImageListDto> getStoreDetails(@PathVariable Long storeId) {
+    @Operation(summary = "가게 리뷰 이미지 조회",
+            description = "가게 리뷰 이미지는 작성자의 정보를 포함하고, 최신순으로 페이징이 적용됩니다. 가게 이미지에 먼저 사용해주세요.")
+    @GetMapping("/{storeId}/reviewImgs")
+    public ApiResponse<ReviewResponseDto.ReviewImageDtoList> getStoreReviewImages(
+            @PathVariable Long storeId) {
+
+        Member testMember = memberRepository.findById(999L).get();
 
         return ApiResponse.onSuccess(null);
+    }
+
+    @Operation(summary = "가게 Daum 이미지 조회",
+            description = "가게 리뷰 이미지가 더이상 없으면 사용해주세요. 최대 15장입니다.")
+    @GetMapping("/{storeId}/daumImgs")
+    public ApiResponse<List<DaumImageResponseDto.Document>> getStoreDaumImages(
+            @PathVariable Long storeId) {
+
+        return ApiResponse.onSuccess(storeQueryServiceImpl.getStoreDaumImages(storeId));
+    }
+
+    /**
+     * 가게 리뷰
+     */
+    @Operation(summary = "특정 가게의 리뷰 페이지 조회 API", description = "리뷰 리스트는 페이징을 포함합니다.")
+    @GetMapping("/{storeId}/reviews")
+    public ApiResponse<ReviewResponseDto.ReviewPreviewListDto> getReviewList(
+            @PathVariable Long storeId,
+            @CheckPage @RequestParam Integer page,
+            @RequestParam SortBy sort,
+            @RequestParam String sortOrder) {
+
+        Page<Review> reviewPage = storeQueryServiceImpl.getReviewList(storeId, page, sort, sortOrder);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
     }
 
     @Operation(summary = "특정 가게의 리뷰 작성 API", description = "isInDB가 ture인 " +
@@ -72,17 +105,9 @@ public class StoreController {
         return ApiResponse.onSuccess(ReviewConverter.toReviewSetResultDto(newReview));
     }
 
-    @Operation(summary = "특정 가게의 리뷰 페이지 조회 API", description = "리뷰 리스트는 페이징을 포함합니다.")
-    @GetMapping("/{storeId}/reviews")
-    public ApiResponse<ReviewResponseDto.ReviewPreviewListDto> getReviewList(
-            @PathVariable Long storeId,
-            @CheckPage @RequestParam Integer page,
-            @RequestParam SortBy sort,
-            @RequestParam String sortOrder) {
-        Page<Review> reviewPage = storeQueryServiceImpl.getReviewList(storeId, page, sort, sortOrder);
-        return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
-    }
-
+    /**
+     * 가게 북마크
+     */
     @Operation(summary = "가게 북마크 저장 API", description = "회원의 가게 북마크에 저장합니다." +
             " isInDB가 ture인 검색 결과에 대해서만 사용하는 API입니다.")
     @PostMapping("/{storeId}/bookmarks")

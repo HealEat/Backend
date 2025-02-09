@@ -31,10 +31,6 @@ public class QSearchResultItem extends EntityPathBase<SearchResultItem> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final ListPath<String, StringPath> daumImageUrlList = this.<String, StringPath>createList("daumImageUrlList", String.class, StringPath.class, PathInits.DIRECT2);
-
-    public final NumberPath<Integer> distance = createNumber("distance", Integer.class);
-
     public final ListPath<String, StringPath> features = this.<String, StringPath>createList("features", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
