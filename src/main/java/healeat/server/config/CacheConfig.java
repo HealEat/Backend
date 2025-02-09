@@ -17,7 +17,7 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager(
-                "searchResult", "recommendResult", "daumImgDocuments");
+                "searchResult", "recommendResult");
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(10000)  // 최대 10,000개 저장
                 .expireAfterWrite(1440, TimeUnit.MINUTES)  // 24시간 후 만료

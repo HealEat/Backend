@@ -9,6 +9,7 @@ import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
+import healeat.server.service.StoreCommandService;
 import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.RecentSearchResponseDto;
 import healeat.server.service.StoreQueryServiceImpl;
@@ -28,10 +29,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final StoreQueryServiceImpl storeQueryServiceImpl;
     private final RecentSearchService recentSearchService;
     private final CategoryFeatureService categoryFeatureService;
     private final MemberRepository memberRepository;
+    private final StoreCommandService storeCommandService;
 
     @Operation(summary = "요청과 검색 결과 API", description =
             """
@@ -51,7 +52,7 @@ public class SearchController {
 
         recentSearchService.saveRecentQuery(testMember, request.getQuery());
 
-        return ApiResponse.onSuccess(storeQueryServiceImpl.searchAndMapStores(
+        return ApiResponse.onSuccess(storeCommandService.searchAndMapStores(
                 testMember, page, request));
     }
 

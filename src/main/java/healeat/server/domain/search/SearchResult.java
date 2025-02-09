@@ -12,6 +12,7 @@ import java.util.Objects;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class SearchResult extends BaseEntity {
@@ -35,22 +36,12 @@ public class SearchResult extends BaseEntity {
     private String selectedRegion;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @Builder.Default
     private List<String> otherRegions = new ArrayList<>();
 
     @OneToMany(mappedBy = "searchResult", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<SearchResultItem> items = new ArrayList<>();
-
-    /**
-     * SearchResult 생성자
-     */
-    @Builder
-    public SearchResult(String query, String baseX, String baseY, Integer radius, Boolean accuracy) {
-        this.query = query;
-        this.baseX = baseX;
-        this.baseY = baseY;
-        this.radius = radius;
-        this.accuracy = accuracy;
-    }
 
     /**
      * Meta 데이터 입력

@@ -1,10 +1,7 @@
 package healeat.server.web.dto;
 
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,13 +10,22 @@ public class StoreResonseDto {
 
     @Builder
     @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SetResultDto {
+    public static class StoreHomeDto {
 
         Long storeId;
-        String placeName;
         LocalDateTime createdAt;
+
+        // 가게 공통 정보
+        StoreInfoDto storeInfoDto;
+
+        // Store 필요
+        IsInDBDto isInDBDto;
+
+        // Member 필요
+        Long bookmarkId;
     }
 
     /**
@@ -42,7 +48,7 @@ public class StoreResonseDto {
         Boolean isLast;
 
         // 검색 정보
-        SearchInfo searchInfo;
+        SearchInfoDto searchInfoDto;
     }
 
     @Builder
@@ -54,8 +60,8 @@ public class StoreResonseDto {
         // 가게 공통 정보
         StoreInfoDto storeInfoDto;
 
-        // Store_reviewImages + API 합친 정보
-        StoreImageListDto storeImageListDto;
+        // 최근 사진 한 장
+        ReviewResponseDto.ReviewImageDto reviewImageDto;
 
         /// Response 전용 필드
         Boolean isInDB;
@@ -86,7 +92,8 @@ public class StoreResonseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SearchInfo {
+    public static class SearchInfoDto {
+        // 홈 알고리즘에 사용
         String memberName;
         Boolean hasHealthInfo;
 
@@ -109,7 +116,6 @@ public class StoreResonseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StoreInfoDto {
-        Integer distance;
         Long placeId;
         String placeName;
         String categoryName;
@@ -120,28 +126,5 @@ public class StoreResonseDto {
         String y;
         String placeUrl;
         List<String> features;
-    }
-
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class StoreImageListDto {
-
-        // 리뷰 이미지 정보
-        List<ReviewImagePreviewDto> reviewImagePreviewDtoList;
-        // 다음 이미지 API
-        List<DaumImageResponseDto.Document> daumImgDocuments;
-    }
-
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ReviewImagePreviewDto {
-
-        Long reviewId;
-        ReviewResponseDto.ReviewerInfo reviewerInfo;
-        String firstImageUrl;
     }
 }

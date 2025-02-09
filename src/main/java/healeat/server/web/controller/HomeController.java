@@ -3,6 +3,7 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
+import healeat.server.service.StoreCommandService;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.StoreResonseDto;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class HomeController {
 
     private final MemberRepository memberRepository;
-    private final StoreQueryServiceImpl storeQueryServiceImpl;
+    private final StoreCommandService storeCommandService;
 
     @Operation(summary = "홈 화면에서 추천 가게 리스트를 조회합니다.", description =
             """ 
@@ -33,6 +34,6 @@ public class HomeController {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(storeQueryServiceImpl.recommendAndMapStores(testMember, page, request));
+        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(testMember, page, request));
     }
 }

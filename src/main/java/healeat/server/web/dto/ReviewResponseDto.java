@@ -1,6 +1,5 @@
 package healeat.server.web.dto;
 
-import healeat.server.domain.ReviewImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -106,5 +105,31 @@ public class ReviewResponseDto {
 
         // 작성 당시의 건강 목적
         private List<String> currentPurposes;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReviewImageDtoList {
+
+        List<ReviewImageDto> reviewImages;
+
+        // 페이징 관련
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Boolean isFirst;
+        Boolean isLast;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReviewImageDto {
+
+        Long reviewId;
+        ReviewerInfo reviewerInfo;
     }
 }

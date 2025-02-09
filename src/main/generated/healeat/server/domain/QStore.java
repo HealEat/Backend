@@ -31,15 +31,19 @@ public class QStore extends EntityPathBase<Store> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final ListPath<healeat.server.web.dto.api_response.DaumImageResponseDto.Document, SimplePath<healeat.server.web.dto.api_response.DaumImageResponseDto.Document>> daumImgDocuments = this.<healeat.server.web.dto.api_response.DaumImageResponseDto.Document, SimplePath<healeat.server.web.dto.api_response.DaumImageResponseDto.Document>>createList("daumImgDocuments", healeat.server.web.dto.api_response.DaumImageResponseDto.Document.class, SimplePath.class, PathInits.DIRECT2);
-
     public final NumberPath<Integer> dietCount = createNumber("dietCount", Integer.class);
 
     public final NumberPath<Float> dietScore = createNumber("dietScore", Float.class);
 
+    public final ListPath<String, StringPath> features = this.<String, StringPath>createList("features", String.class, StringPath.class, PathInits.DIRECT2);
+
     public final NumberPath<Float> freshScore = createNumber("freshScore", Float.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final ListPath<healeat.server.domain.search.ItemDaumImage, healeat.server.domain.search.QItemDaumImage> itemDaumImages = this.<healeat.server.domain.search.ItemDaumImage, healeat.server.domain.search.QItemDaumImage>createList("itemDaumImages", healeat.server.domain.search.ItemDaumImage.class, healeat.server.domain.search.QItemDaumImage.class, PathInits.DIRECT2);
+
+    public final NumberPath<Long> kakaoPlaceId = createNumber("kakaoPlaceId", Long.class);
 
     public final NumberPath<Float> nutrScore = createNumber("nutrScore", Float.class);
 
