@@ -92,7 +92,7 @@ public class StoreController {
     public ApiResponse<ReviewResponseDto.SetResultDto> createReview(
             @PathVariable Long placeId,
             @AuthenticationPrincipal Member member,
-            @RequestPart(name = "files")
+            @RequestPart(name = "files", required = false)
             List<MultipartFile> files,
             @RequestPart(name = "request", required = true)
             ReviewRequestDto request) {

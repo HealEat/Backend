@@ -59,12 +59,11 @@ public class SearchController {
     @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
     @GetMapping("/recent")
     public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
-            @AuthenticationPrincipal Member member,
-            @CheckPage @RequestParam(name = "page") Integer page
+            @AuthenticationPrincipal Member member
     ) {
 
         Member testMember = memberRepository.findById(999L).get();
-        Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId(), page);
+        Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId());
 
         return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }
