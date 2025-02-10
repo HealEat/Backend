@@ -183,6 +183,8 @@ public class Store extends BaseEntity {
         freshScore = subtractReviewScore(freshScore, review.getFreshScore());
         nutrScore = subtractReviewScore(nutrScore, review.getNutrScore());
 
+        reviewCount--; // 리뷰 수 감소
+
         reviews.remove(review);
     }
 

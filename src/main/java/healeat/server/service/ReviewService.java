@@ -176,7 +176,7 @@ public class ReviewService {
             reviewImageRepository.delete(reviewImage);
         }
 
-        // 가게 내 점수 조정
+        // 가게 내 수치 조정
         Store store = review.getStore();
         store.deleteReview(review);
 

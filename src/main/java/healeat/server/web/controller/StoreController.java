@@ -86,8 +86,7 @@ public class StoreController {
         return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
     }
 
-    @Operation(summary = "특정 가게의 리뷰 작성 API", description = "isInDB가 ture인 " +
-            "검색 결과에 대해서만 사용하는 API입니다.",
+    @Operation(summary = "특정 가게의 리뷰 작성 API",
     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
     @PostMapping(value = "/{placeId}/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ReviewResponseDto.SetResultDto> createReview(
