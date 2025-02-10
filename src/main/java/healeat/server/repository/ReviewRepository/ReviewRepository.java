@@ -1,4 +1,4 @@
-package healeat.server.repository;
+package healeat.server.repository.ReviewRepository;
 
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCusotm {
 
     Page<Review> findAllByStore(Store store, Pageable pageable);
 

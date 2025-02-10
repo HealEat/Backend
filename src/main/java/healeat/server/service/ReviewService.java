@@ -2,21 +2,27 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.ReviewHandler;
+import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.aws.s3.AmazonS3Manager;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
 import healeat.server.domain.Store;
+import healeat.server.domain.enums.Diet;
+import healeat.server.domain.enums.SortBy;
+import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.ReviewImageRepository;
-import healeat.server.repository.ReviewRepository;
+import healeat.server.repository.ReviewRepository.ReviewRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.web.dto.ReviewRequestDto;
 import healeat.server.web.dto.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,6 +64,52 @@ public class ReviewService {
                 .isFirst(reviewPage.isFirst())
                 .isLast(reviewPage.isLast())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Review> getStoreReviews(Long placeId, Integer page, SortBy sort, String sortOrder) {
+
+        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
+                new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
+
+        if (sort == null) sort = SortBy.DEFAULT;
+
+        // 페이지 번호를 0-based로 조정
+        int adjustedPage = Math.max(0, page - 1);
+
+        Sort.Direction direction = getSortDirection(sortOrder);
+
+        Sort sorting;
+        PageRequest pageable;
+
+        switch (sort) {
+            case SICK:
+                sorting = Sort.by(direction, "totalScore", "createdAt");
+                pageable = PageRequest.of(adjustedPage, 10, sorting);
+                return reviewRepository.findAllByStoreAndMember_MemberDiseasesNotEmpty(store, pageable);
+            case VEGET:
+                sorting = Sort.by(direction, "totalScore", "createdAt");
+                pageable = PageRequest.of(adjustedPage, 10, sorting);
+                return reviewRepository.findAllByStoreAndMember_Vegetarian(store, Vegetarian.NONE, pageable);
+            case DIET:
+                sorting = Sort.by(direction, "totalScore", "createdAt");
+                pageable = PageRequest.of(adjustedPage, 10, sorting);
+                return reviewRepository.findAllByStoreAndMember_Diet(store, Diet.NONE, pageable);
+            case DEFAULT: // 기본은 최신 순
+                sorting = Sort.by(direction, "createdAt");
+                pageable = PageRequest.of(adjustedPage, 10, sorting);
+                return reviewRepository.findAllByStore(store, pageable);
+            default:
+                throw new SortHandler(ErrorStatus.SORT_NOT_FOUND);
+        }
+    }
+
+    private Sort.Direction getSortDirection(String sortOrder) {
+        if ("asc".equalsIgnoreCase(sortOrder)) {
+            return Sort.Direction.ASC;
+        } else {
+            return Sort.Direction.DESC;
+        }
     }
 
     // 리뷰 생성 API
@@ -109,6 +161,7 @@ public class ReviewService {
     */
     @Transactional
     public Review deleteReview(Member member, Long reviewId) {
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewHandler(ErrorStatus.REVIEW_NOT_FOUND));
 
@@ -122,6 +175,11 @@ public class ReviewService {
             amazonS3Manager.deleteFile(reviewImage.getImageUrl());
             reviewImageRepository.delete(reviewImage);
         }
+
+        // 가게 내 점수 조정
+        Store store = review.getStore();
+        store.deleteReview(review);
+
         // 리뷰 삭제
         reviewRepository.delete(review);
         return review;

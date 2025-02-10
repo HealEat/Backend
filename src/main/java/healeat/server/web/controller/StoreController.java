@@ -82,7 +82,7 @@ public class StoreController {
             @RequestParam SortBy sort,
             @RequestParam String sortOrder) {
 
-        Page<Review> reviewPage = storeQueryServiceImpl.getReviewList(placeId, page, sort, sortOrder);
+        Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, sort, sortOrder);
         return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
     }
 
