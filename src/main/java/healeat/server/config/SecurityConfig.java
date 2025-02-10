@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                         .requestMatchers("/auth/naver", "/auth/kakao", "/auth/apple").permitAll()
-                        .requestMatchers("/auth/naver/unlink", "/auth/kakao/unlink", "/auth/apple/unlink").authenticated()
+                        .requestMatchers("/auth/naver/unlink", "/auth/kakao/unlink", "/auth/apple/unlink", "/auth/logout").authenticated()
                         .requestMatchers("/plans/**", "/home/**", "/info/**", "/my-page/**",
                                 "/search/**", "/stores/**", "/bookmarks/**","/terms/**", "image/**").permitAll()
                         .requestMatchers("/profile-image").permitAll()
