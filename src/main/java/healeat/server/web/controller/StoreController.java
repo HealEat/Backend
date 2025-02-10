@@ -3,6 +3,7 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
+import healeat.server.domain.ReviewImage;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.BookmarkService;
@@ -38,7 +39,7 @@ public class StoreController {
     /**
      * 가게 정보/이미지 조회
      */
-    @Operation(summary = "가게 단건 조회 (이미지 제외)",
+    @Operation(summary = "가게 단건 조회 (이미지 제외) API",
             description = "이미지를 제외한 모든 정보를 조회합니다.")
     @GetMapping("/{placeId}")
     public ApiResponse<StoreResonseDto.StoreHomeDto> getStoreDetails(
@@ -50,19 +51,21 @@ public class StoreController {
         return ApiResponse.onSuccess(storeQueryServiceImpl.getStoreHome(placeId, testMember));
     }
 
-    @Operation(summary = "가게 리뷰 이미지 조회",
-            description = "가게 리뷰 이미지는 작성자의 정보를 포함하고, 최신순으로 페이징이 적용됩니다. 가게 이미지에 먼저 사용해주세요.")
+    @Operation(summary = "가게 리뷰 이미지 조회 API",
+            description = "리뷰 각각에 대해 첫 번째 이미지 리스트입니다." +
+                    " 이미지마다 작성자의 정보도 포함하며, 최신순 페이징이 적용됩니다. 가게 이미지 조회 시 '먼저' 사용해주세요.")
     @GetMapping("/{placeId}/reviewImgs")
     public ApiResponse<ReviewResponseDto.ReviewImageDtoList> getStoreReviewImages(
-            @PathVariable Long placeId) {
+            @PathVariable Long placeId,
+            @CheckPage @RequestParam Integer page) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Page<ReviewImage> reviewImagePage = reviewService.getStoreReviewImages(placeId, page);
 
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewImageDtoList(reviewImagePage));
     }
 
-    @Operation(summary = "가게 Daum 이미지 조회",
-            description = "가게 리뷰 이미지가 더이상 없으면 사용해주세요. 최대 15장입니다.")
+    @Operation(summary = "가게 Daum 이미지 조회 API",
+            description = "가게 이미지 조회 시 리뷰 이미지 조회 API에 이어서 사용해주세요. 최대 15장입니다.")
     @GetMapping("/{placeId}/daumImgs")
     public ApiResponse<List<DaumImageResponseDto.Document>> getStoreDaumImages(
             @PathVariable Long placeId) {

@@ -17,6 +17,7 @@ import healeat.server.web.dto.ReviewResponseDto;
 import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +72,20 @@ public class ReviewService {
         int safePage = Math.max(0, page - 1);
 
         return null;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ReviewImage> getStoreReviewImages(Long placeId, Integer page) {
+
+        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
+                new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
+
+        // 페이지 번호를 0-based로 조정
+        int safePage = Math.max(0, page - 1);
+
+        Pageable pageable = PageRequest.of(safePage, 10);
+
+        return reviewRepository.getFirstReviewImages(store, pageable);
     }
 
     // 리뷰 생성 API

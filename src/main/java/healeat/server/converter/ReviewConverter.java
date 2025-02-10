@@ -1,6 +1,5 @@
 package healeat.server.converter;
 
-import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
 import healeat.server.domain.mapping.Review;
 import healeat.server.web.dto.ImageResponseDto;
@@ -8,7 +7,6 @@ import healeat.server.web.dto.ReviewResponseDto;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +42,33 @@ public class ReviewConverter {
                 .totalElements(reviewPage.getTotalElements())
                 .isFirst(reviewPage.isFirst())
                 .isLast(reviewPage.isLast())
+                .build();
+    }
+
+    public static ReviewResponseDto.ReviewImageDtoList toReviewImageDtoList(Page<ReviewImage> reviewImagePage) {
+
+        List<ReviewResponseDto.ReviewImageDto> reviewImageDtoList = reviewImagePage.stream()
+                .map(ReviewConverter::toReviewImageDto)
+                .toList();
+
+        return ReviewResponseDto.ReviewImageDtoList.builder()
+                .reviewImageDtoList(reviewImageDtoList)
+                .listSize(reviewImageDtoList.size())
+                .totalPage(reviewImagePage.getTotalPages())
+                .totalElements(reviewImagePage.getTotalElements())
+                .isFirst(reviewImagePage.isFirst())
+                .isLast(reviewImagePage.isLast())
+                .build();
+    }
+
+    public static ReviewResponseDto.ReviewImageDto toReviewImageDto(ReviewImage reviewImage) {
+
+        Review review = reviewImage.getReview();
+
+        return ReviewResponseDto.ReviewImageDto.builder()
+                .reviewId(review.getId())
+                .imageUrl(reviewImage.getImageUrl())
+                .reviewerInfo(review.getReviewerInfo())
                 .build();
     }
 
