@@ -44,7 +44,14 @@ public class InfoController {
 
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(profileMember));
     }
-
+    /*
+    @Operation(summary = "질환 정보 CSV 저장 API", description = "disease_names.csv 파일 수정 시 사용")
+    @PostMapping("/disease/upload")
+    public ApiResponse<Void> uploadDiseases(@RequestParam String filePath) {
+        memberService.saveDiseasesFromCSV(filePath);
+        return ApiResponse.onSuccess(null);
+    }
+    */
     @Operation(summary = "질병 검색 API")
     @GetMapping("/disease/search")
     public ApiResponse<List<Disease>> searchDiseases(@RequestParam String keyword) {
