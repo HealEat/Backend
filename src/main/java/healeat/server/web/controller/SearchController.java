@@ -59,8 +59,7 @@ public class SearchController {
     @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
     @GetMapping("/recent")
     public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
-            @AuthenticationPrincipal Member member
-    ) {
+            @AuthenticationPrincipal Member member) {
 
         Member testMember = memberRepository.findById(999L).get();
         Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId());
@@ -74,7 +73,8 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto.SetResultDto> saveRecentStore(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
-        return ApiResponse.onSuccess(null);
+        return ApiResponse.onSuccess(SearchPageConverter.toSetResultDto(
+                recentSearchService.saveRecentStore(member, placeId)));
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")

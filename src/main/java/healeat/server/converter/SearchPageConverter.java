@@ -26,6 +26,13 @@ public class SearchPageConverter {
                 .build();
     }
 
+    public static RecentSearchResponseDto.SetResultDto toSetResultDto(RecentSearch recentSearch) {
+        return RecentSearchResponseDto.SetResultDto.builder()
+                .recentSearchId(recentSearch.getId())
+                .updatedAt(recentSearch.getUpdatedAt())
+                .build();
+    }
+
     public static RecentSearchResponseDto.FoodCategoryResponseDto toFoodCategoryResponseDto(FoodCategory foodCategory) {
 
         return RecentSearchResponseDto.FoodCategoryResponseDto.builder()
@@ -91,6 +98,7 @@ public class SearchPageConverter {
                     .recentSearchId(recentSearch.getId())
                     .searchType(recentSearch.getSearchType())
                     .placeId(recentSearch.getStore().getKakaoPlaceId())
+                    .placeName(recentSearch.getStore().getPlaceName())
                     .build();
         }
         // searchType = QUERY

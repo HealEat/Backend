@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
@@ -29,8 +29,6 @@ public class BookmarkService {
     private final StoreCommandService storeCommandService;
     private final SearchResultItemRepository searchResultItemRepository;
 
-    // 북마크를 회원에 저장
-    @Transactional
     public Bookmark saveBookmark(Member member, Long placeId) {
 
         Optional<Store> optionalStore = storeRepository.findByKakaoPlaceId(placeId);
@@ -54,7 +52,6 @@ public class BookmarkService {
         return bookmarkRepository.save(bookmark);
     }
 
-    @Transactional
     public BookmarkResponseDto deleteBookmark(Long bookmarkId) {
 
         Bookmark bookmark = bookmarkRepository.getBookmarkById(bookmarkId);
