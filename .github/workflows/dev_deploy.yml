@@ -17,10 +17,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Make application.yml  # application.yml 파일 생성
+      - name: Set environment variables
+        run: |
+          echo "BASE_URL=http://healeatapp.com:8080" >> $GITHUB_ENV
+
+      - name: Make application.yml  # application.yml 파일 생성 및 환경 변수 적용
         run: |
           cd ./src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          cat ./application.yml | envsubst > ./application.yml.tmp && mv ./application.yml.tmp ./application.yml
         shell: bash
 
       - name: Decode and Save Apple Auth Key  # 🔹 GitHub Secrets에서 `.p8` 파일 복원
