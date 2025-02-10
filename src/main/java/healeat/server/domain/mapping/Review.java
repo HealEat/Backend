@@ -83,11 +83,6 @@ public class Review extends BaseEntity {
         store.addScoresByReview(this);
     }
 
-    public void addImage(ReviewImage image) {
-        reviewImageList.add(image);
-        image.setReview(this);
-    }
-
     private void calcTotalByAll() {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
     }
