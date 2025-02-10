@@ -67,6 +67,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                     member, null, new ArrayList<>()
             );
             SecurityContextHolder.getContext().setAuthentication(auth);
+            System.out.println("SecurityContextHolder에 사용자 정보 저장 완료");
         } else {
             System.out.println("OAuth2 로그인 성공했지만 Member를 찾을 수 없음.");
         }
