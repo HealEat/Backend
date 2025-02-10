@@ -1,17 +1,13 @@
 package healeat.server.repository.SearchResultItemRepository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.CollectionExpression;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import healeat.server.domain.QStore;
-import healeat.server.domain.Store;
 import healeat.server.domain.search.QSearchResultItem;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
-import healeat.server.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,7 +47,7 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
         }
 
         // Query 실행
-        List<SearchResultItem> results = queryFactory
+        List<SearchResultItem> items = queryFactory
                 .selectFrom(searchResultItem)
                 .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
                 .where(whereClause)
@@ -61,7 +57,7 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
                 .fetch();
 
         // 전체 카운트 쿼리
-        Long total = Optional.ofNullable(queryFactory
+        Long totalCount = Optional.ofNullable(queryFactory
                         .select(searchResultItem.count())
                         .from(searchResultItem)
                         .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
@@ -70,7 +66,7 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
                 .orElse(0L);
 
         // 페이지 결과 반환
-        return new PageImpl<>(results, pageable, total);
+        return new PageImpl<>(items, pageable, totalCount);
     }
 
     // 동적 정렬 생성 메서드

@@ -45,7 +45,7 @@ public class ReviewResponseDto {
     public static class MyPageReviewDto {
 
         private Long placeId;
-        private String storeName;
+        private String placeName;
 
         private ReviewPreviewDto reviewPreview;
     }
@@ -113,7 +113,7 @@ public class ReviewResponseDto {
     @AllArgsConstructor
     public static class ReviewImageDtoList {
 
-        List<ReviewImageDto> reviewImages;
+        List<ReviewImageDto> reviewImageDtoList;
 
         // 페이징 관련
         Integer listSize;
@@ -130,6 +130,7 @@ public class ReviewResponseDto {
     public static class ReviewImageDto {
 
         Long reviewId;
+        String imageUrl;
         ReviewerInfo reviewerInfo;
     }
 }

@@ -2,32 +2,27 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.ReviewHandler;
-import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.aws.s3.AmazonS3Manager;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
 import healeat.server.domain.Store;
-import healeat.server.domain.enums.Diet;
-import healeat.server.domain.enums.SortBy;
-import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.ReviewImageRepository;
 import healeat.server.repository.ReviewRepository.ReviewRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.web.dto.ReviewRequestDto;
 import healeat.server.web.dto.ReviewResponseDto;
+import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,15 +41,16 @@ public class ReviewService {
     // 내가 남긴 후기 목록 조회 API
     @Transactional(readOnly = true)
     public ReviewResponseDto.myPageReviewListDto getMyReviews(Member member, Pageable pageable) {
-        Page<Review> reviewPage = reviewRepository.findByMember(member, pageable);
+        Page<Review> reviewPage = reviewRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
 
-        List<ReviewResponseDto.MyPageReviewDto> reviewsDtoList = reviewPage.stream().map(review ->
-                ReviewResponseDto.MyPageReviewDto.builder()
+        List<ReviewResponseDto.MyPageReviewDto> reviewsDtoList = reviewPage.stream()
+                .map(review -> ReviewResponseDto.MyPageReviewDto.builder()
                         .placeId(review.getStore().getKakaoPlaceId())
-                        .storeName(review.getStore().getPlaceName())
+                        .placeName(review.getStore().getPlaceName())
                         .reviewPreview(ReviewConverter.toReviewPreviewDto(review))
                         .build()
-        ).collect(Collectors.toList());
+                )
+                .toList();
 
         return ReviewResponseDto.myPageReviewListDto.builder()
                 .myPageReviewList(reviewsDtoList)
@@ -67,49 +63,29 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Review> getStoreReviews(Long placeId, Integer page, SortBy sort, String sortOrder) {
+    public Page<Review> getStoreReviews(Long placeId, Integer page, StoreRequestDto.GetReviewRequestDto request) {
 
         Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
 
-        if (sort == null) sort = SortBy.DEFAULT;
-
         // 페이지 번호를 0-based로 조정
-        int adjustedPage = Math.max(0, page - 1);
+        int safePage = Math.max(0, page - 1);
 
-        Sort.Direction direction = getSortDirection(sortOrder);
-
-        Sort sorting;
-        PageRequest pageable;
-
-        switch (sort) {
-            case SICK:
-                sorting = Sort.by(direction, "totalScore", "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_MemberDiseasesNotEmpty(store, pageable);
-            case VEGET:
-                sorting = Sort.by(direction, "totalScore", "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_Vegetarian(store, Vegetarian.NONE, pageable);
-            case DIET:
-                sorting = Sort.by(direction, "totalScore", "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_Diet(store, Diet.NONE, pageable);
-            case DEFAULT: // 기본은 최신 순
-                sorting = Sort.by(direction, "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStore(store, pageable);
-            default:
-                throw new SortHandler(ErrorStatus.SORT_NOT_FOUND);
-        }
+        return null;
     }
 
-    private Sort.Direction getSortDirection(String sortOrder) {
-        if ("asc".equalsIgnoreCase(sortOrder)) {
-            return Sort.Direction.ASC;
-        } else {
-            return Sort.Direction.DESC;
-        }
+    @Transactional(readOnly = true)
+    public Page<ReviewImage> getStoreReviewImages(Long placeId, Integer page) {
+
+        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
+                new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
+
+        // 페이지 번호를 0-based로 조정
+        int safePage = Math.max(0, page - 1);
+
+        Pageable pageable = PageRequest.of(safePage, 10);
+
+        return reviewRepository.getFirstReviewImages(store, pageable);
     }
 
     // 리뷰 생성 API
@@ -131,9 +107,7 @@ public class ReviewService {
 
         reviewRepository.save(review);
 
-        List<ReviewImage> reviewImageList = new ArrayList<>();
-
-        if(!(files == null || files.isEmpty())){
+        if(!files.isEmpty()){
             if (files.size() > 10) {
                 throw new ReviewHandler(ErrorStatus.REVIEW_TOO_MANY_IMAGES);
             }

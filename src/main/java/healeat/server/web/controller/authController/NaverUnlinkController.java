@@ -1,4 +1,4 @@
-package healeat.server.web.controller;
+package healeat.server.web.controller.authController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
