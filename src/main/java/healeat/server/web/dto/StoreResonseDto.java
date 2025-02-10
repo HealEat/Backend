@@ -1,6 +1,5 @@
 package healeat.server.web.dto;
 
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -23,9 +22,23 @@ public class StoreResonseDto {
 
         // Store 필요
         IsInDBDto isInDBDto;
+        TotalStatDto totalStatDto;
 
         // Member 필요
         Long bookmarkId;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TotalStatDto {
+
+        Float tastyScore;
+        Float cleanScore;
+        Float freshScore;
+        Float nutrScore;
     }
 
     /**

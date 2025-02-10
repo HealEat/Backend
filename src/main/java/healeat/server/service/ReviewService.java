@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +44,7 @@ public class ReviewService {
 
         List<ReviewResponseDto.MyPageReviewDto> reviewsDtoList = reviewPage.stream().map(review ->
                 ReviewResponseDto.MyPageReviewDto.builder()
+                        .placeId(review.getStore().getKakaoPlaceId())
                         .storeName(review.getStore().getPlaceName())
                         .reviewPreview(ReviewConverter.toReviewPreviewDto(review))
                         .build()
@@ -62,9 +62,9 @@ public class ReviewService {
 
     // 리뷰 생성 API
     @Transactional
-    public Review createReview(Long storeId, Member member, List<MultipartFile> files, ReviewRequestDto request) {
+    public Review createReview(Long placeId, Member member, List<MultipartFile> files, ReviewRequestDto request) {
 
-        Store store = storeRepository.findByKakaoPlaceId(storeId).orElseThrow(() ->
+        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
 
         Review review = Review.builder()
