@@ -82,6 +82,7 @@ public class RecentSearchResponseDto {
         Long recentSearchId;
         SearchType searchType;
         Long placeId;
+        String placeName;
         String query;
     }
 
@@ -92,6 +93,6 @@ public class RecentSearchResponseDto {
     public static class SetResultDto {
 
         Long recentSearchId;
-        LocalDateTime createdAt;
+        LocalDateTime updatedAt;
     }
 }

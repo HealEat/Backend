@@ -1,16 +1,22 @@
 package healeat.server.service;
 
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.StoreHandler;
 import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
+import healeat.server.domain.enums.SearchType;
+import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
+import healeat.server.repository.RecentSearchRepository;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.service.search.*;
 import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.StoreResonseDto;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +26,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
