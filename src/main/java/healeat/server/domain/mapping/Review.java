@@ -69,10 +69,14 @@ public class Review extends BaseEntity {
                 );
 
         Vegetarian vegetarian = member.getVegetarian();
-        currentPurposes.add(vegetarian == Vegetarian.NONE ? null : vegetarian.getDescription());
+        if (vegetarian != Vegetarian.NONE) {
+            currentPurposes.add(vegetarian.getDescription());
+        }
 
         Diet diet = member.getDiet();
-        currentPurposes.add(diet == Diet.NONE ? null : diet.getDescription());
+        if (diet != Diet.NONE) {
+            currentPurposes.add(diet.getDescription());
+        }
 
         // 리뷰 생성 시 전체 평점 계산
         calcTotalByAll();
