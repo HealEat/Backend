@@ -81,7 +81,7 @@ public class RecentSearchResponseDto {
 
         Long recentSearchId;
         SearchType searchType;
-        Long storeId;
+        Long placeId;
         String query;
     }
 

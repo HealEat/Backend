@@ -71,9 +71,9 @@ public class SearchController {
 
     @Operation(summary = "가게 타입 검색 기록 저장 API", description = "'검색 결과 목록에서 가게에 접근'할 때에만 해당 API를" +
             " 사용하시면 됩니다.")
-    @PostMapping("/{storeId}")
+    @PostMapping("/{placeId}")
     public ApiResponse<RecentSearchResponseDto.SetResultDto> saveRecentStore(
-            @AuthenticationPrincipal Member member, @PathVariable Long storeId) {
+            @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
         return ApiResponse.onSuccess(null);
     }

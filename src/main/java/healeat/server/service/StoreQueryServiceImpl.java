@@ -51,13 +51,13 @@ public class StoreQueryServiceImpl {
 
     private final StoreCommandService storeCommandService;
 
-    public StoreHomeDto getStoreHome(Long storeId, Member member) {
+    public StoreHomeDto getStoreHome(Long placeId, Member member) {
 
-        Optional<Store> optionalStore = storeRepository.findByKakaoPlaceId(storeId);
+        Optional<Store> optionalStore = storeRepository.findByKakaoPlaceId(placeId);
 
         Store store;
         if (optionalStore.isEmpty()) {
-            List<SearchResultItem> searchResultItems = searchResultItemRepository.findByPlaceId(storeId);
+            List<SearchResultItem> searchResultItems = searchResultItemRepository.findByPlaceId(placeId);
             if (searchResultItems.isEmpty()) {
                 throw new StoreHandler(ErrorStatus.STORE_NOT_FOUND);
             }
@@ -77,9 +77,9 @@ public class StoreQueryServiceImpl {
         return storeHomeDto;
     }
 
-    public List<DaumImageResponseDto.Document> getStoreDaumImages(Long storeId) {
+    public List<DaumImageResponseDto.Document> getStoreDaumImages(Long placeId) {
 
-        Store store = storeRepository.findByKakaoPlaceId(storeId).orElseThrow(() ->
+        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
 
         return store.getItemDaumImages().stream()
@@ -87,9 +87,9 @@ public class StoreQueryServiceImpl {
                 .toList();
     }
 
-    public Page<Review> getReviewList(Long storeId, Integer page, SortBy sort, String sortOrder) {
+    public Page<Review> getReviewList(Long placeId, Integer page, SortBy sort, String sortOrder) {
 
-        Store store = storeRepository.findByKakaoPlaceId(storeId).orElseThrow(() ->
+        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
 
         if (sort == null) sort = SortBy.DEFAULT;

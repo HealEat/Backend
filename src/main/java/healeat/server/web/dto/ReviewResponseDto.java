@@ -44,7 +44,7 @@ public class ReviewResponseDto {
     @AllArgsConstructor
     public static class MyPageReviewDto {
 
-        private Long storeId;
+        private Long placeId;
         private String storeName;
 
         private ReviewPreviewDto reviewPreview;

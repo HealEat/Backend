@@ -93,6 +93,7 @@ public class Store extends BaseEntity {
         vegetCount = 0;
         dietScore = 0.0f;
         dietCount = 0;
+
         tastyScore = 0.0f;
         cleanScore = 0.0f;
         freshScore = 0.0f;
@@ -141,6 +142,15 @@ public class Store extends BaseEntity {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
     }
 
+    public StoreResonseDto.TotalStatDto getTotalStatDto() {
+        return StoreResonseDto.TotalStatDto.builder()
+                .tastyScore(tastyScore)
+                .cleanScore(cleanScore)
+                .freshScore(freshScore)
+                .nutrScore(nutrScore)
+                .build();
+    }
+
     public StoreResonseDto.IsInDBDto getIsInDBDto() {
         return StoreResonseDto.IsInDBDto.builder()
                 .totalScore(totalScore)
@@ -178,6 +188,7 @@ public class Store extends BaseEntity {
                 .storeId(id)
                 .createdAt(getCreatedAt())
                 .storeInfoDto(getStoreInfoDto())
+                .totalStatDto(getTotalStatDto())
                 .build();
     }
 

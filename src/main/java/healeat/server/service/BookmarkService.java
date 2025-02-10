@@ -31,13 +31,13 @@ public class BookmarkService {
 
     // 북마크를 회원에 저장
     @Transactional
-    public Bookmark saveBookmark(Member member, Long storeId) {
+    public Bookmark saveBookmark(Member member, Long placeId) {
 
-        Optional<Store> optionalStore = storeRepository.findByKakaoPlaceId(storeId);
+        Optional<Store> optionalStore = storeRepository.findByKakaoPlaceId(placeId);
 
         Store store;
         if (optionalStore.isEmpty()) {
-            List<SearchResultItem> searchResultItems = searchResultItemRepository.findByPlaceId(storeId);
+            List<SearchResultItem> searchResultItems = searchResultItemRepository.findByPlaceId(placeId);
             if (searchResultItems.isEmpty()) {
                 throw new StoreHandler(ErrorStatus.STORE_NOT_FOUND);
             }
