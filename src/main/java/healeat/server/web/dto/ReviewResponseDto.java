@@ -45,7 +45,7 @@ public class ReviewResponseDto {
     public static class MyPageReviewDto {
 
         private Long placeId;
-        private String storeName;
+        private String placeName;
 
         private ReviewPreviewDto reviewPreview;
     }

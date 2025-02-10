@@ -33,7 +33,11 @@ public class Review extends BaseEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Builder.Default
-    private List<String> currentPurposes = new ArrayList<>();
+    private List<String> currentDiseases = new ArrayList<>();
+
+    private String currentVeget;
+
+    private String currentDiet;
 
     @Column(length = 300, nullable = false)
     private String body; // 리뷰 내용
@@ -65,24 +69,23 @@ public class Review extends BaseEntity {
         // 현재 멤버의 건강 목적을 리뷰에 저장
         member.getMemberDiseases()
                 .forEach(memberDisease ->
-                        currentPurposes.add(memberDisease.getDisease().getName())
+                        currentDiseases.add(memberDisease.getDisease().getName())
                 );
 
-        Vegetarian vegetarian = member.getVegetarian();
-        if (vegetarian != Vegetarian.NONE) {
-            currentPurposes.add(vegetarian.getDescription());
-        }
+        currentVeget = member.getVegetarian().getDescription();
 
-        Diet diet = member.getDiet();
-        if (diet != Diet.NONE) {
-            currentPurposes.add(diet.getDescription());
-        }
+        currentDiet = member.getDiet().getDescription();
 
         // 리뷰 생성 시 전체 평점 계산
         calcTotalByAll();
 
         // 가게에 업데이트
         store.addScoresByReview(this);
+    }
+
+    public void addImage(ReviewImage image) {
+        reviewImageList.add(image);
+        image.setReview(this);
     }
 
     private void calcTotalByAll() {
@@ -94,6 +97,11 @@ public class Review extends BaseEntity {
     }
 
     public ReviewResponseDto.ReviewerInfo getReviewerInfo() {
+
+        List<String> currentPurposes = new ArrayList<>(currentDiseases);
+        currentPurposes.add(currentVeget);
+        currentPurposes.add(currentDiet);
+
         return ReviewResponseDto.ReviewerInfo.builder()
                 .name(member.getName())
                 .profileImageUrl(member.getProfileImageUrl())

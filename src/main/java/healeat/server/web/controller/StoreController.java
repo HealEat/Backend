@@ -3,8 +3,6 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
-import healeat.server.domain.Store;
-import healeat.server.domain.enums.SortBy;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.BookmarkService;
@@ -15,6 +13,7 @@ import healeat.server.web.dto.*;
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -74,16 +73,16 @@ public class StoreController {
     /**
      * 가게 리뷰
      */
-    @Operation(summary = "특정 가게의 리뷰 페이지 조회 API", description = "리뷰 리스트는 페이징을 포함합니다.")
+    @Operation(summary = "특정 가게의 리뷰 페이지 조회 API", description = "리뷰 리스트는 페이징을 포함합니다." +
+            "동적 정렬 기준 : LATEST(기본) / TOTAL / SICK / VEGET / DIET 를 받아서 리뷰 목록을 조회합니다.")
     @GetMapping("/{placeId}/reviews")
     public ApiResponse<ReviewResponseDto.ReviewPreviewListDto> getReviewList(
             @PathVariable Long placeId,
             @CheckPage @RequestParam Integer page,
-            @RequestParam SortBy sort,
-            @RequestParam String sortOrder) {
+            @RequestBody StoreRequestDto.GetReviewRequestDto request) {
 
-        Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, sort, sortOrder);
-        return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
+//        Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, request);
+        return ApiResponse.onSuccess(/*ReviewConverter.toReviewPreviewListDto(reviewPage)*/null);
     }
 
     @Operation(summary = "특정 가게의 리뷰 작성 API",

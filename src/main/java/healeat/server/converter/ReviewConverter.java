@@ -8,6 +8,7 @@ import healeat.server.web.dto.ReviewResponseDto;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,12 +16,7 @@ public class ReviewConverter {
 
     public static ReviewResponseDto.ReviewPreviewDto toReviewPreviewDto(Review review) {
 
-        Member member = review.getMember();
-        ReviewResponseDto.ReviewerInfo reviewerInfo = ReviewResponseDto.ReviewerInfo.builder()
-                .name(member.getName())
-                .profileImageUrl(member.getProfileImageUrl())
-                .currentPurposes(review.getCurrentPurposes())
-                .build();
+        ReviewResponseDto.ReviewerInfo reviewerInfo = review.getReviewerInfo();
 
         return ReviewResponseDto.ReviewPreviewDto.builder()
                 .reviewerInfo(reviewerInfo)
@@ -28,7 +24,8 @@ public class ReviewConverter {
                 .totalScore(review.getTotalScore())
                 .imageUrls(review.getReviewImageList().stream()
                         .map(ReviewImage::getImageUrl)
-                        .collect(Collectors.toList())) // 이미지 CRUD 구현 필요
+                        .toList()
+                )
                 .body(review.getBody())
                 .createdAt(review.getCreatedAt())
                 .build();
@@ -76,6 +73,4 @@ public class ReviewConverter {
                 .deletedAt(LocalDateTime.now())
                 .build();
     }
-
-
 }

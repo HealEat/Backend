@@ -1,36 +1,17 @@
 package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
-import healeat.server.apiPayload.exception.handler.SortHandler;
 import healeat.server.apiPayload.exception.handler.StoreHandler;
-import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
-import healeat.server.domain.enums.Diet;
-import healeat.server.domain.enums.SortBy;
-import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Bookmark;
-import healeat.server.domain.mapping.Review;
 import healeat.server.domain.search.ItemDaumImage;
-import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.*;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
-import healeat.server.service.search.ApiCallCountService;
-import healeat.server.service.search.SearchFeatureService;
-import healeat.server.service.search.StoreMappingService;
-import healeat.server.service.search.StoreSearchService;
-import healeat.server.validation.annotation.CheckPage;
-import healeat.server.validation.annotation.CheckSizeSum;
-import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 

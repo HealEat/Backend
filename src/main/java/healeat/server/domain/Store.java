@@ -110,19 +110,18 @@ public class Store extends BaseEntity {
 
     public void addScoresByReview(Review newReview) {
 
-        Member member = newReview.getMember();
         Float newReviewTotal = newReview.getTotalScore();
-        if (!member.getMemberDiseases().isEmpty()) {
+        if (!newReview.getCurrentDiseases().isEmpty()) {
             sickScore = (
                     sickScore * sickCount + newReviewTotal) / (sickCount + 1);
             sickCount++;
         }
-        if (member.getVegetarian() != Vegetarian.NONE) {
+        if (!newReview.getCurrentVeget().isEmpty()) {
             vegetScore = (
                     vegetScore * vegetCount + newReviewTotal) / (vegetCount + 1);
             vegetCount++;
         }
-        if (member.getDiet() != Diet.NONE) {
+        if (!newReview.getCurrentDiet().isEmpty()) {
             dietScore = (
                     dietScore * dietCount + newReviewTotal) / (dietCount + 1);
             dietCount++;
@@ -136,6 +135,9 @@ public class Store extends BaseEntity {
         reviewCount++; // 리뷰 수 증가
 
         calcTotalByAll();
+
+        // 연관 관계
+        reviews.add(newReview);
     }
 
     /**
@@ -149,33 +151,20 @@ public class Store extends BaseEntity {
     public void deleteReview(Review review) {
 
         Float reviewTotal = review.getTotalScore();
-        List<String> currentPurposes = review.getCurrentPurposes();
-        if (currentPurposes.contains("체중 감량") || currentPurposes.contains("건강 유지")) {
-            dietScore = (
-                    dietScore * dietCount - reviewTotal) / (dietCount - 1);
-            dietCount--;
-
-            // 보다 쉬운 건강 목적 판별을 위해 뒤에서부터 지워나간다.
-            currentPurposes.remove(currentPurposes.size() - 1);
-        }
-
-        if (currentPurposes.contains("플렉시테리언") || currentPurposes.contains("폴로-페스코") ||
-                currentPurposes.contains("페스코") || currentPurposes.contains("폴로") ||
-                currentPurposes.contains("락토-오보") || currentPurposes.contains("락토") ||
-                currentPurposes.contains("오보") || currentPurposes.contains("비건")) {
-            vegetScore = (
-                    vegetScore * vegetCount - reviewTotal) / (vegetCount - 1);
-            vegetCount--;
-
-            // 보다 쉬운 건강 목적 판별을 위해 뒤에서부터 지워나간다.
-            currentPurposes.remove(currentPurposes.size() - 1);
-        }
-
-        // 남아있는 건강목적이 존재한다면
-        if (!currentPurposes.isEmpty()) {
+        if (!review.getCurrentDiseases().isEmpty()) {
             sickScore = (
                     sickScore * sickCount - reviewTotal) / (sickCount - 1);
             sickCount--;
+        }
+        if (!review.getCurrentVeget().isEmpty()) {
+            vegetScore = (
+                    vegetScore * vegetCount - reviewTotal) / (vegetCount - 1);
+            vegetCount--;
+        }
+        if (!review.getCurrentDiet().isEmpty()) {
+            dietScore = (
+                    dietScore * dietCount - reviewTotal) / (dietCount - 1);
+            dietCount--;
         }
 
         tastyScore = subtractReviewScore(tastyScore, review.getTastyScore());
@@ -185,6 +174,9 @@ public class Store extends BaseEntity {
 
         reviewCount--; // 리뷰 수 감소
 
+        calcTotalByAll();
+
+        // 연관 관계
         reviews.remove(review);
     }
 
