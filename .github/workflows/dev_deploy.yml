@@ -19,7 +19,7 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "BASE_URL=http://healeatapp.com:8080" >> $GITHUB_ENV
+          echo "BASE_URL=https://healeatapp.com" >> $GITHUB_ENV
 
       - name: Make application.yml  # application.yml 파일 생성 및 환경 변수 적용
         run: |
