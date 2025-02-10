@@ -1,6 +1,5 @@
 package healeat.server.converter;
 
-import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
 import healeat.server.domain.mapping.Review;
 import healeat.server.web.dto.ImageResponseDto;
@@ -15,12 +14,7 @@ public class ReviewConverter {
 
     public static ReviewResponseDto.ReviewPreviewDto toReviewPreviewDto(Review review) {
 
-        Member member = review.getMember();
-        ReviewResponseDto.ReviewerInfo reviewerInfo = ReviewResponseDto.ReviewerInfo.builder()
-                .name(member.getName())
-                .profileImageUrl(member.getProfileImageUrl())
-                .currentPurposes(review.getCurrentPurposes())
-                .build();
+        ReviewResponseDto.ReviewerInfo reviewerInfo = review.getReviewerInfo();
 
         return ReviewResponseDto.ReviewPreviewDto.builder()
                 .reviewerInfo(reviewerInfo)
@@ -28,7 +22,8 @@ public class ReviewConverter {
                 .totalScore(review.getTotalScore())
                 .imageUrls(review.getReviewImageList().stream()
                         .map(ReviewImage::getImageUrl)
-                        .collect(Collectors.toList())) // 이미지 CRUD 구현 필요
+                        .toList()
+                )
                 .body(review.getBody())
                 .createdAt(review.getCreatedAt())
                 .build();
@@ -47,6 +42,33 @@ public class ReviewConverter {
                 .totalElements(reviewPage.getTotalElements())
                 .isFirst(reviewPage.isFirst())
                 .isLast(reviewPage.isLast())
+                .build();
+    }
+
+    public static ReviewResponseDto.ReviewImageDtoList toReviewImageDtoList(Page<ReviewImage> reviewImagePage) {
+
+        List<ReviewResponseDto.ReviewImageDto> reviewImageDtoList = reviewImagePage.stream()
+                .map(ReviewConverter::toReviewImageDto)
+                .toList();
+
+        return ReviewResponseDto.ReviewImageDtoList.builder()
+                .reviewImageDtoList(reviewImageDtoList)
+                .listSize(reviewImageDtoList.size())
+                .totalPage(reviewImagePage.getTotalPages())
+                .totalElements(reviewImagePage.getTotalElements())
+                .isFirst(reviewImagePage.isFirst())
+                .isLast(reviewImagePage.isLast())
+                .build();
+    }
+
+    public static ReviewResponseDto.ReviewImageDto toReviewImageDto(ReviewImage reviewImage) {
+
+        Review review = reviewImage.getReview();
+
+        return ReviewResponseDto.ReviewImageDto.builder()
+                .reviewId(review.getId())
+                .imageUrl(reviewImage.getImageUrl())
+                .reviewerInfo(review.getReviewerInfo())
                 .build();
     }
 
@@ -76,6 +98,4 @@ public class ReviewConverter {
                 .deletedAt(LocalDateTime.now())
                 .build();
     }
-
-
 }

@@ -1,4 +1,4 @@
-package healeat.server.web.controller;
+package healeat.server.web.controller.authController;
 
 import healeat.server.service.AppleAuthService;
 import healeat.server.web.dto.AppleTokenResponse;

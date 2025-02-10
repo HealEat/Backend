@@ -24,4 +24,8 @@ public class ReviewImage extends BaseEntity {
 
     @Column(nullable = false)
     private String imageUrl; // 이미지 파일 경로
+
+    public void setReview(Review review) {
+        this.review = review;
+    }
 }

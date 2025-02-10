@@ -31,7 +31,11 @@ public class QReview extends EntityPathBase<Review> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final ListPath<String, StringPath> currentPurposes = this.<String, StringPath>createList("currentPurposes", String.class, StringPath.class, PathInits.DIRECT2);
+    public final StringPath currentDiet = createString("currentDiet");
+
+    public final ListPath<String, StringPath> currentDiseases = this.<String, StringPath>createList("currentDiseases", String.class, StringPath.class, PathInits.DIRECT2);
+
+    public final StringPath currentVeget = createString("currentVeget");
 
     public final NumberPath<Float> freshScore = createNumber("freshScore", Float.class);
 

@@ -39,7 +39,7 @@ public class SearchController {
                     Request Body에
                     1. 검색어, 사용자 x, y, 검색 기준(ACCURACY / DISTANCE) << DISTANCE의 경우 x와 y 필수
                     2. 필터 조건 : 음식 종류/특징 키워드 id 리스트, 최소 별점
-                    3. 동적 정렬 기준 : NONE(기본순) / TOTAL / SICK / VEGET / DIET 를 받아서 가게 목록을 조회합니다.
+                    3. 동적 정렬 기준 : NONE(기본) / TOTAL / SICK / VEGET / DIET 를 받아서 가게 목록을 조회합니다.
                     
                     위치 또는 반경의 200m 내 오차까지 동일한 캐시에서 반환됩니다.""")
     @PostMapping
@@ -59,12 +59,11 @@ public class SearchController {
     @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
     @GetMapping("/recent")
     public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
-            @AuthenticationPrincipal Member member,
-            @CheckPage @RequestParam(name = "page") Integer page
+            @AuthenticationPrincipal Member member
     ) {
 
         Member testMember = memberRepository.findById(999L).get();
-        Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId(), page);
+        Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId());
 
         return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }

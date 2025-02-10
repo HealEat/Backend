@@ -1,9 +1,11 @@
 package healeat.server.web.dto;
 
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 import java.util.List;
@@ -18,6 +20,17 @@ public class StoreRequestDto {
         String y; // 추천받을 위치 위도
 
         Integer radius; // 조사할 반경
+    }
+
+    @Getter
+    public static class GetReviewRequestDto {
+
+        @Pattern(regexp = "^(LATEST|TOTAL)$", message = "정렬 기준이 올바르지 않습니다")
+        String sortBy;
+
+        @Size(max = 3, message = "필터는 최대 3개까지 선택할 수 있습니다")
+        @Valid
+        List<@Pattern(regexp = "^(SICK|VEGET|DIET)$", message = "필터 기준이 올바르지 않습니다") String> filters;
     }
 
     @Getter
@@ -41,20 +54,5 @@ public class StoreRequestDto {
 
         @Pattern(regexp = "^(NONE|TOTAL|SICK|VEGET|DIET)$", message = "정렬 기준이 올바르지 않습니다")
         String sortBy;
-    }
-
-    @Getter
-    public static class ForSaveStoreDto {
-
-        String placeId;
-        String placeName;
-        String categoryName;
-        String phone;
-        String addressName;
-        String roadAddressName;
-        String x;
-        String y;
-        String placeUrl;
-        List<DaumImageResponseDto.Document> daumImgDocuments; // Daum 이미지 API
     }
 }

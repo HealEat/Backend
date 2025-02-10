@@ -1,4 +1,4 @@
-package healeat.server.web.controller;
+package healeat.server.web.controller.authController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.io.IOException;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -35,7 +34,7 @@ public class AuthController {
     }
 
     @Operation(summary = "로그아웃", description = "사용자를 로그아웃하고 세션을 무효화")
-    @ApiResponse(responseCode = "200", description = "로그아웃 성공 응답",
+    @ApiResponse(responseCode = "200",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = LogoutResponse.class)))
     @PostMapping("/logout")
