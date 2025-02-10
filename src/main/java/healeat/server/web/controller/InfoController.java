@@ -63,6 +63,15 @@ public class InfoController {
         return ApiResponse.onSuccess(responseDto);
     }
 
+    /*
+    @Operation(summary = "질환 정보 CSV 저장 API", description = "disease_names.csv 파일 수정 시 사용")
+    @PostMapping("/disease/upload")
+    public ApiResponse<Void> uploadDiseases(@RequestParam String filePath) {
+        memberService.saveDiseasesFromCSV(filePath);
+        return ApiResponse.onSuccess(null);
+    }
+    */
+
     @Operation(summary = "베지테리언 선택 API")
     @PatchMapping("/veget")
     public ApiResponse<ChooseResultDto> chooseVegetarian(

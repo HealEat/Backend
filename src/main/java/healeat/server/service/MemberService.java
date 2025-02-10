@@ -12,14 +12,23 @@ import healeat.server.repository.MemberRepository;
 import healeat.server.web.dto.MemberDiseaseResponseDto;
 import healeat.server.web.dto.MemberProfileRequestDto;
 import healeat.server.web.dto.MemberProfileResponseDto;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -82,23 +91,76 @@ public class MemberService {
     @Transactional
     public MemberDiseaseResponseDto saveDiseasesToMember(Member member, List<Long> diseaseIds) {
 
-        List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
-        // 기존 질병 데이터 삭제
-        memberDiseaseRepository.deleteAllByMember(member);
-        // 새로운 질병 데이터 추가
-        List<MemberDisease> newMemberDiseases = diseases.stream()
-                .map(disease -> MemberDisease.builder()
-                        .member(member)
-                        .disease(disease)
-                        .build())
-                .collect(Collectors.toList());
-        // 새로운 데이터 저장
-        memberDiseaseRepository.saveAll(newMemberDiseases);
-        // 최신 질병 목록 가져오기
-        List<MemberDiseaseResponseDto.DiseaseInfo> diseaseInfoList = newMemberDiseases.stream()
+        // 현재 회원의 기존 질병 목록 조회
+        List<MemberDisease> existingMemberDiseases = memberDiseaseRepository.findByMember(member);
+        // 기존 질병 ID 목록
+        Set<Long> existingDiseaseIds = existingMemberDiseases.stream()
+                .map(md -> md.getDisease().getId())
+                .collect(Collectors.toSet());
+        // 추가할 질병 목록 (새로운 ID만 추가)
+        List<Disease> newDiseases = diseaseRepository.findAllById(diseaseIds)
+                .stream()
+                .filter(disease -> !existingDiseaseIds.contains(disease.getId())) // 기존에 없는 질병만 추가
+                .toList();
+        // 삭제할 질병 목록 (기존에는 있었지만 새로운 리스트에는 없는 경우 삭제)
+        List<MemberDisease> diseasesToRemove = existingMemberDiseases.stream()
+                .filter(md -> !diseaseIds.contains(md.getDisease().getId()))
+                .toList();
+        // 삭제할 질병 제거
+        if (!diseasesToRemove.isEmpty()) {
+            memberDiseaseRepository.deleteAll(diseasesToRemove);
+        }
+        // 새로운 질병 추가
+        if (!newDiseases.isEmpty()) {
+            List<MemberDisease> newMemberDiseases = newDiseases.stream()
+                    .map(disease -> MemberDisease.builder()
+                            .member(member)
+                            .disease(disease)
+                            .build())
+                    .toList();
+            memberDiseaseRepository.saveAll(newMemberDiseases);
+        }
+        // 최신 질병 목록 반환
+        List<MemberDiseaseResponseDto.DiseaseInfo> updatedDiseaseInfoList = memberDiseaseRepository.findByMember(member)
+                .stream()
                 .map(md -> new MemberDiseaseResponseDto.DiseaseInfo(md.getDisease().getId(), md.getDisease().getName()))
-                .collect(Collectors.toList());
+                .toList();
 
-        return MemberDiseaseResponseDto.from(member.getId(), diseaseInfoList);
+        return MemberDiseaseResponseDto.from(member.getId(), updatedDiseaseInfoList);
+    }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+    // disease_names.csv 파일 읽어서 DB 저장
+    @Transactional
+    public void saveDiseasesFromCSV(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            // member_disease 테이블의 데이터 삭제
+            memberDiseaseRepository.deleteAll();
+            memberDiseaseRepository.flush();
+            // 기존 질병 데이터 전체 삭제
+            diseaseRepository.deleteAll();
+            diseaseRepository.flush();
+            // AUTO_INCREMENT 값 초기화
+            entityManager.createNativeQuery("ALTER TABLE disease AUTO_INCREMENT = 1").executeUpdate();
+            List<Disease> diseaseList = new ArrayList<>();
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    diseaseList.add(Disease.builder().name(line).build());
+                }
+            }
+            // 새로운 질병명 목록 저장
+            if(!diseaseList.isEmpty()) {
+                diseaseRepository.saveAll(diseaseList);
+            }
+            System.out.println("CSV 데이터가 성공적으로 저장되었습니다.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("CSV 파일을 읽는 중 오류 발생: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("데이터 저장 중 오류 발생: " + e.getMessage(), e);
+        }
     }
 }
