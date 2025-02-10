@@ -2,6 +2,8 @@ package healeat.server.domain.mapping;
 
 import healeat.server.domain.*;
 import healeat.server.domain.common.BaseEntity;
+import healeat.server.domain.enums.Diet;
+import healeat.server.domain.enums.Vegetarian;
 import healeat.server.web.dto.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -61,17 +63,26 @@ public class Review extends BaseEntity {
     public void initializeReviewAndStore() {
 
         // 현재 멤버의 건강 목적을 리뷰에 저장
-        for(MemberDisease memberDisease : member.getMemberDiseases()) {
-            currentPurposes.add(memberDisease.getDisease().getName());
+        member.getMemberDiseases()
+                .forEach(memberDisease ->
+                        currentPurposes.add(memberDisease.getDisease().getName())
+                );
+
+        Vegetarian vegetarian = member.getVegetarian();
+        if (vegetarian != Vegetarian.NONE) {
+            currentPurposes.add(vegetarian.getDescription());
         }
-        currentPurposes.add(member.getVegetarian().toString());
-        currentPurposes.add(member.getDiet().toString());
+
+        Diet diet = member.getDiet();
+        if (diet != Diet.NONE) {
+            currentPurposes.add(diet.getDescription());
+        }
 
         // 리뷰 생성 시 전체 평점 계산
         calcTotalByAll();
 
         // 가게에 업데이트
-        store.updateScoresByReview(this);
+        store.addScoresByReview(this);
     }
 
     private void calcTotalByAll() {

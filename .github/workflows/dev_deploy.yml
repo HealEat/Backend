@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # OS환경
+    runs-on: ubuntu-latest # OS 환경
 
     steps:
       - uses: actions/checkout@v3  # 저장소 코드 체크아웃
@@ -17,11 +17,28 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Make application.yml  # application.yml 파일 생성
+      - name: Set environment variables
+        run: |
+          echo "BASE_URL=https://healeatapp.com" >> $GITHUB_ENV
+
+      - name: Make application.yml  # application.yml 파일 생성 및 환경 변수 적용
         run: |
           cd ./src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          cat ./application.yml | envsubst > ./application.yml.tmp && mv ./application.yml.tmp ./application.yml
         shell: bash
+
+      - name: Decode and Save Apple Auth Key  # 🔹 GitHub Secrets에서 `.p8` 파일 복원
+        run: echo "${{ secrets.APPLE_AUTH_KEY }}" | base64 --decode > src/main/resources/AuthKey_22ZPPCRN8T.p8
+
+
+      # 🔹 `.p8` 파일이 제대로 생성되었는지 확인하는 디버깅 스텝
+      - name: Check Current Directory
+        run: pwd  # 현재 디렉토리 확인
+
+      - name: List Files in Resources Directory
+        run: ls -l src/main/resources/  # `.p8` 파일이 정상적으로 생성되었는지 확인
+
 
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
         run: chmod +x gradlew
@@ -29,8 +46,17 @@ jobs:
       - name: Clean and Build with Gradle  # Gradle clean build 실행
         uses: gradle/gradle-build-action@v3
         with:
-          arguments: clean build
+          arguments: clean build --stacktrace --info --scan  # 🔹 자세한 로그 출력
           cache-read-only: false  # Gradle 빌드 캐시 활성화 (빌드 속도 최적화)
+
+
+      - name: Upload Test Report  # 🔹 테스트 리포트 업로드
+        if: failure()  # 테스트 실패 시에만 실행
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: build/reports/tests/test/
+
 
       - name: Upload build artifact  # 빌드된 아티팩트 업로드
         uses: actions/upload-artifact@v4
@@ -39,7 +65,8 @@ jobs:
           path: build/libs/*.jar
 
   deploy:
-    needs: build  # build 작업이 성공적으로 완료된 후 실행
+    needs: build
+    if: success()  # 🔹 빌드 성공 시에만 실행되도록 추가
     runs-on: ubuntu-latest
 
     steps:

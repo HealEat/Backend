@@ -65,7 +65,7 @@ public class RecentSearchService {
     }
 
     @Transactional
-    public RecentSearchResponseDto.SetResultDto saveRecentStore(Member member, Long storeId) {
+    public RecentSearchResponseDto.SetResultDto saveRecentStore(Member member, Long placeId) {
 
         return null;
     }
