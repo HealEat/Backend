@@ -100,4 +100,9 @@ public class Review extends BaseEntity {
                 .currentPurposes(currentPurposes)
                 .build();
     }
+
+    public void addImage(ReviewImage reviewImage) {
+        this.reviewImageList.add(reviewImage);
+        reviewImage.setReview(this);
+    }
 }

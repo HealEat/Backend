@@ -133,7 +133,7 @@ public class ReviewService {
 
         List<ReviewImage> reviewImageList = new ArrayList<>();
 
-        if(!files.isEmpty()){
+        if(!(files == null || files.isEmpty())){
             if (files.size() > 10) {
                 throw new ReviewHandler(ErrorStatus.REVIEW_TOO_MANY_IMAGES);
             }
@@ -146,13 +146,12 @@ public class ReviewService {
                         .imageUrl(uploadFileUrl)
                         .build();
 
-                reviewImageList.add(reviewImage);
+                review.addImage(reviewImage);
                 reviewImageRepository.save(reviewImage);
             }
         }
 
-        review.updateReviewImageList(reviewImageList);
-        return reviewRepository.save(review);
+        return review;
     }
 
     /*

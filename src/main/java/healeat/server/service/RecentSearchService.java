@@ -25,21 +25,19 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Validated
 public class RecentSearchService {
 
     private final RecentSearchRepository recentSearchRepository;
     private final MemberRepository memberRepository;
 
-    public Page<RecentSearch> getRecentSearchPage(Long memberId, @CheckPage Integer page) {
+    public Page<RecentSearch> getRecentSearchPage(Long memberId) {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        // 프론트 입장에서 1 로 입력하면 첫 페이지가 나올 수 있도록
-        int safePage = Math.max(0, page - 1);
+        // 프론트는 생성일 기준으로 20개의 최근 검색 기록을 가져간다.
         Page<RecentSearch> recentSearchPage = recentSearchRepository
-                .findAllByMember(member, PageRequest.of(safePage, 20, Sort.by(Sort.Direction.DESC, "createdAt")));
+                .findAllByMember(member, PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt")));
 
         return recentSearchPage;
     }
