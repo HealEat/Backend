@@ -45,7 +45,6 @@ import static healeat.server.web.dto.StoreResonseDto.*;
 public class StoreQueryServiceImpl {
 
     private final StoreRepository storeRepository;
-    private final ReviewRepository reviewRepository;
     private final SearchResultItemRepository searchResultItemRepository;
     private final BookmarkRepository bookmarkRepository;
 
@@ -85,50 +84,5 @@ public class StoreQueryServiceImpl {
         return store.getItemDaumImages().stream()
                 .map(ItemDaumImage::toDocument)
                 .toList();
-    }
-
-    public Page<Review> getReviewList(Long placeId, Integer page, SortBy sort, String sortOrder) {
-
-        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
-                new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
-
-        if (sort == null) sort = SortBy.DEFAULT;
-
-        // 페이지 번호를 0-based로 조정
-        int adjustedPage = Math.max(0, page - 1);
-
-        Sort.Direction direction = getSortDirection(sortOrder);
-
-        Sort sorting;
-        PageRequest pageable;
-
-        switch (sort) {
-            case SICK:
-                sorting = Sort.by(direction, "totalScore", "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_MemberDiseasesNotEmpty(store, pageable);
-            case VEGET:
-                sorting = Sort.by(direction, "totalScore", "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_Vegetarian(store, Vegetarian.NONE, pageable);
-            case DIET:
-                sorting = Sort.by(direction, "totalScore", "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStoreAndMember_Diet(store, Diet.NONE, pageable);
-            case DEFAULT: // 기본은 최신 순
-                sorting = Sort.by(direction, "createdAt");
-                pageable = PageRequest.of(adjustedPage, 10, sorting);
-                return reviewRepository.findAllByStore(store, pageable);
-            default:
-                throw new SortHandler(ErrorStatus.SORT_NOT_FOUND);
-        }
-    }
-
-    private Sort.Direction getSortDirection(String sortOrder) {
-        if ("asc".equalsIgnoreCase(sortOrder)) {
-            return Sort.Direction.ASC;
-        } else {
-            return Sort.Direction.DESC;
-        }
     }
 }

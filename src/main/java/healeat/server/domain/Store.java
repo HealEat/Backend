@@ -104,11 +104,11 @@ public class Store extends BaseEntity {
      * 새로운 리뷰에 의한
      * 가게 평점 업데이트
      */
-    private float updateScore(float currentScore, float newScore) {
+    private float addReviewScore(float currentScore, float newScore) {
         return (currentScore * reviewCount + newScore) / (reviewCount + 1);
     }
 
-    public void updateScoresByReview(Review newReview) {
+    public void addScoresByReview(Review newReview) {
 
         Member member = newReview.getMember();
         Float newReviewTotal = newReview.getTotalScore();
@@ -128,14 +128,64 @@ public class Store extends BaseEntity {
             dietCount++;
         }
 
-        tastyScore = updateScore(tastyScore, newReview.getTastyScore());
-        cleanScore = updateScore(cleanScore, newReview.getCleanScore());
-        freshScore = updateScore(freshScore, newReview.getFreshScore());
-        nutrScore = updateScore(nutrScore, newReview.getNutrScore());
+        tastyScore = addReviewScore(tastyScore, newReview.getTastyScore());
+        cleanScore = addReviewScore(cleanScore, newReview.getCleanScore());
+        freshScore = addReviewScore(freshScore, newReview.getFreshScore());
+        nutrScore = addReviewScore(nutrScore, newReview.getNutrScore());
 
         reviewCount++; // 리뷰 수 증가
 
         calcTotalByAll();
+    }
+
+    /**
+     * 리뷰 삭제에 의한
+     * 가게 평점 업데이트
+     */
+    private float subtractReviewScore(float currentScore, float newScore) {
+        return (currentScore * reviewCount - newScore) / (reviewCount - 1);
+    }
+
+    public void deleteReview(Review review) {
+
+        Float reviewTotal = review.getTotalScore();
+        List<String> currentPurposes = review.getCurrentPurposes();
+        if (currentPurposes.contains("체중 감량") || currentPurposes.contains("건강 유지")) {
+            dietScore = (
+                    dietScore * dietCount - reviewTotal) / (dietCount - 1);
+            dietCount--;
+
+            // 보다 쉬운 건강 목적 판별을 위해 뒤에서부터 지워나간다.
+            currentPurposes.remove(currentPurposes.size() - 1);
+        }
+
+        if (currentPurposes.contains("플렉시테리언") || currentPurposes.contains("폴로-페스코") ||
+                currentPurposes.contains("페스코") || currentPurposes.contains("폴로") ||
+                currentPurposes.contains("락토-오보") || currentPurposes.contains("락토") ||
+                currentPurposes.contains("오보") || currentPurposes.contains("비건")) {
+            vegetScore = (
+                    vegetScore * vegetCount - reviewTotal) / (vegetCount - 1);
+            vegetCount--;
+
+            // 보다 쉬운 건강 목적 판별을 위해 뒤에서부터 지워나간다.
+            currentPurposes.remove(currentPurposes.size() - 1);
+        }
+
+        // 남아있는 건강목적이 존재한다면
+        if (!currentPurposes.isEmpty()) {
+            sickScore = (
+                    sickScore * sickCount - reviewTotal) / (sickCount - 1);
+            sickCount--;
+        }
+
+        tastyScore = subtractReviewScore(tastyScore, review.getTastyScore());
+        cleanScore = subtractReviewScore(cleanScore, review.getCleanScore());
+        freshScore = subtractReviewScore(freshScore, review.getFreshScore());
+        nutrScore = subtractReviewScore(nutrScore, review.getNutrScore());
+
+        reviewCount--; // 리뷰 수 감소
+
+        reviews.remove(review);
     }
 
     private void calcTotalByAll() {
