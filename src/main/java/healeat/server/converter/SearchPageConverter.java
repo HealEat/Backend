@@ -90,7 +90,7 @@ public class SearchPageConverter {
             return RecentSearchResponseDto.RecentSearchDto.builder()
                     .recentSearchId(recentSearch.getId())
                     .searchType(recentSearch.getSearchType())
-                    .storeId(recentSearch.getStore().getId())
+                    .placeId(recentSearch.getStore().getKakaoPlaceId())
                     .build();
         }
         // searchType = QUERY

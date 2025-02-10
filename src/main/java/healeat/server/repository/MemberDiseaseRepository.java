@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface MemberDiseaseRepository extends JpaRepository<MemberDisease, Long> {
     List<MemberDisease> deleteAllByMember(Member member);
-    List<MemberDisease> findByMember(Member member);
 }
