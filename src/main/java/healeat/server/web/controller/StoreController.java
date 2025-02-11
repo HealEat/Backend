@@ -14,10 +14,12 @@ import healeat.server.web.dto.*;
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,7 @@ import static healeat.server.converter.BookmarkConverter.toSetResponseDto;
 @RestController
 @RequestMapping("/stores")
 @RequiredArgsConstructor
+@Validated
 public class StoreController {
 
     private final StoreQueryServiceImpl storeQueryServiceImpl;
@@ -89,7 +92,7 @@ public class StoreController {
     public ApiResponse<ReviewResponseDto.ReviewPreviewListDto> getReviewList(
             @PathVariable Long placeId,
             @CheckPage @RequestParam Integer page,
-            @RequestBody StoreRequestDto.GetReviewRequestDto request) {
+            @Valid @RequestBody StoreRequestDto.GetReviewRequestDto request) {
 
         Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, request);
         return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
@@ -103,6 +106,7 @@ public class StoreController {
             @AuthenticationPrincipal Member member,
             @RequestPart(name = "files", required = false)
             List<MultipartFile> files,
+            @Valid
             @RequestPart(name = "request", required = true)
             ReviewRequestDto request) {
 

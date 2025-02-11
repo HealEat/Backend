@@ -60,36 +60,43 @@ public class RecentSearchService {
     public void saveRecentQuery(Member member, String query) {
 
         Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndQuery(member, query);
-        optionalRecentSearch.ifPresent(recentSearch ->
-                recentSearch.setUpdatedAt(LocalDateTime.now())); // 필드 수정 없이 updatedAt만 갱신
+        if (optionalRecentSearch.isPresent()) {
+                optionalRecentSearch.get().setUpdatedAt(LocalDateTime.now()); // 필드 수정 없이 updatedAt만 갱신
+        } else {
 
-        RecentSearch recentSearch = RecentSearch.builder()
-                .member(member)
-                .searchType(SearchType.QUERY)
-                .store(null)
-                .query(query)
-                .build();
+            RecentSearch recentSearch = RecentSearch.builder()
+                    .member(member)
+                    .searchType(SearchType.QUERY)
+                    .store(null)
+                    .query(query)
+                    .build();
 
-        recentSearchRepository.save(recentSearch);
+            recentSearchRepository.save(recentSearch);
+        }
     }
 
     @Transactional
     public RecentSearch saveRecentStore(Member member, Long placeId) {
 
         Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndId(member, placeId);
-        optionalRecentSearch.ifPresent(recentSearch ->
-                recentSearch.setUpdatedAt(LocalDateTime.now())); // 필드 수정 없이 updatedAt만 갱신
+        if (optionalRecentSearch.isPresent()) {
 
-        Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
-                new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
+            RecentSearch recentSearch = optionalRecentSearch.get();
+            recentSearch.setUpdatedAt(LocalDateTime.now()); // 필드 수정 없이 updatedAt만 갱신
+            return recentSearch;
+        } else {
 
-        RecentSearch recentStore = RecentSearch.builder()
-                .searchType(SearchType.STORE)
-                .member(member)
-                .store(store)
-                .build();
+            Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
+                    new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
 
-        return recentSearchRepository.save(recentStore);
+            RecentSearch recentStore = RecentSearch.builder()
+                    .searchType(SearchType.STORE)
+                    .member(member)
+                    .store(store)
+                    .build();
+
+            return recentSearchRepository.save(recentStore);
+        }
     }
 
     //최근 검색 기록 삭제

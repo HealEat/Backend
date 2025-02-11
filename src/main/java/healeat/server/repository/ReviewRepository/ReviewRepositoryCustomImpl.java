@@ -47,10 +47,10 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         // 기본은 최신 순
         OrderSpecifier<?> dynamicOrder = review.createdAt.desc();
         if (sortBy.equals("DESC")) {
-            dynamicOrder = review.totalScore.desc();
+            dynamicOrder = review.healthScore.desc();
         }
         else if (sortBy.equals("ASC")) {
-            dynamicOrder = review.totalScore.asc();
+            dynamicOrder = review.healthScore.asc();
         }
 
         List<Review> reviews = queryFactory

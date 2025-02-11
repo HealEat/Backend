@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class AnswerRequestDto {
 
     List<String> selectedAnswers;

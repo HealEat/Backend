@@ -63,7 +63,7 @@ public class QStore extends EntityPathBase<Store> {
 
     public final NumberPath<Float> tastyScore = createNumber("tastyScore", Float.class);
 
-    public final NumberPath<Float> totalScore = createNumber("totalScore", Float.class);
+    public final NumberPath<Float> totalHealthScore = createNumber("totalHealthScore", Float.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;

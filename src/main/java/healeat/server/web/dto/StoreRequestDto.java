@@ -1,6 +1,5 @@
 package healeat.server.web.dto;
 
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

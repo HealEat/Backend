@@ -74,10 +74,9 @@ public class StoreResponseDto {
         // 가게 공통 정보
         StoreInfoDto storeInfoDto;
 
-        // 최근 사진 한 장
-        ReviewResponseDto.ReviewImageDto reviewImageDto;
-        // Daum 사진 한 장
-        DaumImageResponseDto.Document daumDocument;
+        // 리뷰 사진 또는 Daum 사진 한 장
+        // StoreThumnail 데이터가 존재한다면 그것을 우선함.
+        String imageUrl;
 
         // Store 필요
         IsInDBDto isInDBDto;
@@ -91,7 +90,7 @@ public class StoreResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class IsInDBDto {
-        Float totalScore;
+        Float totalHealthScore;
         Integer reviewCount;
         Float sickScore;
         Integer sickCount;

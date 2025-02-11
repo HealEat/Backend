@@ -19,7 +19,7 @@ public class ReviewConverter {
         return ReviewResponseDto.ReviewPreviewDto.builder()
                 .reviewerInfo(reviewerInfo)
                 .reviewId(review.getId())
-                .totalScore(review.getTotalScore())
+                .totalScore(review.getHealthScore())
                 .imageUrls(review.getReviewImageList().stream()
                         .map(ReviewImage::getImageUrl)
                         .toList()
