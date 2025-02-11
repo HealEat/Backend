@@ -57,8 +57,8 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
                 .fetch();
 
         // 전체 카운트 쿼리
-        Long totalCount = Optional.ofNullable(queryFactory
-                        .select(searchResultItem.count())
+        Long totalCount = Optional.ofNullable(
+                queryFactory.select(searchResultItem.count())
                         .from(searchResultItem)
                         .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
                         .where(whereClause)

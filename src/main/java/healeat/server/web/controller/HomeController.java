@@ -23,9 +23,10 @@ public class HomeController {
     @Operation(summary = "홈 화면에서 추천 가게 리스트를 조회합니다.", description =
             """ 
                     Request Body에
-                    사용자 x, y, 조사할 반경(radius)를 받아서 추천 가게 목록을 조회합니다.
+                      - 사용자 x, y, 조사할 반경(radius)를 받아서 추천 가게 목록을 조회합니다.
                     
-                    위치 또는 반경의 200m 내 오차까지 동일한 캐시에서 반환됩니다.""")
+                    페이징이 적용됩니다.(페이지 당 10개)
+                    동일한 위치(오차 범위 200m 이내) 및 반경(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
     @PostMapping
     public ApiResponse<StoreResonseDto.StorePreviewDtoList> getHomeList(
             @AuthenticationPrincipal Member member,

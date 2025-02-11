@@ -71,7 +71,10 @@ public class ReviewService {
         // 페이지 번호를 0-based로 조정
         int safePage = Math.max(0, page - 1);
 
-        return null;
+        Pageable pageable = PageRequest.of(safePage, 10);
+
+        return reviewRepository.sortAndFilterReviews(
+                store, request.getSortBy(), request.getFilters(), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -85,7 +88,7 @@ public class ReviewService {
 
         Pageable pageable = PageRequest.of(safePage, 10);
 
-        return reviewRepository.getFirstReviewImages(store, pageable);
+        return reviewImageRepository.findAllByReview_StoreOrderByCreatedAtDesc(store, pageable);
     }
 
     // 리뷰 생성 API

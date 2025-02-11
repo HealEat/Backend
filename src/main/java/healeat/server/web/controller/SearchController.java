@@ -41,7 +41,8 @@ public class SearchController {
                     2. 필터 조건 : 음식 종류/특징 키워드 id 리스트, 최소 별점
                     3. 동적 정렬 기준 : NONE(기본) / TOTAL / SICK / VEGET / DIET 를 받아서 가게 목록을 조회합니다.
                     
-                    위치 또는 반경의 200m 내 오차까지 동일한 캐시에서 반환됩니다.""")
+                    페이징이 적용됩니다.(페이지 당 10개)
+                    같은 검색어, 동일한 검색 기준 및 위치(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
     @PostMapping
     public ApiResponse<StoreResonseDto.StorePreviewDtoList> getSearchResults(
             @AuthenticationPrincipal Member member,
@@ -62,6 +63,7 @@ public class SearchController {
             @AuthenticationPrincipal Member member) {
 
         Member testMember = memberRepository.findById(999L).get();
+
         Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId());
 
         return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
@@ -73,8 +75,10 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto.SetResultDto> saveRecentStore(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
+        Member testMember = memberRepository.findById(999L).get();
+
         return ApiResponse.onSuccess(SearchPageConverter.toSetResultDto(
-                recentSearchService.saveRecentStore(member, placeId)));
+                recentSearchService.saveRecentStore(testMember, placeId)));
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")

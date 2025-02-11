@@ -26,7 +26,8 @@ public class TermController {
         return ApiResponse.onSuccess(termService.getTerms());
     }
 
-    @Operation(summary = "사용자 약관 동의 받기 API")
+    @Operation(summary = "사용자 약관 동의 받기 API", description = "서버에서 테스트 멤버를 주입하지 않습니다. " +
+            "실제 로그인 시의 멤버 토큰을 주입해주세요.")
     @PostMapping("/agree")
     public ApiResponse<Void> agreeToTerms(
             @AuthenticationPrincipal Member member,
