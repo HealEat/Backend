@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RecentSearchService {
 
-    private final EntityManager entityManager;
     private final RecentSearchRepository recentSearchRepository;
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
@@ -60,7 +60,8 @@ public class RecentSearchService {
     public void saveRecentQuery(Member member, String query) {
 
         Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndQuery(member, query);
-        optionalRecentSearch.ifPresent(entityManager::refresh); // 필드 수정 없이 updatedAt만 갱신
+        optionalRecentSearch.ifPresent(recentSearch ->
+                recentSearch.setUpdatedAt(LocalDateTime.now())); // 필드 수정 없이 updatedAt만 갱신
 
         RecentSearch recentSearch = RecentSearch.builder()
                 .member(member)
@@ -76,7 +77,8 @@ public class RecentSearchService {
     public RecentSearch saveRecentStore(Member member, Long placeId) {
 
         Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndId(member, placeId);
-        optionalRecentSearch.ifPresent(entityManager::refresh); // 필드 수정 없이 updatedAt만 갱신
+        optionalRecentSearch.ifPresent(recentSearch ->
+                recentSearch.setUpdatedAt(LocalDateTime.now())); // 필드 수정 없이 updatedAt만 갱신
 
         Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
