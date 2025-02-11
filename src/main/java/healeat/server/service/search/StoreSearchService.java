@@ -1,7 +1,6 @@
 package healeat.server.service.search;
 
 import healeat.server.domain.FoodFeature;
-import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.SearchResultRepository;

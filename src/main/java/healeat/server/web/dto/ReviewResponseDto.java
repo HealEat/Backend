@@ -28,7 +28,7 @@ public class ReviewResponseDto {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class myPageReviewListDto {
+    public static class MyPageReviewListDto {
 
         private List<MyPageReviewDto> myPageReviewList;
         private Integer listSize;
@@ -60,7 +60,7 @@ public class ReviewResponseDto {
     public static class SetResultDto {
 
         Long reviewId;
-        int imageCount;
+        Integer imageCount;
         LocalDateTime createdAt;
     }
 

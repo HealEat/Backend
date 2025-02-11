@@ -2,15 +2,19 @@ package healeat.server.service.search;
 
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Member;
+import healeat.server.domain.ReviewImage;
 import healeat.server.domain.Store;
 import healeat.server.domain.mapping.Bookmark;
-import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.domain.search.SearchResultItem;
+import healeat.server.repository.ReviewImageRepository;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
 import healeat.server.repository.StoreRepository;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.service.ReviewService;
+import healeat.server.web.dto.ReviewResponseDto;
+import healeat.server.web.dto.StoreResponseDto;
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
-import healeat.server.web.dto.StoreResonseDto.StorePreviewDto;
+import healeat.server.web.dto.StoreResponseDto.StorePreviewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +30,8 @@ public class StoreMappingService {
 
     private final StoreRepository storeRepository;
     private final DaumImageService daumImageService;
-    private final SearchResultItemRepository searchResultItemRepository;
+    private final ReviewService reviewService;
+    private final ReviewImageRepository reviewImageRepository;
 
     @Transactional
     public SearchResultItem docToSearchResultItem(Document document,
@@ -64,25 +69,41 @@ public class StoreMappingService {
 
         Optional<Store> optionalStore = storeRepository.findByKakaoPlaceId(item.getPlaceId());
         boolean isInDB = optionalStore.isPresent();
+        ReviewResponseDto.ReviewImageDto reviewImageDto = null;
+        DaumImageResponseDto.Document daumDocument = null;
         Store store;
         if (isInDB) {
             store = optionalStore.get();
+            // 리뷰 이미지 최신 하나
+            Optional<ReviewImage> optionalReviewImage =
+                    reviewImageRepository.findFirstByReview_StoreOrderByCreatedAtDesc(store);
+            if (optionalReviewImage.isPresent()) {
+
+                ReviewImage reviewImage = optionalReviewImage.get();
+
+                reviewImageDto = ReviewResponseDto.ReviewImageDto.builder()
+                        .reviewId(reviewImage.getId())
+                        .imageUrl(reviewImage.getImageUrl())
+                        .reviewerInfo(reviewImage.getReview().getReviewerInfo())
+                        .build();
+            }
         } else {
             store = null;
+            // 다음 이미지 제일 앞의 하나
+            daumDocument =
+                    daumImageService.getDaumImagesWithNameInfo(item.getPlaceName(), item.getAddressName())
+                            .get(0);
         }
-        StoreResonseDto.StoreInfoDto storeInfo = item.getStoreInfoDto();
+        StoreResponseDto.StoreInfoDto storeInfo = item.getStoreInfoDto();
 
         return StorePreviewDto.builder()
                 // 가게 공통 정보
                 .storeInfoDto(storeInfo)
 
                 // 최근 리뷰 사진 한 장
-                .reviewImageDto(isInDB ?
-                        /*구현 필요 */ null :
-                        null)
-
-                /// Response 전용 필드
-                .isInDB(isInDB)
+                .reviewImageDto(reviewImageDto)
+                // Daum 사진 한 장
+                .daumDocument(daumDocument)
 
                 /// Store 필요
                 .isInDBDto(isInDB ?

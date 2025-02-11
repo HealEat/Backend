@@ -14,7 +14,6 @@ import healeat.server.web.dto.*;
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -42,7 +41,7 @@ public class StoreController {
     @Operation(summary = "가게 단건 조회 (이미지 제외) API",
             description = "이미지를 제외한 모든 정보를 조회합니다.")
     @GetMapping("/{placeId}")
-    public ApiResponse<StoreResonseDto.StoreHomeDto> getStoreDetails(
+    public ApiResponse<StoreResponseDto.StoreHomeDto> getStoreDetails(
             @PathVariable Long placeId,
             @AuthenticationPrincipal Member member) {
 

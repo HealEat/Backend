@@ -3,16 +3,12 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
-import healeat.server.domain.MemberHealQuestion;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
 import healeat.server.service.ReviewService;
-import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.*;
-import healeat.server.web.dto.HealInfoResponseDto.ChangeBaseResultDto;
-import healeat.server.web.dto.HealInfoResponseDto.ChangeChoiceResultDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import static healeat.server.converter.MemberHealQuestionConverter.*;
 
 @RestController
 @RequestMapping("/my-page")
@@ -63,7 +57,7 @@ public class MyPageController {
     @Operation(summary = "내가 남긴 후기 목록 조회 API",
             description = "내가 작성한 후기 목록을 페이징 처리하여 조회")
     @GetMapping("/reviews")
-    public ApiResponse<ReviewResponseDto.myPageReviewListDto> getMyReviews(
+    public ApiResponse<ReviewResponseDto.MyPageReviewListDto> getMyReviews(
             @AuthenticationPrincipal Member member,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -71,7 +65,7 @@ public class MyPageController {
         Member testMember = memberRepository.findById(999L).get();
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        ReviewResponseDto.myPageReviewListDto responseDto = reviewService.getMyReviews(testMember, pageable);
+        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(testMember, pageable);
 
         return ApiResponse.onSuccess(responseDto);
     }
