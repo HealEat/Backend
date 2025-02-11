@@ -92,9 +92,10 @@ public class StoreController {
     public ApiResponse<ReviewResponseDto.ReviewPreviewListDto> getReviewList(
             @PathVariable Long placeId,
             @CheckPage @RequestParam Integer page,
-            @Valid @RequestBody StoreRequestDto.GetReviewRequestDto request) {
+            @RequestParam(required = false, defaultValue = "LATEST") String sortBy,
+            @RequestParam(required = false) List<String> filters) {
 
-        Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, request);
+        Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, sortBy, filters);
         return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
     }
 
