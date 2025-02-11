@@ -41,8 +41,6 @@ public class QStore extends EntityPathBase<Store> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final ListPath<healeat.server.domain.search.ItemDaumImage, healeat.server.domain.search.QItemDaumImage> itemDaumImages = this.<healeat.server.domain.search.ItemDaumImage, healeat.server.domain.search.QItemDaumImage>createList("itemDaumImages", healeat.server.domain.search.ItemDaumImage.class, healeat.server.domain.search.QItemDaumImage.class, PathInits.DIRECT2);
-
     public final NumberPath<Long> kakaoPlaceId = createNumber("kakaoPlaceId", Long.class);
 
     public final NumberPath<Float> nutrScore = createNumber("nutrScore", Float.class);

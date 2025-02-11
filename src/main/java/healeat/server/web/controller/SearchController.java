@@ -10,11 +10,9 @@ import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.StoreCommandService;
-import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.RecentSearchResponseDto;
-import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.web.dto.StoreRequestDto;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +42,7 @@ public class SearchController {
                     페이징이 적용됩니다.(페이지 당 10개)
                     같은 검색어, 동일한 검색 기준 및 위치(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
     @PostMapping
-    public ApiResponse<StoreResonseDto.StorePreviewDtoList> getSearchResults(
+    public ApiResponse<StoreResponseDto.StorePreviewDtoList> getSearchResults(
             @AuthenticationPrincipal Member member,
             @RequestParam Integer page,
             @Valid @RequestBody StoreRequestDto.SearchKeywordDto request) {

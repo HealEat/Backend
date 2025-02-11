@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class ReviewService {
 
     // 내가 남긴 후기 목록 조회 API
     @Transactional(readOnly = true)
-    public ReviewResponseDto.myPageReviewListDto getMyReviews(Member member, Pageable pageable) {
+    public ReviewResponseDto.MyPageReviewListDto getMyReviews(Member member, Pageable pageable) {
         Page<Review> reviewPage = reviewRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
 
         List<ReviewResponseDto.MyPageReviewDto> reviewsDtoList = reviewPage.stream()
@@ -52,7 +51,7 @@ public class ReviewService {
                 )
                 .toList();
 
-        return ReviewResponseDto.myPageReviewListDto.builder()
+        return ReviewResponseDto.MyPageReviewListDto.builder()
                 .myPageReviewList(reviewsDtoList)
                 .listSize(reviewsDtoList.size())
                 .totalPage(reviewPage.getTotalPages())

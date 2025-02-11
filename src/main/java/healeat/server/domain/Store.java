@@ -1,11 +1,8 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Diet;
-import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
-import healeat.server.domain.search.ItemDaumImage;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -76,13 +73,6 @@ public class Store extends BaseEntity {
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<ItemDaumImage> itemDaumImages = new ArrayList<>();
-
-
-    //==비즈니스 로직==//
-
     @PrePersist
     public void initializeStore() {
         totalScore = 0.0f;
@@ -99,6 +89,8 @@ public class Store extends BaseEntity {
         freshScore = 0.0f;
         nutrScore = 0.0f;
     }
+
+    //==비즈니스 로직==//
 
     /**
      * 새로운 리뷰에 의한
@@ -184,8 +176,10 @@ public class Store extends BaseEntity {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
     }
 
-    public StoreResonseDto.TotalStatDto getTotalStatDto() {
-        return StoreResonseDto.TotalStatDto.builder()
+    //==Dto 변환==//
+
+    public StoreResponseDto.TotalStatDto getTotalStatDto() {
+        return StoreResponseDto.TotalStatDto.builder()
                 .tastyScore(tastyScore)
                 .cleanScore(cleanScore)
                 .freshScore(freshScore)
@@ -193,8 +187,8 @@ public class Store extends BaseEntity {
                 .build();
     }
 
-    public StoreResonseDto.IsInDBDto getIsInDBDto() {
-        return StoreResonseDto.IsInDBDto.builder()
+    public StoreResponseDto.IsInDBDto getIsInDBDto() {
+        return StoreResponseDto.IsInDBDto.builder()
                 .totalScore(totalScore)
                 .reviewCount(reviewCount)
                 .sickScore(sickScore)
@@ -206,11 +200,11 @@ public class Store extends BaseEntity {
                 .build();
     }
 
-    public StoreResonseDto.StoreInfoDto getStoreInfoDto() {
+    public StoreResponseDto.StoreInfoDto getStoreInfoDto() {
 
         String[] categoryWords = categoryName.split(" > ");
 
-        return StoreResonseDto.StoreInfoDto.builder()
+        return StoreResponseDto.StoreInfoDto.builder()
                 .placeId(kakaoPlaceId)
                 .placeName(placeName)
                 .categoryName(categoryWords[categoryWords.length - 1])
@@ -224,37 +218,13 @@ public class Store extends BaseEntity {
                 .build();
     }
 
-    public StoreResonseDto.StoreHomeDto getStoreHomeDto() {
+    public StoreResponseDto.StoreHomeDto getStoreHomeDto() {
 
-        return StoreResonseDto.StoreHomeDto.builder()
+        return StoreResponseDto.StoreHomeDto.builder()
                 .storeId(id)
                 .createdAt(getCreatedAt())
                 .storeInfoDto(getStoreInfoDto())
                 .totalStatDto(getTotalStatDto())
                 .build();
     }
-
-    public void addItemDaumImage(ItemDaumImage itemDaumImage) {
-        itemDaumImages.add(itemDaumImage);
-        itemDaumImage.setStore(this);
-    }
-
-    //    public List<StoreResonseDto.ReviewImagePreviewDto> getReviewImagePreviewDtoList() {
-//        return reviews.stream()
-//                .map(review -> {
-//
-//                    List<ReviewImage> reviewImageList = review.getReviewImageList().stream()
-//                            .sorted(Comparator.comparing(ReviewImage::getCreatedAt).reversed()) // 최신순 정렬
-//                            .toList();
-//
-//                    return StoreResonseDto.ReviewImagePreviewDto.builder()
-//                            .reviewId(review.getId())
-//                            .reviewerInfo(review.getReviewerInfo())
-//                            .firstImageUrl(reviewImageList.isEmpty() ?
-//                                    null :
-//                                    reviewImageList.get(0).getImageUrl())
-//                            .build();
-//                })
-//                .toList();
-//    }
 }

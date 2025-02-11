@@ -63,6 +63,8 @@ public class Review extends BaseEntity {
     @Builder.Default
     private List<ReviewImage> reviewImageList = new ArrayList<>();
 
+    //==비즈니스 로직==//
+
     @PrePersist
     public void initializeReviewAndStore() {
 
@@ -87,9 +89,14 @@ public class Review extends BaseEntity {
         totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
     }
 
-    public void updateReviewImageList(List<ReviewImage> reviewImageList) {
-        this.reviewImageList = reviewImageList;
+    //==연관관계 편의 메서드==//
+
+    public void addImage(ReviewImage reviewImage) {
+        this.reviewImageList.add(reviewImage);
+        reviewImage.setReview(this);
     }
+
+    //==Dto 변환==//
 
     public ReviewResponseDto.ReviewerInfo getReviewerInfo() {
 
@@ -102,10 +109,5 @@ public class Review extends BaseEntity {
                 .profileImageUrl(member.getProfileImageUrl())
                 .currentPurposes(currentPurposes)
                 .build();
-    }
-
-    public void addImage(ReviewImage reviewImage) {
-        this.reviewImageList.add(reviewImage);
-        reviewImage.setReview(this);
     }
 }
