@@ -37,7 +37,7 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
             whereClause.and(searchResultItem.id.in(itemIds));
         }
         if (minRating != null && minRating > 0.0f) {
-            whereClause.and(store.totalScore.goe(minRating));
+            whereClause.and(store.totalHealthScore.goe(minRating));
         }
 
         // '선택 없음'이 아닐 경우 동적 정렬 생성
@@ -86,7 +86,7 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
             case "SICK" -> dynamicOrder = store.sickScore.desc();
             case "VEGET" -> dynamicOrder = store.vegetScore.desc();
             case "DIET" -> dynamicOrder = store.dietScore.desc();
-            default -> dynamicOrder = store.totalScore.desc();
+            default -> dynamicOrder = store.totalHealthScore.desc();
         }
         orderSpecifiers.add(dynamicOrder);
 

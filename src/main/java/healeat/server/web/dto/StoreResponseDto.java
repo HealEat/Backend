@@ -91,7 +91,7 @@ public class StoreResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class IsInDBDto {
-        Float totalScore;
+        Float totalHealthScore;
         Integer reviewCount;
         Float sickScore;
         Integer sickCount;

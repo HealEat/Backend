@@ -10,6 +10,8 @@ import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.StoreCommandService;
+import healeat.server.validation.annotation.CheckPage;
+import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.RecentSearchResponseDto;
 import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.StoreResponseDto;
@@ -18,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/search")
 @RequiredArgsConstructor
+@Validated
 public class SearchController {
 
     private final RecentSearchService recentSearchService;
@@ -38,14 +42,13 @@ public class SearchController {
                     1. 검색어, 사용자 x, y, 검색 기준(ACCURACY / DISTANCE) << DISTANCE의 경우 x와 y 필수
                     2. 필터 조건 : 음식 종류/특징 키워드 id 리스트, 최소 별점
                     3. 동적 정렬 기준 : NONE(기본) / TOTAL / SICK / VEGET / DIET 를 받아서 가게 목록을 조회합니다.
-                    
-                    페이징이 적용됩니다.(페이지 당 10개)
-                    같은 검색어, 동일한 검색 기준 및 위치(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
+                    - 페이징이 적용됩니다.(페이지 당 10개)
+                    - 같은 검색어, 동일한 검색 기준 및 위치(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
     @PostMapping
     public ApiResponse<StoreResponseDto.StorePreviewDtoList> getSearchResults(
             @AuthenticationPrincipal Member member,
-            @RequestParam Integer page,
-            @Valid @RequestBody StoreRequestDto.SearchKeywordDto request) {
+            @CheckPage @RequestParam Integer page,
+            @Valid @CheckSizeSum @RequestBody StoreRequestDto.SearchKeywordDto request) {
 
         Member testMember = memberRepository.findById(999L).get();
 

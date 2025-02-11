@@ -39,6 +39,8 @@ public class QReview extends EntityPathBase<Review> {
 
     public final NumberPath<Float> freshScore = createNumber("freshScore", Float.class);
 
+    public final NumberPath<Float> healthScore = createNumber("healthScore", Float.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final healeat.server.domain.QMember member;
@@ -50,8 +52,6 @@ public class QReview extends EntityPathBase<Review> {
     public final healeat.server.domain.QStore store;
 
     public final NumberPath<Float> tastyScore = createNumber("tastyScore", Float.class);
-
-    public final NumberPath<Float> totalScore = createNumber("totalScore", Float.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;

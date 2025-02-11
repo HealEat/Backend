@@ -16,6 +16,7 @@ import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.StoreResponseDto.StorePreviewDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,6 +78,7 @@ public class StoreMappingService {
             // 리뷰 이미지 최신 하나
             Optional<ReviewImage> optionalReviewImage =
                     reviewImageRepository.findFirstByReview_StoreOrderByCreatedAtDesc(store);
+
             if (optionalReviewImage.isPresent()) {
 
                 ReviewImage reviewImage = optionalReviewImage.get();
@@ -86,13 +88,19 @@ public class StoreMappingService {
                         .imageUrl(reviewImage.getImageUrl())
                         .reviewerInfo(reviewImage.getReview().getReviewerInfo())
                         .build();
+            } else {
+                // 다음 이미지 제일 앞의 하나
+                List<DaumImageResponseDto.Document> documents =
+                        daumImageService.getDaumImagesWithNameInfo(item.getPlaceName(), item.getAddressName());
+                daumDocument = documents.isEmpty() ? null : documents.get(0);
             }
+
         } else {
             store = null;
             // 다음 이미지 제일 앞의 하나
-            daumDocument =
-                    daumImageService.getDaumImagesWithNameInfo(item.getPlaceName(), item.getAddressName())
-                            .get(0);
+            List<DaumImageResponseDto.Document> documents =
+                    daumImageService.getDaumImagesWithNameInfo(item.getPlaceName(), item.getAddressName());
+            daumDocument = documents.isEmpty() ? null : documents.get(0);
         }
         StoreResponseDto.StoreInfoDto storeInfo = item.getStoreInfoDto();
 

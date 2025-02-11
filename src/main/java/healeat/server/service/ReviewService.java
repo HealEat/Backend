@@ -100,6 +100,7 @@ public class ReviewService {
         Review review = Review.builder()
                 .store(store)
                 .member(member)
+                .healthScore(request.getHealthScore())
                 .tastyScore(request.getTastyScore())
                 .cleanScore(request.getCleanScore())
                 .freshScore(request.getFreshScore())
