@@ -62,7 +62,10 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Review> getStoreReviews(Long placeId, Integer page, StoreRequestDto.GetReviewRequestDto request) {
+    public Page<Review> getStoreReviews(Long placeId, Integer page, String sortBy, List<String> filters) {
+
+        if (filters.isEmpty())
+            return Page.empty();
 
         Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
@@ -73,7 +76,7 @@ public class ReviewService {
         Pageable pageable = PageRequest.of(safePage, 10);
 
         return reviewRepository.sortAndFilterReviews(
-                store, request.getSortBy(), request.getFilters(), pageable);
+                store, sortBy, filters, pageable);
     }
 
     @Transactional(readOnly = true)

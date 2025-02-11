@@ -3,6 +3,7 @@ package healeat.server.repository.ReviewRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import healeat.server.domain.Member;
@@ -35,13 +36,13 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         whereClause.and(review.store.eq(store));
 
         if (filters.contains("SICK")) {
-            whereClause.and(review.currentDiseases.isNotEmpty());
+            whereClause.and(Expressions.booleanTemplate("json_length({0}) > 0", review.currentDiseases));
         }
         if (filters.contains("VEGET")) {
-            whereClause.and(review.currentVeget.isNotEmpty());
+            whereClause.and(review.currentVeget.isNotNull().and(review.currentVeget.length().gt(0)));
         }
         if (filters.contains("DIET")) {
-            whereClause.and(review.currentDiet.isNotEmpty());
+            whereClause.and(review.currentDiet.isNotNull().and(review.currentDiet.length().gt(0)));
         }
 
         // 기본은 최신 순
