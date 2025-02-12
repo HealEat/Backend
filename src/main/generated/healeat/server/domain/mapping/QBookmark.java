@@ -31,6 +31,8 @@ public class QBookmark extends EntityPathBase<Bookmark> {
 
     public final healeat.server.domain.QMember member;
 
+    public final NumberPath<Long> placeId = createNumber("placeId", Long.class);
+
     public final healeat.server.domain.QStore store;
 
     //inherited

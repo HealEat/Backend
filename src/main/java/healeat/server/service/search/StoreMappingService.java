@@ -50,9 +50,9 @@ public class StoreMappingService {
     }
 
     public StorePreviewDto mapToDto(Member member, SearchResultItem item) {
-        Long bookmarkId = member == null ? null :
+        Long bookmarkId = (member == null) ? null :
                 member.getBookmarks().stream()
-                        .filter(bookmark -> bookmark.getStore().getId().equals(item.getId()))
+                        .filter(bookmark -> bookmark.getPlaceId().equals(item.getPlaceId()))
                         .map(Bookmark::getId)
                         .findFirst()
                         .orElse(null);
