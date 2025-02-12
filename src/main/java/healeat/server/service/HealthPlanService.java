@@ -14,6 +14,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,12 +45,13 @@ public class HealthPlanService {
     }
 
     // Page 로 나누어서 HealthPlan 조회
-    public Page<HealthPlan> findAllByMember(Member member, Integer page) {
+    public Page<HealthPlan> find10PlansByMemberPage(Member member, Integer page) {
 
         // 3. 페이지 요청 생성
         int safePage = Math.max(0, page - 1);
 
-        return healthPlanRepository.findAllByMember(member, PageRequest.of(safePage, 10));
+        Pageable pageable = PageRequest.of(safePage, 10, Sort.by("createdAt").descending());
+        return healthPlanRepository.findAllByMember(member, pageable);
     }
 
     @Transactional
@@ -120,7 +123,7 @@ public class HealthPlanService {
             throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_TOO_MANY_IMAGES);
         }
 
-        String keyName = amazonS3Manager.generateProfileKeyName();
+        String keyName = amazonS3Manager.generateHealthPlanKeyName();
         String uploadFileUrl = amazonS3Manager.uploadFile(keyName, file);
 
         HealthPlanImage healthPlanImage = HealthPlanImage.builder()

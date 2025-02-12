@@ -40,12 +40,12 @@ public class HealthPlanController {
     @GetMapping
     public ApiResponse<HealthPlanResponseDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member,
-            @CheckPage @RequestParam(defaultValue = "1") Integer page) {
+            @CheckPage @RequestParam Integer page) {
 
         Member testMember = memberRepository.findById(999L).get();
 
         //정상적으로 HealthPlan 조회
-        Page<HealthPlan> healthPlans = healthPlanService.findAllByMember(testMember, page);
+        Page<HealthPlan> healthPlans = healthPlanService.find10PlansByMemberPage(testMember, page);
 
         return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanResponseDto(healthPlans));
     }
