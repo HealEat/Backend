@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,7 +45,7 @@ public class HealthPlanController {
         Member testMember = memberRepository.findById(999L).get();
 
         //정상적으로 HealthPlan 조회
-        Page<HealthPlan> healthPlans = healthPlanService.findAllByMember(testMember, page);
+        Page<HealthPlan> healthPlans = healthPlanService.find10PlansByMemberPage(testMember, page);
 
         return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanResponseDto(healthPlans));
     }
