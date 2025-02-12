@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +55,7 @@ public class MemberService {
 
     // 프로필 수정 API
     @Transactional
-    public Member updateProfile(Member member, MultipartFile file,MemberProfileRequestDto request) {
+    public Member updateProfile(Member member, MultipartFile file, MemberProfileRequestDto request) {
         if (member == null) {
             throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
         }
@@ -91,13 +90,13 @@ public class MemberService {
                         .member(member)
                         .disease(disease)
                         .build())
-                .collect(Collectors.toList());
+                .toList();
         // 새로운 데이터 저장
         memberDiseaseRepository.saveAll(newMemberDiseases);
         // 최신 질병 목록 가져오기
         List<MemberDiseaseResponseDto.DiseaseInfo> diseaseInfoList = newMemberDiseases.stream()
                 .map(md -> new MemberDiseaseResponseDto.DiseaseInfo(md.getDisease().getId(), md.getDisease().getName()))
-                .collect(Collectors.toList());
+                .toList();
 
         return MemberDiseaseResponseDto.from(member.getId(), diseaseInfoList);
     }

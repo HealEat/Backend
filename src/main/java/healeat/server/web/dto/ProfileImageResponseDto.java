@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ProfileImageResponseDto {
-    private Long id;
-    private String profileImageUrl; // 프로필 이미지 URL
+    Long id;
+    String profileImageUrl; // 프로필 이미지 URL
 }

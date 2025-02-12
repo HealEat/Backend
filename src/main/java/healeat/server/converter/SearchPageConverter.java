@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class SearchPageConverter {
@@ -73,20 +72,15 @@ public class SearchPageConverter {
                 .build();
     }
 
-    public static RecentSearchResponseDto toRecentSearchResponseDto(Page<RecentSearch> recentSearches) {
+    public static RecentSearchResponseDto toRecentSearchResponseDto(List<RecentSearch> recentSearches) {
 
         List<RecentSearchResponseDto.RecentSearchDto> recentSearchList = recentSearches.stream()
                 .map(SearchPageConverter::toRecentSearchDto)
-                .collect(Collectors.toList());
+                .toList();
 
 
         return RecentSearchResponseDto.builder()
                 .recentSearchList(recentSearchList)
-                .listSize(recentSearchList.size())
-                .totalPage(recentSearches.getTotalPages())
-                .totalElements(recentSearches.getTotalElements())
-                .isFirst(recentSearches.isFirst())
-                .isLast(recentSearches.isLast())
                 .build();
     }
 
@@ -97,7 +91,7 @@ public class SearchPageConverter {
             return RecentSearchResponseDto.RecentSearchDto.builder()
                     .recentSearchId(recentSearch.getId())
                     .searchType(recentSearch.getSearchType())
-                    .placeId(recentSearch.getStore().getKakaoPlaceId())
+                    .placeId(recentSearch.getPlaceId())
                     .placeName(recentSearch.getStore().getPlaceName())
                     .build();
         }

@@ -2,25 +2,20 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
-import healeat.server.apiPayload.exception.handler.MemberHandler;
-import healeat.server.apiPayload.exception.handler.ReviewHandler;
 import healeat.server.aws.s3.AmazonS3Manager;
-import healeat.server.aws.s3.S3PresignedUploader;
-import healeat.server.aws.s3.S3Uploader;
-import healeat.server.converter.HealthPlanConverter;
 import healeat.server.domain.HealthPlan;
 import healeat.server.domain.HealthPlanImage;
 import healeat.server.domain.Member;
-import healeat.server.domain.ReviewImage;
-import healeat.server.domain.mapping.Review;
 import healeat.server.repository.HealthPlanImageRepository;
 import healeat.server.repository.HealthPlanRepository;
 import healeat.server.web.dto.HealthPlanRequestDto;
-import healeat.server.web.dto.HealthPlanResponseDto;
-import healeat.server.web.dto.ImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -48,18 +39,19 @@ public class HealthPlanService {
 
     /***************************** 건강관리목표를 위한 메서드 *****************************/
 
-    public List<HealthPlan> getAllHealthPlans() {
-        return healthPlanRepository.findAll();
-    }
-
-    //혹시나 필요하면 쓸 getById
     public HealthPlan getHealthPlanById(Long id) {
         return healthPlanRepository.findById(id).orElseThrow(() ->
                 new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
     }
 
-    public List<HealthPlan> getHealthPlanByMember(Member member) {
-        return healthPlanRepository.findByMember(member);
+    // Page 로 나누어서 HealthPlan 조회
+    public Page<HealthPlan> find10PlansByMemberPage(Member member, Integer page) {
+
+        // 3. 페이지 요청 생성
+        int safePage = Math.max(0, page - 1);
+
+        Pageable pageable = PageRequest.of(safePage, 10, Sort.by("createdAt").descending());
+        return healthPlanRepository.findAllByMember(member, pageable);
     }
 
     @Transactional
@@ -131,7 +123,7 @@ public class HealthPlanService {
             throw new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_TOO_MANY_IMAGES);
         }
 
-        String keyName = amazonS3Manager.generateProfileKeyName();
+        String keyName = amazonS3Manager.generateHealthPlanKeyName();
         String uploadFileUrl = amazonS3Manager.uploadFile(keyName, file);
 
         HealthPlanImage healthPlanImage = HealthPlanImage.builder()

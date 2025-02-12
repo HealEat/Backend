@@ -7,17 +7,14 @@ import healeat.server.repository.ReviewImageRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.repository.StoreThumbnailRepository;
 import healeat.server.service.ReviewService;
-import healeat.server.web.dto.ReviewResponseDto;
-import healeat.server.web.dto.StoreResponseDto;
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
-import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
+import healeat.server.web.dto.apiResponse.DaumImageResponseDto;
+import healeat.server.web.dto.apiResponse.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.StoreResponseDto.StorePreviewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -53,9 +50,9 @@ public class StoreMappingService {
     }
 
     public StorePreviewDto mapToDto(Member member, SearchResultItem item) {
-        Long bookmarkId = member == null ? null :
+        Long bookmarkId = (member == null) ? null :
                 member.getBookmarks().stream()
-                        .filter(bookmark -> bookmark.getStore().getId().equals(item.getId()))
+                        .filter(bookmark -> bookmark.getPlaceId().equals(item.getPlaceId()))
                         .map(Bookmark::getId)
                         .findFirst()
                         .orElse(null);

@@ -67,7 +67,7 @@ public class SearchController {
 
         Member testMember = memberRepository.findById(999L).get();
 
-        Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(testMember.getId());
+        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(testMember.getId());
 
         return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }

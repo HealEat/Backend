@@ -12,16 +12,16 @@ import java.util.List;
 @Getter
 @Builder
 public class MemberDiseaseResponseDto {
-    private Long memberId;
-    private List<DiseaseInfo> diseases;
+    Long memberId;
+    List<DiseaseInfo> diseases;
 
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
     @Builder
     public static class DiseaseInfo {
-        private Long id;
-        private String name;
+        Long id;
+        String name;
     }
 
     public static MemberDiseaseResponseDto from(Long memberId, List<DiseaseInfo> diseases) {

@@ -1,17 +1,17 @@
 package healeat.server.web.controller.authController;
 
-import healeat.server.service.AppleAuthService;
-import healeat.server.web.dto.AppleTokenResponse;
+import healeat.server.service.authService.AppleAuthService;
+import healeat.server.web.dto.authResonse.AppleTokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-import healeat.server.web.dto.AppleAuthRequest;
+import healeat.server.web.dto.authResonse.AppleAuthRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import healeat.server.service.AppleTokenService;
+import healeat.server.service.authService.AppleTokenService;
 import healeat.server.user.AppleJwtUtils;
 import healeat.server.repository.MemberRepository;
 import healeat.server.domain.Member;

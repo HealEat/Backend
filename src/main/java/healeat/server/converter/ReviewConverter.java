@@ -94,7 +94,7 @@ public class ReviewConverter {
                 .deletedReviewId(review.getId())
                 .deletedReviewImageUrls(review.getReviewImageList().stream()
                         .map(ReviewImage::getImageUrl)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .deletedAt(LocalDateTime.now())
                 .build();
     }

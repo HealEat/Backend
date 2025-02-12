@@ -15,9 +15,9 @@ import java.util.List;
 @Getter
 public class MemberProfileResponseDto {
 
-    private Long id;
-    private String name;
-    private String profileImage;
+    Long id;
+    String name;
+    String profileImage;
 
     public static MemberProfileResponseDto from(Member member) {
         MemberProfileResponseDto response = new MemberProfileResponseDto();

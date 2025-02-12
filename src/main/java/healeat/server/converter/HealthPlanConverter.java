@@ -3,6 +3,7 @@ package healeat.server.converter;
 import healeat.server.domain.HealthPlan;
 import healeat.server.domain.HealthPlanImage;
 import healeat.server.web.dto.HealthPlanResponseDto;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -28,22 +29,27 @@ public class HealthPlanConverter {
                 .build();
     }
 
-    public static HealthPlanResponseDto.HealthPlanListDto toHealthPlanListDto(List<HealthPlan> healthPlans) {
-        List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanDtoList = healthPlans.stream()
+    public static HealthPlanResponseDto toHealthPlanResponseDto(Page<HealthPlan> healthPlans) {
+
+        List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanOneDtoList = healthPlans.stream()
                 .map(HealthPlanConverter::toHealthPlanOneDto)
-                .collect(Collectors.toList());
+                .toList();
 
-        return  HealthPlanResponseDto.HealthPlanListDto.builder()
-                    .HealthPlanList(healthPlanDtoList)
-                    .build();
-
+        return HealthPlanResponseDto.builder()
+                .HealthPlanList(healthPlanOneDtoList)
+                .listSize(healthPlanOneDtoList.size())
+                .totalPage(healthPlans.getTotalPages())
+                .totalElements(healthPlans.getTotalElements())
+                .isFirst(healthPlans.isFirst())
+                .isLast(healthPlans.isLast())
+                .build();
     }
 
     public static HealthPlanResponseDto.HealthPlanOneDto toHealthPlanOneDto(HealthPlan healthPlan) {
         List<HealthPlanResponseDto.HealthPlanImageResponseDto> healthPlanImages = healthPlan.getHealthPlanImages()
                 .stream()
                 .map(HealthPlanConverter::toHealthPlanImageResponseDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return HealthPlanResponseDto.HealthPlanOneDto.builder()
                 .id(healthPlan.getId())
@@ -62,7 +68,7 @@ public class HealthPlanConverter {
 
         return healthPlanImages.stream()
                 .map(HealthPlanConverter::toHealthPlanImageResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static HealthPlanResponseDto.HealthPlanImageResponseDto toHealthPlanImageResponseDto(HealthPlanImage healthPlanImage) {
