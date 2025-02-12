@@ -1,4 +1,4 @@
-package healeat.server.web.dto.api_response;
+package healeat.server.web.dto.apiResponse;
 
 import lombok.Builder;
 import lombok.Getter;

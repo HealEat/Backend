@@ -14,11 +14,6 @@ import java.util.List;
 public class RecentSearchResponseDto {
 
     List<RecentSearchDto> recentSearchList;
-    Integer listSize;
-    Integer totalPage;
-    Long totalElements;
-    Boolean isFirst;
-    Boolean isLast;
 
     //검색창 - 최근 검색 기록 삭제 DTO
     @Getter

@@ -5,8 +5,8 @@ import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.SearchResultRepository;
 import healeat.server.service.StoreApiClient;
-import healeat.server.web.dto.api_response.KakaoPlaceResponseDto;
-import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
+import healeat.server.web.dto.apiResponse.KakaoPlaceResponseDto;
+import healeat.server.web.dto.apiResponse.KakaoPlaceResponseDto.Document;
 import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +28,9 @@ public class StoreSearchService {
 
     private final ApiCallCountService apiCallCountService;
 
+    /**
+     * 검색
+     */
     @Transactional
     @Cacheable(value = "searchResult", key = "T(java.lang.String).format('%s_%s_%s_%s', " +
             "(#request.query != null and #request.query != '' ? " +
@@ -51,9 +54,78 @@ public class StoreSearchService {
 
         List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesByQuery(searchResult);
 
-        return saveSearchResultAndItems(searchResult, kakaoResponses);
+        return saveResultAndItemsForSearch(searchResult, kakaoResponses);
     }
 
+    private static final double EARTH_RADIUS_METERS = 111_139; // 1도 ≈ 111.139km (약 111,139m)
+
+    @Transactional
+    protected SearchResult saveResultAndItemsForSearch(
+            SearchResult searchResult,
+            List<KakaoPlaceResponseDto> kakaoResponses) {
+
+        int count = getCount(searchResult, kakaoResponses);
+        if (count == 0) {
+            return searchResult;
+        }
+
+        List<Document> documents = new ArrayList<>();
+        kakaoResponses.forEach(response -> documents.addAll(response.getDocuments()));
+
+        double sumX = 0, sumY = 0;
+        for (Document document : documents) {
+            sumX += Double.parseDouble(document.getX());
+            sumY += Double.parseDouble(document.getY());
+
+            Set<FoodFeature> features = searchFeatureService
+                    .extractFeaturesForDocument(document);
+
+            SearchResultItem item = storeMappingService
+                    .docToSearchResultItem(document, features);
+
+            searchResult.addItem(item);
+        }
+
+        double avgX = sumX / count;
+        double avgY = sumY / count;
+
+        // maxDistance 계산
+        double maxDistanceDegree = 0;
+        for (Document document : documents) {
+            double x = Double.parseDouble(document.getX());
+            double y = Double.parseDouble(document.getY());
+            double distance = calculateDistance(avgX, avgY, x, y);
+            maxDistanceDegree = Math.max(maxDistanceDegree, distance);
+        }
+
+        // degree -> meter 변환
+        double maxMeters = maxDistanceDegree * EARTH_RADIUS_METERS;
+
+        searchResult.setViewData(avgX, avgY, maxMeters);
+
+        return searchResultRepository.save(searchResult);
+    }
+
+    private int getCount(SearchResult searchResult, List<KakaoPlaceResponseDto> kakaoResponses) {
+        KakaoPlaceResponseDto.Meta meta = kakaoResponses.get(0).getMeta();
+        KakaoPlaceResponseDto.SameName metaSameName = meta.getSame_name();
+
+        if (metaSameName != null) {
+            searchResult.setMetaData(
+                    metaSameName.getKeyword(), metaSameName.getSelected_region(), metaSameName.getRegion());
+        }
+
+        return meta.getPageable_count();
+    }
+
+    // 유클리드 거리 계산
+    private double calculateDistance(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+
+    /**
+     * 홈 추천
+     */
     @Transactional
     @Cacheable(value = "recommendResult", key = "T(java.lang.String).format('%s_%s_%s', " +
             "(#request.x != null and #request.x != '' ? " +               // 약 200m 오차 허용 (/ 111320)
@@ -80,18 +152,17 @@ public class StoreSearchService {
 
         List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesForHome(x, y, radius);
 
-        return saveSearchResultAndItems(searchResult, kakaoResponses);
+        return saveResultAndItemsForHome(searchResult, kakaoResponses);
     }
 
     @Transactional
-    protected SearchResult saveSearchResultAndItems(
+    protected SearchResult saveResultAndItemsForHome(
             SearchResult searchResult,
             List<KakaoPlaceResponseDto> kakaoResponses) {
 
-        KakaoPlaceResponseDto.SameName metaData = kakaoResponses.get(0).getMeta().getSame_name();
-        if (metaData != null) {
-            searchResult.setMetaData(
-                    metaData.getKeyword(), metaData.getSelected_region(), metaData.getRegion());
+        int count = getCount(searchResult, kakaoResponses);
+        if (count == 0) {
+            return searchResult;
         }
 
         List<Document> documents = new ArrayList<>();

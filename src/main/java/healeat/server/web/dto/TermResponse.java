@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TermResponse {
 
-    private Long id;
-    private String title;
-    private String body;
-    private boolean isRequired;
+    Long id;
+    String title;
+    String body;
+    Boolean isRequired;
 
     public static TermResponse from(Term term) {
         return new TermResponse(

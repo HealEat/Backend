@@ -1,6 +1,5 @@
 package healeat.server.web.dto;
 
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -75,7 +74,7 @@ public class StoreResponseDto {
         StoreInfoDto storeInfoDto;
 
         // 리뷰 사진 또는 Daum 사진 한 장
-        // StoreThumnail 데이터가 존재한다면 그것을 우선함.
+        // StoreThumbnail 데이터가 존재한다면 그것을 우선함.
         String imageUrl;
 
         // Store 필요
@@ -109,12 +108,15 @@ public class StoreResponseDto {
         String memberName;
         Boolean hasHealthInfo;
 
+        String query;
         // 현재 위치 또는 검색 지역명 위치
         String baseX;
         String baseY;
         Integer radius;
 
-        String query;
+        Double avgX;
+        Double avgY;
+        Double maxMeters;
 
         List<String> otherRegions;
         String selectedRegion;

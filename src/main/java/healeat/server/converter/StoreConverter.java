@@ -23,10 +23,16 @@ public class StoreConverter {
         return StoreResponseDto.SearchInfoDto.builder()
                 .memberName(memberName)
                 .hasHealthInfo(hasHealthInfo)
+
+                .query(searchResult.getQuery())
                 .baseX(searchResult.getBaseX())
                 .baseY(searchResult.getBaseY())
                 .radius(searchResult.getRadius())
-                .query(searchResult.getQuery())
+
+                .avgX(searchResult.getAvgX())
+                .avgY(searchResult.getAvgY())
+                .maxMeters(searchResult.getMaxMeters())
+
                 .otherRegions(searchResult.getOtherRegions())
                 .selectedRegion(searchResult.getSelectedRegion())
 

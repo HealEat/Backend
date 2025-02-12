@@ -1,4 +1,4 @@
-package healeat.server.web.dto.api_response;
+package healeat.server.web.dto.apiResponse;
 
 import lombok.Getter;
 
@@ -32,7 +32,6 @@ public class KakaoPlaceResponseDto {
         Boolean is_end;
 
         SameName same_name;
-
     }
 
     @Getter

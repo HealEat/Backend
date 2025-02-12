@@ -21,13 +21,13 @@ public class AuthController {
 
     private final HttpSession httpSession;
 
-    @Operation(summary = "카카오 로그인 리다이렉션", description = "카카오 로그인 경로로 리다이렉션(스웨거 테스트 X)")
+    @Operation(summary = "카카오 로그인 리다이렉션", description = "카카오 로그인 경로(/oauth2/authorization/kakao)로 리다이렉션(스웨거 테스트 X)")
     @GetMapping("/kakao")
     public void redirectToKakao(HttpServletResponse response) throws IOException {
         response.sendRedirect("/oauth2/authorization/kakao");
     }
 
-    @Operation(summary = "네이버 로그인 리다이렉션", description = "네이버 로그인 경로로 리다이렉션(스웨거 테스트 X)")
+    @Operation(summary = "네이버 로그인 리다이렉션", description = "네이버 로그인 경로(/oauth2/authorization/naver)로 리다이렉션(스웨거 테스트 X)")
     @GetMapping("/naver")
     public void redirectToNaver(HttpServletResponse response) throws IOException {
         response.sendRedirect("/oauth2/authorization/naver");

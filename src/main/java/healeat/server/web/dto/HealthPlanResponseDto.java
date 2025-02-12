@@ -7,7 +7,16 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Builder
 public class HealthPlanResponseDto {
+
+    List<HealthPlanOneDto> HealthPlanList;
+    Integer listSize;
+    Integer totalPage;
+    Long totalElements;
+    Boolean isFirst;
+    Boolean isLast;
 
     @Getter
     @Builder
@@ -15,9 +24,9 @@ public class HealthPlanResponseDto {
     @AllArgsConstructor
     public static class SetResultDto {
 
-        private String memberName;
-        private Long healthPlanId;
-        private LocalDateTime createdAt;
+        String memberName;
+        Long healthPlanId;
+        LocalDateTime createdAt;
     }
 
     @Getter
@@ -25,16 +34,8 @@ public class HealthPlanResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class DeleteResultDto {
-        private Long healthPlanId;
-        private LocalDateTime deletedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class HealthPlanListDto{
-       private List<HealthPlanOneDto> HealthPlanList;
+        Long healthPlanId;
+        LocalDateTime deletedAt;
     }
 
     @Getter
@@ -43,14 +44,14 @@ public class HealthPlanResponseDto {
     @AllArgsConstructor
     public static class HealthPlanOneDto{
 
-        private Long id;
-        private String name;
-        private Duration duration;
-        private Integer goalNumber;
-        private Status status;
-        private String goal;
-        private String memo;
-        private List<HealthPlanImageResponseDto> healthPlanImages;
+        Long id;
+        String name;
+        Duration duration;
+        Integer goalNumber;
+        Status status;
+        String goal;
+        String memo;
+        List<HealthPlanImageResponseDto> healthPlanImages;
     }
 
     @Getter
@@ -58,8 +59,8 @@ public class HealthPlanResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class HealthPlanImageResponseDto {
-        private Long id;
-        private String imageUrl;
+        Long id;
+        String imageUrl;
     }
 
     @Getter
@@ -67,8 +68,8 @@ public class HealthPlanResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemoResponseDto {
-        private Long id;
-        private String memo;
+        Long id;
+        String memo;
     }
 
     @Getter
@@ -76,7 +77,7 @@ public class HealthPlanResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StatusResponseDto {
-        private Long id;
-        private Status status;
+        Long id;
+        Status status;
     }
 }

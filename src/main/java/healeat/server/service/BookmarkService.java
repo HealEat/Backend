@@ -47,6 +47,7 @@ public class BookmarkService {
         Bookmark bookmark = Bookmark.builder()
                 .member(member)
                 .store(store)
+                .placeId(placeId)
                 .build();
 
         return bookmarkRepository.save(bookmark);

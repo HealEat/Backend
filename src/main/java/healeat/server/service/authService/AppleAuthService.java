@@ -1,6 +1,6 @@
-package healeat.server.service;
+package healeat.server.service.authService;
 
-import healeat.server.web.dto.AppleTokenResponse;
+import healeat.server.web.dto.authResonse.AppleTokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +36,6 @@ public class AppleAuthService {
                 AppleTokenResponse.class
         );
 
-        return response.getBody();
+        return response.getBody();  //여기서 `id_token`을 받음
     }
 }
