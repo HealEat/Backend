@@ -33,7 +33,7 @@ public class HealthPlanConverter {
 
         List<HealthPlanResponseDto.HealthPlanOneDto> healthPlanOneDtoList = healthPlans.stream()
                 .map(HealthPlanConverter::toHealthPlanOneDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return HealthPlanResponseDto.builder()
                 .HealthPlanList(healthPlanOneDtoList)
@@ -49,7 +49,7 @@ public class HealthPlanConverter {
         List<HealthPlanResponseDto.HealthPlanImageResponseDto> healthPlanImages = healthPlan.getHealthPlanImages()
                 .stream()
                 .map(HealthPlanConverter::toHealthPlanImageResponseDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return HealthPlanResponseDto.HealthPlanOneDto.builder()
                 .id(healthPlan.getId())
@@ -68,7 +68,7 @@ public class HealthPlanConverter {
 
         return healthPlanImages.stream()
                 .map(HealthPlanConverter::toHealthPlanImageResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static HealthPlanResponseDto.HealthPlanImageResponseDto toHealthPlanImageResponseDto(HealthPlanImage healthPlanImage) {

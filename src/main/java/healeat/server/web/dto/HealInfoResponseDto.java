@@ -66,11 +66,11 @@ public class HealInfoResponseDto {
     @NoArgsConstructor
     public static class MyHealthInfoDto {
 
-        private List<String> healthGoals;   // 건강 목표 (질병 관리, 비건, 다이어트)
-        private String vegetarianType;      // 비건 종류
-        private List<String> healthIssues;  // 건강 상의 불편함
-        private List<String> requiredMeals; // 필요한 식사
-        private List<String> requiredNutrients;     // 필요한 영양소
-        private List<String> avoidedFoods;  // 피해야 하는 음식
+        List<String> healthGoals;   // 건강 목표 (질병 관리, 비건, 다이어트)
+        String vegetarianType;      // 비건 종류
+        List<String> healthIssues;  // 건강 상의 불편함
+        List<String> requiredMeals; // 필요한 식사
+        List<String> requiredNutrients;     // 필요한 영양소
+        List<String> avoidedFoods;  // 피해야 하는 음식
     }
 }

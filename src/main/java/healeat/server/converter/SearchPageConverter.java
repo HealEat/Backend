@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class SearchPageConverter {
@@ -77,7 +76,7 @@ public class SearchPageConverter {
 
         List<RecentSearchResponseDto.RecentSearchDto> recentSearchList = recentSearches.stream()
                 .map(SearchPageConverter::toRecentSearchDto)
-                .collect(Collectors.toList());
+                .toList();
 
 
         return RecentSearchResponseDto.builder()

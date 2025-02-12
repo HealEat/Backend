@@ -56,8 +56,8 @@ public class MyPageController {
     @GetMapping("/reviews")
     public ApiResponse<ReviewResponseDto.MyPageReviewListDto> getMyReviews(
             @AuthenticationPrincipal Member member,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
 
         Pageable pageable = PageRequest.of(page - 1, size);
         ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(member, pageable);
