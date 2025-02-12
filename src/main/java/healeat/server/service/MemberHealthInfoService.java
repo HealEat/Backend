@@ -172,7 +172,7 @@ public class MemberHealthInfoService {
                 member.getVegetarian() != Vegetarian.NONE ? "비건" : null,
                 member.getDiet() != Diet.NONE ? "다이어트" : null,
                 memberHealQuestionRepository.findByMember(member).isEmpty() ? null : "질병 관리"
-        ).stream().filter(Objects::nonNull).collect(Collectors.toList());
+        ).stream().filter(Objects::nonNull).toList();
     }
 
     // 질문에 대한 회원의 응답 가져오기 메서드
@@ -193,6 +193,6 @@ public class MemberHealthInfoService {
         return questionAnswers.getOrDefault(question, List.of()).stream()
                 .map(Answer::getDescription)
                 .distinct() // 중복 제거
-                .collect(Collectors.toList());
+                .toList();
     }
 }

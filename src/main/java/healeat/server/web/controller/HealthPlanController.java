@@ -140,7 +140,7 @@ public class HealthPlanController {
     /***************************** 건강관리목표 상태 *****************************/
 
     @Operation(summary = "건강관리목표 상태 수정", description = "선택한 건강관리목표 상태를 수정합니다")
-    @DeleteMapping("/{planId}/status")
+    @PatchMapping("/{planId}/status")
     public ApiResponse<HealthPlanResponseDto.StatusResponseDto> updateHealthPlanStatus(
             @PathVariable Long planId,
             @RequestBody HealthPlanRequestDto.HealthPlanStatusUpdateRequestDto request) {
