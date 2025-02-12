@@ -31,6 +31,13 @@ public class SearchResult extends BaseEntity {
 
     private Boolean accuracy;
 
+    /**
+     * 지도 이동, 화면 뷰 위한 필드
+     */
+    private Double avgX;
+    private Double avgY;
+    private Double maxMeters;
+
     private String keyword;
 
     private String selectedRegion;
@@ -58,5 +65,11 @@ public class SearchResult extends BaseEntity {
     public void addItem(SearchResultItem item) {
         this.items.add(item);
         item.setSearchResult(this);
+    }
+
+    public void setViewData(Double avgX, Double avgY, Double maxMeters) {
+        this.avgX = avgX;
+        this.avgY = avgY;
+        this.maxMeters = maxMeters;
     }
 }

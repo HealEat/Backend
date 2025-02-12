@@ -32,7 +32,6 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     private final ApiCallCountService apiCallCountService;
     private final SearchFeatureService searchFeatureService;
     private final StoreMappingService storeMappingService;
-    private final DaumImageService daumImageService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
@@ -71,6 +70,13 @@ public class StoreCommandServiceImpl implements StoreCommandService {
 
         StoreResponseDto.SearchInfoDto searchInfoDto = StoreConverter
                 .toSearchInfo(member, searchResult, apiCallCount);
+
+        if (searchResult.getItems().isEmpty()) {
+            return StoreConverter.toStorePreviewListDto(
+                    Page.empty(),
+                    searchInfoDto
+            );
+        }
 
         // 2. category와 feature로 필터링된 placeId 리스트
         List<Long> filteredItemIds = searchFeatureService.getFilteredItemIds(
@@ -124,6 +130,13 @@ public class StoreCommandServiceImpl implements StoreCommandService {
 
         StoreResponseDto.SearchInfoDto searchInfoDto = StoreConverter
                 .toSearchInfo(member, searchResult, apiCallCount);
+
+        if (searchResult.getItems().isEmpty()) {
+            return StoreConverter.toStorePreviewListDto(
+                    Page.empty(),
+                    searchInfoDto
+            );
+        }
 
         // 2. 멤버의 healEatFoods(카테고리 이름 리스트) 로 필터링된 placeId 리스트
         List<Long> filteredItemIds = searchFeatureService.getHealEatItemIds(
