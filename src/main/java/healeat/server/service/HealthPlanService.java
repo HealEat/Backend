@@ -15,17 +15,22 @@ import healeat.server.domain.ReviewImage;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.HealthPlanImageRepository;
 import healeat.server.repository.HealthPlanRepository;
+import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.ImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -40,6 +45,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Validated
 public class HealthPlanService {
 
     private final HealthPlanRepository healthPlanRepository;
@@ -48,18 +54,18 @@ public class HealthPlanService {
 
     /***************************** 건강관리목표를 위한 메서드 *****************************/
 
-    public List<HealthPlan> getAllHealthPlans() {
-        return healthPlanRepository.findAll();
-    }
-
-    //혹시나 필요하면 쓸 getById
     public HealthPlan getHealthPlanById(Long id) {
         return healthPlanRepository.findById(id).orElseThrow(() ->
                 new HealthPlanHandler(ErrorStatus.HEALTH_PLAN_NOT_FOUND));
     }
 
-    public List<HealthPlan> getHealthPlanByMember(Member member) {
-        return healthPlanRepository.findByMember(member);
+    // Page 로 나누어서 HealthPlan 조회
+    public Page<HealthPlan> findAllByMember(Member member,@CheckPage Integer page) {
+
+        // 3. 페이지 요청 생성
+        int safePage = Math.max(0, page - 1);
+
+        return healthPlanRepository.findAllByMember(member, PageRequest.of(safePage, 10));
     }
 
     @Transactional

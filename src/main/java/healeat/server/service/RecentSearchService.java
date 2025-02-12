@@ -9,7 +9,6 @@ import healeat.server.domain.enums.SearchType;
 import healeat.server.domain.mapping.RecentSearch;
 import healeat.server.repository.MemberRepository;
 import healeat.server.repository.RecentSearchRepository;
-import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.RecentSearchResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.Comparator;
 import java.util.List;
@@ -68,15 +66,13 @@ public class RecentSearchService {
         return null;
     }
 
-    //최근 검색 기록 삭제
+    // 최근 검색 기록 삭제
     @Transactional
-    public void deleteRecentSearch(Long id) {recentSearchRepository.deleteById(id); }
-
     public RecentSearchResponseDto.DeleteResultDto toDeleteRecentSearch(Long recentId) {
         RecentSearch deleteRecentSearch = getRecentSearchById(recentId);
         RecentSearchResponseDto.DeleteResultDto response = SearchPageConverter.toDeleteResultDto(deleteRecentSearch);
 
-        deleteRecentSearch(recentId);
+        recentSearchRepository.delete(deleteRecentSearch);
 
         return response;
     }

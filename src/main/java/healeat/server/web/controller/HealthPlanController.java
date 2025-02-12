@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,15 +35,16 @@ public class HealthPlanController {
 
     @Operation(summary = "건강 관리 목표 조회", description = "사용자의 건강 관리 목표를 전체 조회합니다.")
     @GetMapping
-    public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans(
-            @AuthenticationPrincipal Member member) {
+    public ApiResponse<HealthPlanResponseDto> getAllHealthPlans(
+            @AuthenticationPrincipal Member member,
+            @RequestParam(defaultValue = "1") Integer page) {
 
         Member testMember = memberRepository.findById(999L).get();
 
         //정상적으로 HealthPlan 조회
-        List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMember(testMember);
+        Page<HealthPlan> healthPlans = healthPlanService.findAllByMember(testMember, page);
 
-        return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanListDto(healthPlans));
+        return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanResponseDto(healthPlans));
     }
 
     @Operation(summary = "건강 관리 목표 추가", description = "건강 관리 목표를 추가합니다." +
