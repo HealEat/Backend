@@ -1,4 +1,4 @@
-package healeat.server.service;
+package healeat.server.service.authService;
 
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;

@@ -1,8 +1,5 @@
 package healeat.server.domain.enums;
 
-import healeat.server.apiPayload.code.status.ErrorStatus;
-import healeat.server.apiPayload.exception.handler.HealthInfoHandler;
-
 import java.util.Arrays;
 
 public enum Vegetarian {

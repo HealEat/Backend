@@ -10,18 +10,18 @@ public class HealthPlanRequestDto {
 
     @Getter
     public static class HealthPlanUpdateRequestDto {
-        private Duration duration;
-        private Integer number;
-        private String goal;
+        Duration duration;
+        Integer number;
+        String goal;
     }
 
     @Getter
     public static class HealthPlanMemoUpdateRequestDto {
-        private String memo;
+        String memo;
     }
 
     @Getter
     public static class HealthPlanStatusUpdateRequestDto {
-        private Status status;
+        Status status;
     }
 }

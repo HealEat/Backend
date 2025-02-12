@@ -19,9 +19,9 @@ public class ReviewResponseDto {
     @AllArgsConstructor
     public static class DeleteResultDto {
 
-        private Long deletedReviewId;
-        private List<String> deletedReviewImageUrls;
-        private LocalDateTime deletedAt;
+        Long deletedReviewId;
+        List<String> deletedReviewImageUrls;
+        LocalDateTime deletedAt;
     }
 
     @Builder
@@ -30,12 +30,12 @@ public class ReviewResponseDto {
     @AllArgsConstructor
     public static class MyPageReviewListDto {
 
-        private List<MyPageReviewDto> myPageReviewList;
-        private Integer listSize;
-        private Integer totalPage;
-        private Long totalElements;
-        private Boolean isFirst;
-        private Boolean isLast;
+        List<MyPageReviewDto> myPageReviewList;
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Boolean isFirst;
+        Boolean isLast;
     }
 
     @Builder
@@ -44,10 +44,10 @@ public class ReviewResponseDto {
     @AllArgsConstructor
     public static class MyPageReviewDto {
 
-        private Long placeId;
-        private String placeName;
+        Long placeId;
+        String placeName;
 
-        private ReviewPreviewDto reviewPreview;
+        ReviewPreviewDto reviewPreview;
     }
 
     /**
@@ -85,13 +85,13 @@ public class ReviewResponseDto {
     public static class ReviewPreviewDto {
 
         // 리뷰 작성자 정보
-        private ReviewerInfo reviewerInfo;
+        ReviewerInfo reviewerInfo;
 
-        private Long reviewId;
-        private Float totalScore;
-        private List<String> imageUrls;
-        private String body;
-        private LocalDateTime createdAt;
+        Long reviewId;
+        Float totalScore;
+        List<String> imageUrls;
+        String body;
+        LocalDateTime createdAt;
     }
 
     @Builder
@@ -100,11 +100,11 @@ public class ReviewResponseDto {
     @AllArgsConstructor
     public static class ReviewerInfo {
 
-        private String name;
-        private String profileImageUrl;
+        String name;
+        String profileImageUrl;
 
         // 작성 당시의 건강 목적
-        private List<String> currentPurposes;
+        List<String> currentPurposes;
     }
 
     @Builder

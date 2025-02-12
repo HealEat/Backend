@@ -34,36 +34,11 @@ public class MemberHealthInfoService {
 
         return member;
     }
-    public Member updateVegetarian(Member member, String choose) {
-
-        Vegetarian vegetarian = Vegetarian.getByDescription(choose);
-
-        // 변경 사항 있을 시 알고리즘 새로 계산
-        boolean isChanged = member.setVegetAndCheckChanged(vegetarian);
-        if (isChanged) {
-            makeHealEat(member);
-        }
-
-        return member;
-    }
 
     public Member chooseDiet(Member member, String choose) {
 
         Diet diet = Diet.getByDescription(choose);
         member.setDietAndCheckChanged(diet);
-
-        return member;
-    }
-    public Member updateDiet(Member member, String choose) {
-
-        Diet diet = Diet.getByDescription(choose);
-        member.setDietAndCheckChanged(diet);
-
-        // 변경 사항 있을 시 알고리즘 새로 계산
-        boolean isChanged = member.setDietAndCheckChanged(diet);
-        if (isChanged) {
-            makeHealEat(member);
-        }
 
         return member;
     }
@@ -86,32 +61,6 @@ public class MemberHealthInfoService {
                 .build();
 
         return memberHealQuestionRepository.save(memberHealQuestion);
-    }
-    // Question에 대한 회원의 답변 수정
-    public MemberHealQuestion updateQuestion(Member member, Integer questionNum, AnswerRequestDto request) {
-
-        // 1. HEALTH_ISSUE, 2. MEAL_NEEDED, 3. NUTRIENT_NEEDED, 4. FOOD_TO_AVOID
-        questionNum = Math.max(0, questionNum - 1);
-        Question question = Question.values()[questionNum];
-
-        List<Answer> answers = request.getSelectedAnswers().stream()
-                .map(Answer::getByDescription)
-                .toList();
-
-        List<MemberHealQuestion> memberHealQuestions = memberHealQuestionRepository.findByMember(member);
-        MemberHealQuestion memberHealQuestion = memberHealQuestions.stream()
-                .filter(mhq -> mhq.getQuestion() == question)
-                .findFirst().orElseThrow(() ->
-                        new HealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
-
-        // 변경 사항 있을 시 알고리즘 새로 계산
-        boolean isChanged = !(new HashSet<>(memberHealQuestion.getAnswers()).equals(new HashSet<>(answers)));
-        if (isChanged) {
-            memberHealQuestion.setAnswers(answers);
-            makeHealEat(member);
-        }
-
-        return memberHealQuestion;
     }
 
     public HealInfoResponseDto makeHealEat(Member member) {
@@ -195,4 +144,57 @@ public class MemberHealthInfoService {
                 .distinct() // 중복 제거
                 .toList();
     }
+
+//    public Member updateVegetarian(Member member, String choose) {
+//
+//        Vegetarian vegetarian = Vegetarian.getByDescription(choose);
+//
+//        // 변경 사항 있을 시 알고리즘 새로 계산
+//        boolean isChanged = member.setVegetAndCheckChanged(vegetarian);
+//        if (isChanged) {
+//            makeHealEat(member);
+//        }
+//
+//        return member;
+//    }
+//    public Member updateDiet(Member member, String choose) {
+//
+//        Diet diet = Diet.getByDescription(choose);
+//        member.setDietAndCheckChanged(diet);
+//
+//        // 변경 사항 있을 시 알고리즘 새로 계산
+//        boolean isChanged = member.setDietAndCheckChanged(diet);
+//        if (isChanged) {
+//            makeHealEat(member);
+//        }
+//
+//        return member;
+//    }
+//
+//    // Question에 대한 회원의 답변 수정
+//    public MemberHealQuestion updateQuestion(Member member, Integer questionNum, AnswerRequestDto request) {
+//
+//        // 1. HEALTH_ISSUE, 2. MEAL_NEEDED, 3. NUTRIENT_NEEDED, 4. FOOD_TO_AVOID
+//        questionNum = Math.max(0, questionNum - 1);
+//        Question question = Question.values()[questionNum];
+//
+//        List<Answer> answers = request.getSelectedAnswers().stream()
+//                .map(Answer::getByDescription)
+//                .toList();
+//
+//        List<MemberHealQuestion> memberHealQuestions = memberHealQuestionRepository.findByMember(member);
+//        MemberHealQuestion memberHealQuestion = memberHealQuestions.stream()
+//                .filter(mhq -> mhq.getQuestion() == question)
+//                .findFirst().orElseThrow(() ->
+//                        new HealthInfoHandler(ErrorStatus.QUESTION_NOT_FOUND));
+//
+//        // 변경 사항 있을 시 알고리즘 새로 계산
+//        boolean isChanged = !(new HashSet<>(memberHealQuestion.getAnswers()).equals(new HashSet<>(answers)));
+//        if (isChanged) {
+//            memberHealQuestion.setAnswers(answers);
+//            makeHealEat(member);
+//        }
+//
+//        return memberHealQuestion;
+//    }
 }

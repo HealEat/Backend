@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import healeat.server.service.CustomOAuth2UserService;
+import healeat.server.service.authService.CustomOAuth2UserService;
 import healeat.server.apiPayload.exception.handler.OAuth2LoginSuccessHandler;
 import healeat.server.apiPayload.exception.handler.OAuth2LoginFailureHandler;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +55,7 @@ public class MemberService {
 
     // 프로필 수정 API
     @Transactional
-    public Member updateProfile(Member member, MultipartFile file,MemberProfileRequestDto request) {
+    public Member updateProfile(Member member, MultipartFile file, MemberProfileRequestDto request) {
         if (member == null) {
             throw new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND);
         }
