@@ -96,7 +96,7 @@ public class SearchPageConverter {
             return RecentSearchResponseDto.RecentSearchDto.builder()
                     .recentSearchId(recentSearch.getId())
                     .searchType(recentSearch.getSearchType())
-                    .placeId(recentSearch.getStore().getKakaoPlaceId())
+                    .placeId(recentSearch.getPlaceId())
                     .placeName(recentSearch.getStore().getPlaceName())
                     .build();
         }
