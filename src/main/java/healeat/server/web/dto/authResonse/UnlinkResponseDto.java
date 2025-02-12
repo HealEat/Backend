@@ -1,4 +1,4 @@
-package healeat.server.web.dto;
+package healeat.server.web.dto.authResonse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,8 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UnlinkResponseDto {
-    private boolean isSuccess;
-    private String code;
-    private String message;
+    Boolean isSuccess;
+    String code;
+    String message;
 }
 

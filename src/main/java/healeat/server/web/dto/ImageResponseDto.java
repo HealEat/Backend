@@ -13,15 +13,6 @@ public class ImageResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PresignedUrlDto {
-        private String presignedUrl; // Presigned URL
-        private String publicUrl;    // Public URL
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class publicUrlDto {
         private Long id;
         private String imageUrl;    // Public URL
