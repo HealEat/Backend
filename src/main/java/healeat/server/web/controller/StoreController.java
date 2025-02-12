@@ -11,7 +11,7 @@ import healeat.server.service.ReviewService;
 import healeat.server.service.StoreQueryServiceImpl;
 import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.*;
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
+import healeat.server.web.dto.apiResponse.DaumImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.validation.Valid;
@@ -93,7 +93,8 @@ public class StoreController {
             @PathVariable Long placeId,
             @CheckPage @RequestParam Integer page,
             @RequestParam(required = false, defaultValue = "LATEST") String sortBy,
-            @RequestParam(required = false) List<String> filters) {
+            // filters[] 형식도 지원
+            @RequestParam(name = "filters[]", required = false) List<String> filters) {
 
         Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, sortBy, filters);
         return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));

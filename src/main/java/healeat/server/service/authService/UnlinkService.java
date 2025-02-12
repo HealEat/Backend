@@ -1,9 +1,11 @@
-package healeat.server.service;
+package healeat.server.service.authService;
 
 import healeat.server.domain.HealthPlan;
 import healeat.server.domain.Member;
 import healeat.server.repository.HealthPlanRepository;
 import healeat.server.repository.MemberRepository;
+import healeat.server.service.HealthPlanService;
+import healeat.server.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

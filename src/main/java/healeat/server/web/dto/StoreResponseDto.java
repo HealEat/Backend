@@ -1,6 +1,5 @@
 package healeat.server.web.dto;
 
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import lombok.*;
 
 import java.time.LocalDateTime;

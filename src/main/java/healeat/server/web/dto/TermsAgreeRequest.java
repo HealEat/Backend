@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class TermsAgreeRequest {
 
-    private List<TermAgree> agreements;
+    List<TermAgree> agreements;
 
     @Getter
     @AllArgsConstructor
@@ -22,8 +22,8 @@ public class TermsAgreeRequest {
     public static class TermAgree {
 
         @NotNull
-        private Long termId;
+        Long termId;
         @NotNull
-        private Boolean agree;
+        Boolean agree;
     }
 }
