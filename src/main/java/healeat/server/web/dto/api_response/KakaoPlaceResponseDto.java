@@ -32,7 +32,6 @@ public class KakaoPlaceResponseDto {
         Boolean is_end;
 
         SameName same_name;
-
     }
 
     @Getter

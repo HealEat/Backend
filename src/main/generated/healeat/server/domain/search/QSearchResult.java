@@ -24,6 +24,10 @@ public class QSearchResult extends EntityPathBase<SearchResult> {
 
     public final BooleanPath accuracy = createBoolean("accuracy");
 
+    public final NumberPath<Double> avgX = createNumber("avgX", Double.class);
+
+    public final NumberPath<Double> avgY = createNumber("avgY", Double.class);
+
     public final StringPath baseX = createString("baseX");
 
     public final StringPath baseY = createString("baseY");
@@ -36,6 +40,8 @@ public class QSearchResult extends EntityPathBase<SearchResult> {
     public final ListPath<SearchResultItem, QSearchResultItem> items = this.<SearchResultItem, QSearchResultItem>createList("items", SearchResultItem.class, QSearchResultItem.class, PathInits.DIRECT2);
 
     public final StringPath keyword = createString("keyword");
+
+    public final NumberPath<Double> maxMeters = createNumber("maxMeters", Double.class);
 
     public final ListPath<String, StringPath> otherRegions = this.<String, StringPath>createList("otherRegions", String.class, StringPath.class, PathInits.DIRECT2);
 

@@ -2,6 +2,7 @@ package healeat.server.domain.mapping;
 
 import healeat.server.domain.*;
 import healeat.server.domain.common.BaseEntity;
+import healeat.server.domain.enums.Diet;
 import healeat.server.web.dto.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -86,7 +87,9 @@ public class Review extends BaseEntity {
 
         List<String> currentPurposes = new ArrayList<>(currentDiseases);
         currentPurposes.add(currentVeget);
-        currentPurposes.add(currentDiet);
+        if (!currentDiet.isEmpty()) {
+            currentPurposes.add("다이어트");
+        }
 
         return ReviewResponseDto.ReviewerInfo.builder()
                 .name(member.getName())
