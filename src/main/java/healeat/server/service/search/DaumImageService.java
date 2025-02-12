@@ -1,7 +1,7 @@
 package healeat.server.service.search;
 
 import healeat.server.service.StoreApiClient;
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
+import healeat.server.web.dto.apiResponse.DaumImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

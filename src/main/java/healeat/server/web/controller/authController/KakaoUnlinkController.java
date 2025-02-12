@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 import org.springframework.http.MediaType;
-import healeat.server.service.UnlinkService;
-import healeat.server.web.dto.UnlinkResponseDto;
+import healeat.server.service.authService.UnlinkService;
+import healeat.server.web.dto.authResonse.UnlinkResponseDto;
 
 @RestController
 @RequestMapping("/auth/kakao")

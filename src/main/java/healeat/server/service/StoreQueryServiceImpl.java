@@ -9,7 +9,7 @@ import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.*;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
 import healeat.server.service.search.DaumImageService;
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
+import healeat.server.web.dto.apiResponse.DaumImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

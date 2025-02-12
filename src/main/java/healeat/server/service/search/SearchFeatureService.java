@@ -7,7 +7,7 @@ import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.FeatCategoryMapRepository;
 import healeat.server.repository.FoodCategoryRepository;
 import healeat.server.repository.FoodFeatureRepository;
-import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
+import healeat.server.web.dto.apiResponse.KakaoPlaceResponseDto.Document;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
