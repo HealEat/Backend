@@ -1,6 +1,7 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
@@ -48,9 +49,7 @@ public class StoreController {
             @PathVariable Long placeId,
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(storeQueryServiceImpl.getStoreHome(placeId, testMember));
+        return ApiResponse.onSuccess(storeQueryServiceImpl.getStoreHome(placeId, member));
     }
 
     @Operation(summary = "가게 리뷰 이미지 조회 API", description =
@@ -111,10 +110,11 @@ public class StoreController {
             @RequestPart(name = "request", required = true)
             ReviewRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        if(member == null) {
+            return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
+        }
 
-        //로그인 연결되면 testMember만 나중에 member로 수정
-        Review newReview = reviewService.createReview(placeId, testMember, files, request);
+        Review newReview = reviewService.createReview(placeId, member, files, request);
         return ApiResponse.onSuccess(ReviewConverter.toReviewSetResultDto(newReview));
     }
 
@@ -126,10 +126,12 @@ public class StoreController {
     public ApiResponse<BookmarkResponseDto> saveBookmark(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        if (member == null) {
+            return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
+        }
 
         return ApiResponse.onSuccess(toSetResponseDto(
-                bookmarkService.saveBookmark(testMember, placeId)));
+                bookmarkService.saveBookmark(member, placeId)));
     }
 
     @Operation(summary = "가게 북마크 삭제 API", description = "회원의 가게 북마크에서 삭제합니다.")

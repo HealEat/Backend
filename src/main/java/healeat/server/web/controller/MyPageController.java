@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,20 +23,18 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/my-page")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")  // 로그인 안된 사용자가 접근하면 403 Forbidden 반환
 public class MyPageController {
 
     private final MemberService memberService;
     private final MemberHealthInfoService memberHealthInfoService;
-    private final MemberRepository memberRepository;
     private final ReviewService reviewService;
 
     @Operation(summary = "프로필 정보 조회 API", description = "프로필 수정 화면에 사용합니다.")
     @GetMapping("/profile")
     public ApiResponse<MemberProfileResponseDto> getProfileInfo(@AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(memberService.getProfileInfo(testMember));
+        return ApiResponse.onSuccess(memberService.getProfileInfo(member));
     }
 
     @Operation(summary = "프로필 수정 API",
@@ -48,9 +47,7 @@ public class MyPageController {
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        Member changedProfileMember = memberService.updateProfile(testMember, file, request);
+        Member changedProfileMember = memberService.updateProfile(member, file, request);
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(changedProfileMember));
     }
 
@@ -62,10 +59,8 @@ public class MyPageController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
         Pageable pageable = PageRequest.of(page - 1, size);
-        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(testMember, pageable);
+        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(member, pageable);
 
         return ApiResponse.onSuccess(responseDto);
     }
@@ -76,9 +71,7 @@ public class MyPageController {
             @AuthenticationPrincipal Member member,
             @PathVariable Long reviewId) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        Review deleteReview = reviewService.deleteReview(testMember, reviewId);
+        Review deleteReview = reviewService.deleteReview(member, reviewId);
         return ApiResponse.onSuccess(ReviewConverter.toReviewDeleteResultDto(deleteReview));
     }
 
@@ -88,9 +81,7 @@ public class MyPageController {
     public ApiResponse<HealInfoResponseDto.MyHealthInfoDto> getMyHealthInfo(
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(testMember);
+        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(member);
         return ApiResponse.onSuccess(responseDto);
     }
 
