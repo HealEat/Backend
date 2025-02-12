@@ -2,50 +2,33 @@ package healeat.server.service;
 
 import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.apiPayload.exception.handler.HealthPlanHandler;
-import healeat.server.apiPayload.exception.handler.MemberHandler;
-import healeat.server.apiPayload.exception.handler.ReviewHandler;
 import healeat.server.aws.s3.AmazonS3Manager;
-import healeat.server.aws.s3.S3PresignedUploader;
-import healeat.server.aws.s3.S3Uploader;
-import healeat.server.converter.HealthPlanConverter;
 import healeat.server.domain.HealthPlan;
 import healeat.server.domain.HealthPlanImage;
 import healeat.server.domain.Member;
-import healeat.server.domain.ReviewImage;
-import healeat.server.domain.mapping.Review;
 import healeat.server.repository.HealthPlanImageRepository;
 import healeat.server.repository.HealthPlanRepository;
-import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.HealthPlanRequestDto;
-import healeat.server.web.dto.HealthPlanResponseDto;
-import healeat.server.web.dto.ImageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Validated
 public class HealthPlanService {
 
     private final HealthPlanRepository healthPlanRepository;
@@ -60,7 +43,7 @@ public class HealthPlanService {
     }
 
     // Page 로 나누어서 HealthPlan 조회
-    public Page<HealthPlan> findAllByMember(Member member,@CheckPage Integer page) {
+    public Page<HealthPlan> findAllByMember(Member member, Integer page) {
 
         // 3. 페이지 요청 생성
         int safePage = Math.max(0, page - 1);

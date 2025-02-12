@@ -7,6 +7,7 @@ import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.HealthPlanService;
 import healeat.server.converter.HealthPlanConverter;
+import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/plans")
 @RequiredArgsConstructor
+@Validated
 public class HealthPlanController {
 
     private final HealthPlanService healthPlanService;
@@ -37,7 +40,7 @@ public class HealthPlanController {
     @GetMapping
     public ApiResponse<HealthPlanResponseDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member,
-            @RequestParam(defaultValue = "1") Integer page) {
+            @CheckPage @RequestParam(defaultValue = "1") Integer page) {
 
         Member testMember = memberRepository.findById(999L).get();
 
