@@ -3,14 +3,13 @@ package healeat.server.service;
 import healeat.server.converter.StoreConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
-import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.domain.search.SearchResult;
 import healeat.server.domain.search.SearchResultItem;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.service.search.*;
 import healeat.server.web.dto.StoreRequestDto;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,9 +51,6 @@ public class StoreCommandServiceImpl implements StoreCommandService {
                 .features(item.getFeatures())
                 .build();
 
-        List<ItemDaumImage> daumImgDocuments = daumImageService.getDaumImgDocuments(store);
-        daumImgDocuments.forEach(store::addItemDaumImage);
-
         return storeRepository.save(store);
     }
 
@@ -63,7 +59,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
      * 정렬 및 페이징 적용
      */
     @Override
-    public StoreResonseDto.StorePreviewDtoList searchAndMapStores(
+    public StoreResponseDto.StorePreviewDtoList searchAndMapStores(
             Member member,
             Integer page,
             StoreRequestDto.SearchKeywordDto request) {
@@ -73,7 +69,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
 
         int apiCallCount = apiCallCountService.getAndResetApiCallCount(); // API 호출 횟수 기록
 
-        StoreResonseDto.SearchInfoDto searchInfoDto = StoreConverter
+        StoreResponseDto.SearchInfoDto searchInfoDto = StoreConverter
                 .toSearchInfo(member, searchResult, apiCallCount);
 
         // 2. category와 feature로 필터링된 placeId 리스트
@@ -116,7 +112,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
      * 정렬 및 페이징 적용
      */
     @Override
-    public StoreResonseDto.StorePreviewDtoList recommendAndMapStores(
+    public StoreResponseDto.StorePreviewDtoList recommendAndMapStores(
             Member member,
             Integer page,
             StoreRequestDto.HealEatRequestDto request) {
@@ -126,7 +122,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
 
         int apiCallCount = apiCallCountService.getAndResetApiCallCount(); // API 호출 횟수 기록
 
-        StoreResonseDto.SearchInfoDto searchInfoDto = StoreConverter
+        StoreResponseDto.SearchInfoDto searchInfoDto = StoreConverter
                 .toSearchInfo(member, searchResult, apiCallCount);
 
         // 2. 멤버의 healEatFoods(카테고리 이름 리스트) 로 필터링된 placeId 리스트

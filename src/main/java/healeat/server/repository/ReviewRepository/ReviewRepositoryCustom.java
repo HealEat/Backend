@@ -6,9 +6,9 @@ import healeat.server.domain.mapping.Review;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ReviewRepositoryCustom {
 
-    Page<Review> findSortedReviews(String sortBy, Pageable pageable);
-
-    Page<ReviewImage> getFirstReviewImages(Store store, Pageable pageable);
+    Page<Review> sortAndFilterReviews(Store store, String sortBy, List<String> filters, Pageable pageable);
 }

@@ -1,7 +1,7 @@
 package healeat.server.domain.search;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -47,11 +47,11 @@ public class SearchResultItem extends BaseEntity {
     @Builder.Default
     private List<String> features = new ArrayList<>();
 
-    public StoreResonseDto.StoreInfoDto getStoreInfoDto() {
+    public StoreResponseDto.StoreInfoDto getStoreInfoDto() {
 
         String[] categoryWords = categoryName.split(" > ");
 
-        return StoreResonseDto.StoreInfoDto.builder()
+        return StoreResponseDto.StoreInfoDto.builder()
                 .placeId(placeId)
                 .placeName(placeName)
                 .categoryName(categoryWords[categoryWords.length - 1])

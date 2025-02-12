@@ -1,11 +1,8 @@
 package healeat.server.domain;
 
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Diet;
-import healeat.server.domain.enums.Vegetarian;
 import healeat.server.domain.mapping.Review;
-import healeat.server.domain.search.ItemDaumImage;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -54,8 +51,7 @@ public class Store extends BaseEntity {
     /**
      * 평점
      */
-
-    private Float totalScore; // 전체 평점
+    private Float totalHealthScore; // 전체 건강 평점
     private Integer reviewCount; // 전체 리뷰 수
 
     private Float sickScore; // 환자 평점
@@ -76,16 +72,9 @@ public class Store extends BaseEntity {
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<ItemDaumImage> itemDaumImages = new ArrayList<>();
-
-
-    //==비즈니스 로직==//
-
     @PrePersist
     public void initializeStore() {
-        totalScore = 0.0f;
+        totalHealthScore = 0.0f;
         reviewCount = 0;
         sickScore = 0.0f;
         sickCount = 0;
@@ -100,6 +89,8 @@ public class Store extends BaseEntity {
         nutrScore = 0.0f;
     }
 
+    //==비즈니스 로직==//
+
     /**
      * 새로운 리뷰에 의한
      * 가게 평점 업데이트
@@ -110,7 +101,7 @@ public class Store extends BaseEntity {
 
     public void addScoresByReview(Review newReview) {
 
-        Float newReviewTotal = newReview.getTotalScore();
+        Float newReviewTotal = newReview.getHealthScore();
         if (!newReview.getCurrentDiseases().isEmpty()) {
             sickScore = (
                     sickScore * sickCount + newReviewTotal) / (sickCount + 1);
@@ -127,14 +118,16 @@ public class Store extends BaseEntity {
             dietCount++;
         }
 
+        // 건강 전체 평점
+        totalHealthScore = addReviewScore(totalHealthScore, newReview.getHealthScore());
+
+        // 맛/청/신/영
         tastyScore = addReviewScore(tastyScore, newReview.getTastyScore());
         cleanScore = addReviewScore(cleanScore, newReview.getCleanScore());
         freshScore = addReviewScore(freshScore, newReview.getFreshScore());
         nutrScore = addReviewScore(nutrScore, newReview.getNutrScore());
 
         reviewCount++; // 리뷰 수 증가
-
-        calcTotalByAll();
 
         // 연관 관계
         reviews.add(newReview);
@@ -145,12 +138,13 @@ public class Store extends BaseEntity {
      * 가게 평점 업데이트
      */
     private float subtractReviewScore(float currentScore, float newScore) {
+        if (reviewCount <= 1) return 0.0f;
         return (currentScore * reviewCount - newScore) / (reviewCount - 1);
     }
 
     public void deleteReview(Review review) {
 
-        Float reviewTotal = review.getTotalScore();
+        Float reviewTotal = review.getHealthScore();
         if (!review.getCurrentDiseases().isEmpty()) {
             sickScore = (
                     sickScore * sickCount - reviewTotal) / (sickCount - 1);
@@ -167,6 +161,10 @@ public class Store extends BaseEntity {
             dietCount--;
         }
 
+        // 건강 전체 평점
+        totalHealthScore = subtractReviewScore(totalHealthScore, review.getHealthScore());
+
+        // 맛/청/신/영
         tastyScore = subtractReviewScore(tastyScore, review.getTastyScore());
         cleanScore = subtractReviewScore(cleanScore, review.getCleanScore());
         freshScore = subtractReviewScore(freshScore, review.getFreshScore());
@@ -174,18 +172,14 @@ public class Store extends BaseEntity {
 
         reviewCount--; // 리뷰 수 감소
 
-        calcTotalByAll();
-
         // 연관 관계
         reviews.remove(review);
     }
 
-    private void calcTotalByAll() {
-        totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
-    }
+    //==Dto 변환==//
 
-    public StoreResonseDto.TotalStatDto getTotalStatDto() {
-        return StoreResonseDto.TotalStatDto.builder()
+    public StoreResponseDto.TotalStatDto getTotalStatDto() {
+        return StoreResponseDto.TotalStatDto.builder()
                 .tastyScore(tastyScore)
                 .cleanScore(cleanScore)
                 .freshScore(freshScore)
@@ -193,9 +187,9 @@ public class Store extends BaseEntity {
                 .build();
     }
 
-    public StoreResonseDto.IsInDBDto getIsInDBDto() {
-        return StoreResonseDto.IsInDBDto.builder()
-                .totalScore(totalScore)
+    public StoreResponseDto.IsInDBDto getIsInDBDto() {
+        return StoreResponseDto.IsInDBDto.builder()
+                .totalHealthScore(totalHealthScore)
                 .reviewCount(reviewCount)
                 .sickScore(sickScore)
                 .sickCount(sickCount)
@@ -206,14 +200,16 @@ public class Store extends BaseEntity {
                 .build();
     }
 
-    public StoreResonseDto.StoreInfoDto getStoreInfoDto() {
+    public StoreResponseDto.StoreInfoDto getStoreInfoDto() {
 
-        String[] categoryWords = categoryName.split(" > ");
+        String singleCategory = (categoryName != null && categoryName.contains(" > ")) ?
+                categoryName.split(" > ")[categoryName.split(" > ").length - 1] :
+                categoryName;
 
-        return StoreResonseDto.StoreInfoDto.builder()
+        return StoreResponseDto.StoreInfoDto.builder()
                 .placeId(kakaoPlaceId)
                 .placeName(placeName)
-                .categoryName(categoryWords[categoryWords.length - 1])
+                .categoryName(singleCategory)
                 .phone(phone)
                 .addressName(addressName)
                 .roadAddressName(roadAddressName)
@@ -224,37 +220,13 @@ public class Store extends BaseEntity {
                 .build();
     }
 
-    public StoreResonseDto.StoreHomeDto getStoreHomeDto() {
+    public StoreResponseDto.StoreHomeDto getStoreHomeDto() {
 
-        return StoreResonseDto.StoreHomeDto.builder()
+        return StoreResponseDto.StoreHomeDto.builder()
                 .storeId(id)
                 .createdAt(getCreatedAt())
                 .storeInfoDto(getStoreInfoDto())
                 .totalStatDto(getTotalStatDto())
                 .build();
     }
-
-    public void addItemDaumImage(ItemDaumImage itemDaumImage) {
-        itemDaumImages.add(itemDaumImage);
-        itemDaumImage.setStore(this);
-    }
-
-    //    public List<StoreResonseDto.ReviewImagePreviewDto> getReviewImagePreviewDtoList() {
-//        return reviews.stream()
-//                .map(review -> {
-//
-//                    List<ReviewImage> reviewImageList = review.getReviewImageList().stream()
-//                            .sorted(Comparator.comparing(ReviewImage::getCreatedAt).reversed()) // 최신순 정렬
-//                            .toList();
-//
-//                    return StoreResonseDto.ReviewImagePreviewDto.builder()
-//                            .reviewId(review.getId())
-//                            .reviewerInfo(review.getReviewerInfo())
-//                            .firstImageUrl(reviewImageList.isEmpty() ?
-//                                    null :
-//                                    reviewImageList.get(0).getImageUrl())
-//                            .build();
-//                })
-//                .toList();
-//    }
 }

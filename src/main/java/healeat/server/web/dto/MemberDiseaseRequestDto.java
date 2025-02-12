@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Builder
 public class MemberDiseaseRequestDto {
 
     private List<Long> diseaseIds;

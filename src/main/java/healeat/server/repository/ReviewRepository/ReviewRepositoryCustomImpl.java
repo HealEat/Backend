@@ -1,7 +1,9 @@
 package healeat.server.repository.ReviewRepository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import healeat.server.domain.Member;
@@ -17,10 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,71 +27,48 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     private final QReview review = QReview.review;
-    private final QReviewImage reviewImage = QReviewImage.reviewImage;
 
-    @Override
-    public Page<Review> findSortedReviews(String sortBy, Pageable pageable) {
+    @Override                                      /* LATEST|DESC|ASC     SICK|VEGET|DIET */
+    public Page<Review> sortAndFilterReviews(Store store, String sortBy, List<String> filters, Pageable pageable) {
 
-//        List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(sortBy, review);
+        // WHERE 조건 생성 (null 방지)
+        BooleanBuilder whereClause = new BooleanBuilder();
+        whereClause.and(review.store.eq(store));
+
+        if (filters.contains("SICK")) {
+            whereClause.and(Expressions.booleanTemplate("json_length({0}) > 0", review.currentDiseases));
+        }
+        if (filters.contains("VEGET")) {
+            whereClause.and(review.currentVeget.isNotNull().and(review.currentVeget.length().gt(0)));
+        }
+        if (filters.contains("DIET")) {
+            whereClause.and(review.currentDiet.isNotNull().and(review.currentDiet.length().gt(0)));
+        }
+
+        // 기본은 최신 순
+        OrderSpecifier<?> dynamicOrder = review.createdAt.desc();
+        if (sortBy.equals("DESC")) {
+            dynamicOrder = review.healthScore.desc();
+        }
+        else if (sortBy.equals("ASC")) {
+            dynamicOrder = review.healthScore.asc();
+        }
 
         List<Review> reviews = queryFactory
                 .selectFrom(review)
-//                .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
+                .where(whereClause)
+                .orderBy(dynamicOrder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long totalCount = Optional.ofNullable(queryFactory
-                .select(review.count())
-                .from(review)
-                .fetchOne())
+        Long totalCount = Optional.ofNullable(
+                queryFactory.select(review.count())
+                        .from(review)
+                        .where(whereClause)
+                        .fetchOne())
                 .orElse(0L);
 
         return new PageImpl<>(reviews, pageable, totalCount);
     }
-
-    @Override
-    public Page<ReviewImage> getFirstReviewImages(Store store, Pageable pageable) {
-
-        // 리뷰와 리뷰 이미지를 조인하여 한 번에 가져오기
-        List<Tuple> results = queryFactory
-                .select(review, reviewImage)
-                .from(review)
-                .where(review.store.eq(store))
-                .leftJoin(review.reviewImageList, reviewImage)  // LEFT JOIN 활용
-                .on(reviewImage.id.eq(  // 첫 번째 이미지만 가져오도록 조인 조건 추가
-                        JPAExpressions.select(reviewImage.id.min())
-                                .from(reviewImage)
-                                .where(reviewImage.review.eq(review))
-                ))
-                .orderBy(review.createdAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        // 각 리뷰에서 첫 번째 이미지 추출 (null 제거)
-        List<ReviewImage> firstReviewImages = results.stream()
-                .map(tuple -> tuple.get(reviewImage))  // 리뷰 이미지만 추출
-                .filter(Objects::nonNull)
-                .toList();
-
-        return new PageImpl<>(firstReviewImages, pageable, firstReviewImages.size());
-    }
-
-//    private List<OrderSpecifier<?>> getOrderSpecifiers(String sortBy, QReview review) {
-//        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
-//
-//        OrderSpecifier<?> dynamicOrder;
-//
-//        switch (sortBy) {
-//            case "SICK" -> dynamicOrder = review.sickScore.desc();
-//            case "VEGET" -> dynamicOrder = review.vegetScore.desc();
-//            case "DIET" -> dynamicOrder = review.dietScore.desc();
-//            default -> dynamicOrder = review.totalScore.desc();
-//        }
-//
-//
-////        orderSpecifiers.add()
-//        return null;
-//    }
 }

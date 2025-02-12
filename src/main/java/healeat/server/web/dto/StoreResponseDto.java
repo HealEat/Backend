@@ -1,11 +1,12 @@
 package healeat.server.web.dto;
 
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class StoreResonseDto {
+public class StoreResponseDto {
 
     @Builder
     @Getter
@@ -73,11 +74,9 @@ public class StoreResonseDto {
         // 가게 공통 정보
         StoreInfoDto storeInfoDto;
 
-        // 최근 사진 한 장
-        ReviewResponseDto.ReviewImageDto reviewImageDto;
-
-        /// Response 전용 필드
-        Boolean isInDB;
+        // 리뷰 사진 또는 Daum 사진 한 장
+        // StoreThumnail 데이터가 존재한다면 그것을 우선함.
+        String imageUrl;
 
         // Store 필요
         IsInDBDto isInDBDto;
@@ -91,7 +90,7 @@ public class StoreResonseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class IsInDBDto {
-        Float totalScore;
+        Float totalHealthScore;
         Integer reviewCount;
         Float sickScore;
         Integer sickCount;

@@ -1,18 +1,17 @@
 package healeat.server.converter;
 
 import healeat.server.domain.Member;
-import healeat.server.domain.Store;
 import healeat.server.domain.search.SearchResult;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public class StoreConverter {
 
-    public static StoreResonseDto.SearchInfoDto toSearchInfo(Member member,
-                                                             SearchResult searchResult,
-                                                             int apiCallCount) {
+    public static StoreResponseDto.SearchInfoDto toSearchInfo(Member member,
+                                                              SearchResult searchResult,
+                                                              int apiCallCount) {
         String memberName = null;
         List<String> healEatFoods = null;
         if (member != null) {
@@ -21,7 +20,7 @@ public class StoreConverter {
         }
 
         boolean hasHealthInfo = (healEatFoods != null) && (!healEatFoods.isEmpty());
-        return StoreResonseDto.SearchInfoDto.builder()
+        return StoreResponseDto.SearchInfoDto.builder()
                 .memberName(memberName)
                 .hasHealthInfo(hasHealthInfo)
                 .baseX(searchResult.getBaseX())
@@ -35,10 +34,10 @@ public class StoreConverter {
                 .build();
     }
 
-    public static StoreResonseDto.StorePreviewDtoList toStorePreviewListDto(
-            Page<StoreResonseDto.StorePreviewDto> storePage, StoreResonseDto.SearchInfoDto searchInfoDto) {
+    public static StoreResponseDto.StorePreviewDtoList toStorePreviewListDto(
+            Page<StoreResponseDto.StorePreviewDto> storePage, StoreResponseDto.SearchInfoDto searchInfoDto) {
 
-        return StoreResonseDto.StorePreviewDtoList.builder()
+        return StoreResponseDto.StorePreviewDtoList.builder()
                 .storeList(storePage.getContent())
                 .listSize(storePage.getNumberOfElements())
                 .totalPage(storePage.getTotalPages())

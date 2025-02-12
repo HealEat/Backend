@@ -2,8 +2,6 @@ package healeat.server.domain.mapping;
 
 import healeat.server.domain.*;
 import healeat.server.domain.common.BaseEntity;
-import healeat.server.domain.enums.Diet;
-import healeat.server.domain.enums.Vegetarian;
 import healeat.server.web.dto.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,23 +43,18 @@ public class Review extends BaseEntity {
     /**
      * 평점
      */
-    private Float totalScore; // 전체 평점
+    private Float healthScore; // 건강 평점
 
-    @Builder.Default
-    private Float tastyScore = 1.0f; // 맛
-
-    @Builder.Default
-    private Float cleanScore = 1.0f; // 청결도
-
-    @Builder.Default
-    private Float freshScore = 1.0f; // 신선도
-
-    @Builder.Default
-    private Float nutrScore = 1.0f; // 영양 균형
+    private Float tastyScore; // 평점(맛)
+    private Float cleanScore; // 평점(청결도)
+    private Float freshScore; // 평점(신선도)
+    private Float nutrScore; // 평점(영양 균형)
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<ReviewImage> reviewImageList = new ArrayList<>();
+
+    //==비즈니스 로직==//
 
     @PrePersist
     public void initializeReviewAndStore() {
@@ -76,20 +69,18 @@ public class Review extends BaseEntity {
 
         currentDiet = member.getDiet().getDescription();
 
-        // 리뷰 생성 시 전체 평점 계산
-        calcTotalByAll();
-
         // 가게에 업데이트
         store.addScoresByReview(this);
     }
 
-    private void calcTotalByAll() {
-        totalScore = (tastyScore + cleanScore + freshScore + nutrScore) / 4;
+    //==연관관계 편의 메서드==//
+
+    public void addImage(ReviewImage reviewImage) {
+        this.reviewImageList.add(reviewImage);
+        reviewImage.setReview(this);
     }
 
-    public void updateReviewImageList(List<ReviewImage> reviewImageList) {
-        this.reviewImageList = reviewImageList;
-    }
+    //==Dto 변환==//
 
     public ReviewResponseDto.ReviewerInfo getReviewerInfo() {
 
@@ -102,10 +93,5 @@ public class Review extends BaseEntity {
                 .profileImageUrl(member.getProfileImageUrl())
                 .currentPurposes(currentPurposes)
                 .build();
-    }
-
-    public void addImage(ReviewImage reviewImage) {
-        this.reviewImageList.add(reviewImage);
-        reviewImage.setReview(this);
     }
 }

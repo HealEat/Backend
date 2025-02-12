@@ -1,16 +1,17 @@
 package healeat.server.service.search;
 
-import healeat.server.domain.FoodFeature;
-import healeat.server.domain.Member;
-import healeat.server.domain.Store;
+import healeat.server.domain.*;
 import healeat.server.domain.mapping.Bookmark;
-import healeat.server.domain.search.ItemDaumImage;
 import healeat.server.domain.search.SearchResultItem;
-import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
+import healeat.server.repository.ReviewImageRepository;
 import healeat.server.repository.StoreRepository;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.repository.StoreThumbnailRepository;
+import healeat.server.service.ReviewService;
+import healeat.server.web.dto.ReviewResponseDto;
+import healeat.server.web.dto.StoreResponseDto;
+import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import healeat.server.web.dto.api_response.KakaoPlaceResponseDto.Document;
-import healeat.server.web.dto.StoreResonseDto.StorePreviewDto;
+import healeat.server.web.dto.StoreResponseDto.StorePreviewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,9 @@ public class StoreMappingService {
 
     private final StoreRepository storeRepository;
     private final DaumImageService daumImageService;
-    private final SearchResultItemRepository searchResultItemRepository;
+    private final ReviewService reviewService;
+    private final ReviewImageRepository reviewImageRepository;
+    private final StoreThumbnailRepository storeThumbnailRepository;
 
     @Transactional
     public SearchResultItem docToSearchResultItem(Document document,
@@ -50,46 +53,48 @@ public class StoreMappingService {
     }
 
     public StorePreviewDto mapToDto(Member member, SearchResultItem item) {
+        Long bookmarkId = member == null ? null :
+                member.getBookmarks().stream()
+                        .filter(bookmark -> bookmark.getStore().getId().equals(item.getId()))
+                        .map(Bookmark::getId)
+                        .findFirst()
+                        .orElse(null);
 
-        Long bookmarkId = null;
-        if (member != null) {
-             Optional<Bookmark> optionalBookmark = member.getBookmarks().stream()
-                     .filter(bookmark -> bookmark.getStore().getId().equals(item.getId()))
-                     .findFirst();
+        Long placeId = item.getPlaceId();
 
-             if (optionalBookmark.isPresent()) {
-                 bookmarkId = optionalBookmark.get().getId();
-             }
-        }
+        // Store 존재 여부 확인 및 객체 가져오기
+        Store store = storeRepository.findByKakaoPlaceId(placeId).orElse(null);
+        boolean isInDB = store != null;
 
-        Optional<Store> optionalStore = storeRepository.findByKakaoPlaceId(item.getPlaceId());
-        boolean isInDB = optionalStore.isPresent();
-        Store store;
-        if (isInDB) {
-            store = optionalStore.get();
-        } else {
-            store = null;
-        }
-        StoreResonseDto.StoreInfoDto storeInfo = item.getStoreInfoDto();
+        // 가게 썸네일 관련
+        String imageUrl = storeThumbnailRepository.findByPlaceId(placeId)
+                .map(StoreThumbnail::getImageUrl)
+                .orElseGet(() -> {
+                    if (isInDB) {
+                        return reviewImageRepository.findFirstByReview_StoreOrderByCreatedAtDesc(store)
+                                .map(ReviewImage::getImageUrl)
+                                .orElseGet(() -> getDaumImage(item));
+                    }
+                    return getDaumImage(item);
+                });
 
         return StorePreviewDto.builder()
-                // 가게 공통 정보
-                .storeInfoDto(storeInfo)
 
-                // 최근 리뷰 사진 한 장
-                .reviewImageDto(isInDB ?
-                        /*구현 필요 */ null :
-                        null)
+                .storeInfoDto(item.getStoreInfoDto())
 
-                /// Response 전용 필드
-                .isInDB(isInDB)
+                .imageUrl(imageUrl)
 
-                /// Store 필요
-                .isInDBDto(isInDB ?
-                        store.getIsInDBDto() :
-                        null)
-                // Member 필요
+                .isInDBDto(isInDB ? store.getIsInDBDto() : null)
+
                 .bookmarkId(bookmarkId)
                 .build();
+    }
+
+    private String getDaumImage(SearchResultItem item) {
+        return daumImageService.getDaumImagesWithNameInfo(item.getPlaceName(), item.getAddressName())
+                .stream()
+                .findFirst()
+                .map(DaumImageResponseDto.Document::getImage_url)
+                .orElse("");
     }
 }

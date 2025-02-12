@@ -6,20 +6,19 @@ import healeat.server.domain.search.SearchResultItem;
 import healeat.server.validation.annotation.CheckPage;
 import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.StoreRequestDto;
-import healeat.server.web.dto.StoreResonseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import org.springframework.validation.annotation.Validated;
 
-@Validated
 public interface StoreCommandService {
 
     Store saveStore(SearchResultItem item);
 
-    StoreResonseDto.StorePreviewDtoList searchAndMapStores(Member member,
-                                                           @CheckPage Integer page,
-                                                           @CheckSizeSum StoreRequestDto.SearchKeywordDto request);
+    StoreResponseDto.StorePreviewDtoList searchAndMapStores(Member member,
+                                                            Integer page,
+                                                            StoreRequestDto.SearchKeywordDto request);
 
-    StoreResonseDto.StorePreviewDtoList recommendAndMapStores(
+    StoreResponseDto.StorePreviewDtoList recommendAndMapStores(
             Member member,
-            @CheckPage Integer page,
+            Integer page,
             StoreRequestDto.HealEatRequestDto request);
 }

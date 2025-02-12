@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class ReviewService {
 
     // 내가 남긴 후기 목록 조회 API
     @Transactional(readOnly = true)
-    public ReviewResponseDto.myPageReviewListDto getMyReviews(Member member, Pageable pageable) {
+    public ReviewResponseDto.MyPageReviewListDto getMyReviews(Member member, Pageable pageable) {
         Page<Review> reviewPage = reviewRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
 
         List<ReviewResponseDto.MyPageReviewDto> reviewsDtoList = reviewPage.stream()
@@ -52,7 +51,7 @@ public class ReviewService {
                 )
                 .toList();
 
-        return ReviewResponseDto.myPageReviewListDto.builder()
+        return ReviewResponseDto.MyPageReviewListDto.builder()
                 .myPageReviewList(reviewsDtoList)
                 .listSize(reviewsDtoList.size())
                 .totalPage(reviewPage.getTotalPages())
@@ -63,7 +62,10 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Review> getStoreReviews(Long placeId, Integer page, StoreRequestDto.GetReviewRequestDto request) {
+    public Page<Review> getStoreReviews(Long placeId, Integer page, String sortBy, List<String> filters) {
+
+        if (filters.isEmpty())
+            return Page.empty();
 
         Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
@@ -71,7 +73,10 @@ public class ReviewService {
         // 페이지 번호를 0-based로 조정
         int safePage = Math.max(0, page - 1);
 
-        return null;
+        Pageable pageable = PageRequest.of(safePage, 10);
+
+        return reviewRepository.sortAndFilterReviews(
+                store, sortBy, filters, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -85,7 +90,7 @@ public class ReviewService {
 
         Pageable pageable = PageRequest.of(safePage, 10);
 
-        return reviewRepository.getFirstReviewImages(store, pageable);
+        return reviewImageRepository.findAllByReview_StoreOrderByCreatedAtDesc(store, pageable);
     }
 
     // 리뷰 생성 API
@@ -98,6 +103,7 @@ public class ReviewService {
         Review review = Review.builder()
                 .store(store)
                 .member(member)
+                .healthScore(request.getHealthScore())
                 .tastyScore(request.getTastyScore())
                 .cleanScore(request.getCleanScore())
                 .freshScore(request.getFreshScore())

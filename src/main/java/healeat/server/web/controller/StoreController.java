@@ -14,11 +14,12 @@ import healeat.server.web.dto.*;
 import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,7 @@ import static healeat.server.converter.BookmarkConverter.toSetResponseDto;
 @RestController
 @RequestMapping("/stores")
 @RequiredArgsConstructor
+@Validated
 public class StoreController {
 
     private final StoreQueryServiceImpl storeQueryServiceImpl;
@@ -42,7 +44,7 @@ public class StoreController {
     @Operation(summary = "가게 단건 조회 (이미지 제외) API",
             description = "이미지를 제외한 모든 정보를 조회합니다.")
     @GetMapping("/{placeId}")
-    public ApiResponse<StoreResonseDto.StoreHomeDto> getStoreDetails(
+    public ApiResponse<StoreResponseDto.StoreHomeDto> getStoreDetails(
             @PathVariable Long placeId,
             @AuthenticationPrincipal Member member) {
 
@@ -51,9 +53,12 @@ public class StoreController {
         return ApiResponse.onSuccess(storeQueryServiceImpl.getStoreHome(placeId, testMember));
     }
 
-    @Operation(summary = "가게 리뷰 이미지 조회 API",
-            description = "리뷰 각각에 대해 첫 번째 이미지 리스트입니다." +
-                    " 이미지마다 작성자의 정보도 포함하며, 최신순 페이징이 적용됩니다. 가게 이미지 조회 시 '먼저' 사용해주세요.")
+    @Operation(summary = "가게 리뷰 이미지 조회 API", description =
+            """
+                    가게의 리뷰 이미지 전체를 조회하며, 이미지마다 작성자의 정보도 포함합니다.
+                    가게 이미지 조회 시 '먼저' 사용해주세요.
+                    
+                    페이징이 적용됩니다.(페이지 당 10개)""")
     @GetMapping("/{placeId}/reviewImgs")
     public ApiResponse<ReviewResponseDto.ReviewImageDtoList> getStoreReviewImages(
             @PathVariable Long placeId,
@@ -76,16 +81,22 @@ public class StoreController {
     /**
      * 가게 리뷰
      */
-    @Operation(summary = "특정 가게의 리뷰 페이지 조회 API", description = "리뷰 리스트는 페이징을 포함합니다." +
-            "동적 정렬 기준 : LATEST(기본) / TOTAL / SICK / VEGET / DIET 를 받아서 리뷰 목록을 조회합니다.")
+    @Operation(summary = "특정 가게의 리뷰 페이지 조회 API", description =
+            """
+                    Request Body에
+                    1. 동적 정렬 기준 : LATEST(기본) / DESC(높은 순) / ASC(낮은 순)
+                    2. 필터 조건 : 리스트 - [SICK, VEGET, DIET] (기본은 전부) 를 받아서 리뷰 목록을 조회합니다.
+                    
+                    페이징이 적용됩니다.(페이지 당 10개)""")
     @GetMapping("/{placeId}/reviews")
     public ApiResponse<ReviewResponseDto.ReviewPreviewListDto> getReviewList(
             @PathVariable Long placeId,
             @CheckPage @RequestParam Integer page,
-            @RequestBody StoreRequestDto.GetReviewRequestDto request) {
+            @RequestParam(required = false, defaultValue = "LATEST") String sortBy,
+            @RequestParam(required = false) List<String> filters) {
 
-//        Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, request);
-        return ApiResponse.onSuccess(/*ReviewConverter.toReviewPreviewListDto(reviewPage)*/null);
+        Page<Review> reviewPage = reviewService.getStoreReviews(placeId, page, sortBy, filters);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewPreviewListDto(reviewPage));
     }
 
     @Operation(summary = "특정 가게의 리뷰 작성 API",
@@ -96,6 +107,7 @@ public class StoreController {
             @AuthenticationPrincipal Member member,
             @RequestPart(name = "files", required = false)
             List<MultipartFile> files,
+            @Valid
             @RequestPart(name = "request", required = true)
             ReviewRequestDto request) {
 
@@ -109,8 +121,7 @@ public class StoreController {
     /**
      * 가게 북마크
      */
-    @Operation(summary = "가게 북마크 저장 API", description = "회원의 가게 북마크에 저장합니다." +
-            " isInDB가 ture인 검색 결과에 대해서만 사용하는 API입니다.")
+    @Operation(summary = "가게 북마크 저장 API", description = "회원의 가게 북마크로 저장합니다.")
     @PostMapping("/{placeId}/bookmarks")
     public ApiResponse<BookmarkResponseDto> saveBookmark(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {

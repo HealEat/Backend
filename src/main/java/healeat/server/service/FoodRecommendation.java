@@ -35,12 +35,14 @@ public class FoodRecommendation {
                 .collect(Collectors.toSet());
 
         // 베지테리언 - 필요한 음식 추가
-        if (vegetarian != Vegetarian.FLEXI){
+        if (vegetarian != Vegetarian.NONE && vegetarian != Vegetarian.FLEXI){
             recommendedFoods.addAll(FoodMappingConfig.VEGETARIAN_FOOD_ASSIGNMENT.get(vegetarian));
         }
 
         // 다이어트 - 필요한 음식 추가
-        recommendedFoods.addAll(FoodMappingConfig.DIET_FOOD_ASSIGNMENT.get(diet));
+        if (diet != Diet.NONE && diet != Diet.MAINTAIN) {
+            recommendedFoods.addAll(FoodMappingConfig.DIET_FOOD_ASSIGNMENT.get(diet));
+        }
 
         return new ArrayList<>(recommendedFoods);
     }

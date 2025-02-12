@@ -1,6 +1,5 @@
 package healeat.server.web.dto;
 
-import healeat.server.web.dto.api_response.DaumImageResponseDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -20,17 +19,6 @@ public class StoreRequestDto {
         String y; // 추천받을 위치 위도
 
         Integer radius; // 조사할 반경
-    }
-
-    @Getter
-    public static class GetReviewRequestDto {
-
-        @Pattern(regexp = "^(LATEST|TOTAL)$", message = "정렬 기준이 올바르지 않습니다")
-        String sortBy;
-
-        @Size(max = 3, message = "필터는 최대 3개까지 선택할 수 있습니다")
-        @Valid
-        List<@Pattern(regexp = "^(SICK|VEGET|DIET)$", message = "필터 기준이 올바르지 않습니다") String> filters;
     }
 
     @Getter
