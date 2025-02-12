@@ -31,6 +31,8 @@ public class QRecentSearch extends EntityPathBase<RecentSearch> {
 
     public final healeat.server.domain.QMember member;
 
+    public final NumberPath<Long> placeId = createNumber("placeId", Long.class);
+
     public final StringPath query = createString("query");
 
     public final EnumPath<healeat.server.domain.enums.SearchType> searchType = createEnum("searchType", healeat.server.domain.enums.SearchType.class);

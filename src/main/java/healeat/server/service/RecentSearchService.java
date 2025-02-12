@@ -89,6 +89,7 @@ public class RecentSearchService {
                     .searchType(SearchType.STORE)
                     .member(member)
                     .store(store)
+                    .placeId(placeId)
                     .build();
 
             return recentSearchRepository.save(recentStore);

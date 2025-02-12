@@ -44,7 +44,7 @@ public class ReviewService {
 
         List<ReviewResponseDto.MyPageReviewDto> reviewsDtoList = reviewPage.stream()
                 .map(review -> ReviewResponseDto.MyPageReviewDto.builder()
-                        .placeId(review.getStore().getKakaoPlaceId())
+                        .placeId(review.getPlaceId())
                         .placeName(review.getStore().getPlaceName())
                         .reviewPreview(ReviewConverter.toReviewPreviewDto(review))
                         .build()
@@ -102,6 +102,7 @@ public class ReviewService {
 
         Review review = Review.builder()
                 .store(store)
+                .placeId(placeId)
                 .member(member)
                 .healthScore(request.getHealthScore())
                 .tastyScore(request.getTastyScore())
