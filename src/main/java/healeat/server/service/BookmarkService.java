@@ -68,4 +68,16 @@ public class BookmarkService {
 
         return response;
     }
+
+    public List<BookmarkResponseDto> getMemberBookmarks(Member member) {
+        List<Bookmark> bookmarks = bookmarkRepository.findByMember(member);
+        return bookmarks.stream().map(bookmark -> BookmarkResponseDto.builder()
+                .bookmarkId(bookmark.getId())
+                .memberId(bookmark.getMember().getId())
+                .placeName(bookmark.getStore().getPlaceName())
+                .createdAt(bookmark.getCreatedAt())
+                .build())
+                .toList();
+
+    }
 }

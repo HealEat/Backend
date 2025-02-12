@@ -5,6 +5,7 @@ import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.mapping.Review;
 import healeat.server.repository.MemberRepository;
+import healeat.server.service.BookmarkService;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
 import healeat.server.service.ReviewService;
@@ -19,6 +20,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/my-page")
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class MyPageController {
     private final MemberHealthInfoService memberHealthInfoService;
     private final MemberRepository memberRepository;
     private final ReviewService reviewService;
+    private final BookmarkService bookmarkService;
 
     @Operation(summary = "프로필 정보 조회 API", description = "프로필 수정 화면에 사용합니다.")
     @GetMapping("/profile")
@@ -92,6 +96,16 @@ public class MyPageController {
 
         HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(testMember);
         return ApiResponse.onSuccess(responseDto);
+    }
+
+    @Operation(summary = "회원의 북마크 목록 조회 API", description = "회원이 저장한 북마크 목록을 조회합니다.")
+    @GetMapping("/bookmarks")
+    public ApiResponse<List<BookmarkResponseDto>> getMemberBookmarks(@AuthenticationPrincipal Member member) {
+
+        if (member == null) {
+            return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
+        }
+        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(member));
     }
 
     // 기획안 수정됨 : 건강 정보 각각에 대한 정보 수정 X -> 건강 정보 전체에 대한 정보 수정 O (프론트에서 Info 도메인 재사용한다고 함)
