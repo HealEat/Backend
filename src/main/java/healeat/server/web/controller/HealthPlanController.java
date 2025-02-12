@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -40,7 +41,7 @@ public class HealthPlanController {
     @GetMapping
     public ApiResponse<HealthPlanResponseDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member,
-            @CheckPage @RequestParam(defaultValue = "1") Integer page) {
+            @CheckPage @RequestParam Integer page) {
 
         Member testMember = memberRepository.findById(999L).get();
 
