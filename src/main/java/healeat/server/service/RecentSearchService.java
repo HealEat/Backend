@@ -58,6 +58,10 @@ public class RecentSearchService {
     @Transactional
     public void saveRecentQuery(Member member, String query) {
 
+        if (query == null || query.isBlank()) {
+            return;
+        }
+
         Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndQuery(member, query);
         if (optionalRecentSearch.isPresent()) {
                 optionalRecentSearch.get().setUpdatedAt(LocalDateTime.now()); // 필드 수정 없이 updatedAt만 갱신

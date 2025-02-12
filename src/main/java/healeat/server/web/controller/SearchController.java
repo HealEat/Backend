@@ -43,7 +43,9 @@ public class SearchController {
                     2. 필터 조건 : 음식 종류/특징 키워드 id 리스트, 최소 별점
                     3. 동적 정렬 기준 : NONE(기본) / TOTAL / SICK / VEGET / DIET 를 받아서 가게 목록을 조회합니다.
                     - 페이징이 적용됩니다.(페이지 당 10개)
-                    - 같은 검색어, 동일한 검색 기준 및 위치(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
+                    - 같은 검색어, 동일한 검색 기준 및 위치(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.
+                    
+                    - 홈과 다른 점은, 지도 점프 및 지도 뷰를 위해 avgX, avgY, maxDistance가 제공된다는 점입니다.""")
     @PostMapping
     public ApiResponse<StoreResponseDto.StorePreviewDtoList> getSearchResults(
             @AuthenticationPrincipal Member member,
