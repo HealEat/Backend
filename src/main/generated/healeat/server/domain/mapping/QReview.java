@@ -47,6 +47,8 @@ public class QReview extends EntityPathBase<Review> {
 
     public final NumberPath<Float> nutrScore = createNumber("nutrScore", Float.class);
 
+    public final NumberPath<Long> placeId = createNumber("placeId", Long.class);
+
     public final ListPath<healeat.server.domain.ReviewImage, healeat.server.domain.QReviewImage> reviewImageList = this.<healeat.server.domain.ReviewImage, healeat.server.domain.QReviewImage>createList("reviewImageList", healeat.server.domain.ReviewImage.class, healeat.server.domain.QReviewImage.class, PathInits.DIRECT2);
 
     public final healeat.server.domain.QStore store;

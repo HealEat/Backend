@@ -26,4 +26,5 @@ public class Bookmark extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
+    private Long placeId;   // 보다 쉬운 테이블 분석을 위해 카카오 id 도 추가
 }
