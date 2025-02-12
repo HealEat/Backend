@@ -113,7 +113,7 @@ public class ReviewService {
 
         reviewRepository.save(review);
 
-        if(!files.isEmpty()){
+        if(!(files == null || files.isEmpty())){
             if (files.size() > 10) {
                 throw new ReviewHandler(ErrorStatus.REVIEW_TOO_MANY_IMAGES);
             }

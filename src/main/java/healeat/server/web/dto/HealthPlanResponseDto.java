@@ -7,7 +7,16 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Builder
 public class HealthPlanResponseDto {
+
+    List<HealthPlanOneDto> HealthPlanList;
+    Integer listSize;
+    Integer totalPage;
+    Long totalElements;
+    Boolean isFirst;
+    Boolean isLast;
 
     @Getter
     @Builder
@@ -27,14 +36,6 @@ public class HealthPlanResponseDto {
     public static class DeleteResultDto {
         private Long healthPlanId;
         private LocalDateTime deletedAt;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class HealthPlanListDto{
-       private List<HealthPlanOneDto> HealthPlanList;
     }
 
     @Getter

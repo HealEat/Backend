@@ -7,15 +7,18 @@ import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.HealthPlanService;
 import healeat.server.converter.HealthPlanConverter;
+import healeat.server.validation.annotation.CheckPage;
 import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/plans")
 @RequiredArgsConstructor
+@Validated
 public class HealthPlanController {
 
     private final HealthPlanService healthPlanService;
@@ -34,15 +38,16 @@ public class HealthPlanController {
 
     @Operation(summary = "건강 관리 목표 조회", description = "사용자의 건강 관리 목표를 전체 조회합니다.")
     @GetMapping
-    public ApiResponse<HealthPlanResponseDto.HealthPlanListDto> getAllHealthPlans(
-            @AuthenticationPrincipal Member member) {
+    public ApiResponse<HealthPlanResponseDto> getAllHealthPlans(
+            @AuthenticationPrincipal Member member,
+            @CheckPage @RequestParam(defaultValue = "1") Integer page) {
 
         Member testMember = memberRepository.findById(999L).get();
 
         //정상적으로 HealthPlan 조회
-        List<HealthPlan> healthPlans = healthPlanService.getHealthPlanByMember(testMember);
+        Page<HealthPlan> healthPlans = healthPlanService.findAllByMember(testMember, page);
 
-        return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanListDto(healthPlans));
+        return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanResponseDto(healthPlans));
     }
 
     @Operation(summary = "건강 관리 목표 추가", description = "건강 관리 목표를 추가합니다." +

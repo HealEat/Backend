@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -103,15 +102,13 @@ public class RecentSearchService {
         }
     }
 
-    //최근 검색 기록 삭제
+    // 최근 검색 기록 삭제
     @Transactional
-    public void deleteRecentSearch(Long id) {recentSearchRepository.deleteById(id); }
-
     public RecentSearchResponseDto.DeleteResultDto toDeleteRecentSearch(Long recentId) {
         RecentSearch deleteRecentSearch = getRecentSearchById(recentId);
         RecentSearchResponseDto.DeleteResultDto response = SearchPageConverter.toDeleteResultDto(deleteRecentSearch);
 
-        deleteRecentSearch(recentId);
+        recentSearchRepository.delete(deleteRecentSearch);
 
         return response;
     }
