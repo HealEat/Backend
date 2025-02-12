@@ -29,7 +29,7 @@ public class TermService {
         return termRepository.findAllByOrderByIsRequiredDesc()
                 .stream()
                 .map(TermResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 회원의 약관 동의 저장 API
