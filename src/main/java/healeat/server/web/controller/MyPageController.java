@@ -100,12 +100,16 @@ public class MyPageController {
 
     @Operation(summary = "회원의 북마크 목록 조회 API", description = "회원이 저장한 북마크 목록을 조회합니다.")
     @GetMapping("/bookmarks")
-    public ApiResponse<List<BookmarkResponseDto>> getMemberBookmarks(@AuthenticationPrincipal Member member) {
+    public ApiResponse<StoreResponseDto.StorePreviewDtoList> getMemberBookmarks(
+            @AuthenticationPrincipal Member member,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
 
         if (member == null) {
             return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
         }
-        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(member));
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(member, pageable));
     }
 
     // 기획안 수정됨 : 건강 정보 각각에 대한 정보 수정 X -> 건강 정보 전체에 대한 정보 수정 O (프론트에서 Info 도메인 재사용한다고 함)

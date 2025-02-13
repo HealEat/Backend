@@ -11,7 +11,10 @@ import healeat.server.repository.BookmarkRepository;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.web.dto.BookmarkResponseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,15 +73,15 @@ public class BookmarkService {
         return response;
     }
 
-    public List<BookmarkResponseDto> getMemberBookmarks(Member member) {
-        List<Bookmark> bookmarks = bookmarkRepository.findByMember(member);
-        return bookmarks.stream().map(bookmark -> BookmarkResponseDto.builder()
-                .bookmarkId(bookmark.getId())
-                .memberId(bookmark.getMember().getId())
-                .placeName(bookmark.getStore().getPlaceName())
-                .createdAt(bookmark.getCreatedAt())
-                .build())
-                .toList();
+    public StoreResponseDto.StorePreviewDtoList getMemberBookmarks(Member member, Pageable pageable) {
+        Page<Bookmark> bookmarkPage = bookmarkRepository.findByMember(member, pageable);
 
+        Page<StoreResponseDto.StorePreviewDto> storePreviewPage = bookmarkPage.map(bookmark -> {
+            StoreResponseDto.StoreHomeDto storeHomeDto = bookmark.getStore().getStoreHomeDto();
+            storeHomeDto.setBookmarkId(bookmark.getId());
+            return StoreConverter.toStorePreviewDto(storeHomeDto);
+        });
+
+        return StoreConverter.toStorePreviewListDto(storePreviewPage, null);
     }
 }
