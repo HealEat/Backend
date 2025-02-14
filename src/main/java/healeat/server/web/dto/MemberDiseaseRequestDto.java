@@ -7,5 +7,5 @@ import java.util.List;
 @Getter
 public class MemberDiseaseRequestDto {
 
-    List<Long> diseaseIds;
+    String diseaseName;
 }
