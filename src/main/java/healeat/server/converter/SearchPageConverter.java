@@ -72,7 +72,7 @@ public class SearchPageConverter {
                 .build();
     }
 
-    public static RecentSearchResponseDto toRecentSearchResponseDto(Page<RecentSearch> recentSearches) {
+    public static RecentSearchResponseDto toRecentSearchResponseDto(List<RecentSearch> recentSearches) {
 
         List<RecentSearchResponseDto.RecentSearchDto> recentSearchList = recentSearches.stream()
                 .map(SearchPageConverter::toRecentSearchDto)
@@ -81,11 +81,6 @@ public class SearchPageConverter {
 
         return RecentSearchResponseDto.builder()
                 .recentSearchList(recentSearchList)
-                .listSize(recentSearchList.size())
-                .totalPage(recentSearches.getTotalPages())
-                .totalElements(recentSearches.getTotalElements())
-                .isFirst(recentSearches.isFirst())
-                .isLast(recentSearches.isLast())
                 .build();
     }
 

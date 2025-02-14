@@ -3,7 +3,6 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.Disease;
 import healeat.server.domain.Member;
-import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
 import healeat.server.web.dto.*;
@@ -58,7 +57,7 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestBody MemberDiseaseRequestDto request) {
 
-        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(member, request.getDiseaseIds());
+        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(member, request.getDiseaseName());
         return ApiResponse.onSuccess(responseDto);
     }
 

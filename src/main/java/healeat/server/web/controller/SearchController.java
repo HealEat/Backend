@@ -6,7 +6,6 @@ import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Member;
 import healeat.server.domain.mapping.RecentSearch;
-import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.StoreCommandService;
@@ -67,7 +66,8 @@ public class SearchController {
             return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
         }
 
-        Page<RecentSearch> recentSearches = recentSearchService.getRecentSearchPage(member.getId());
+        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(member.getId());
+
         return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }
 

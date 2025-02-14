@@ -4,7 +4,6 @@ import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.mapping.Review;
-import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
 import healeat.server.service.ReviewService;

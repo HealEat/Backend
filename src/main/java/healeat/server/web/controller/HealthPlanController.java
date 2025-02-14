@@ -42,10 +42,10 @@ public class HealthPlanController {
     @GetMapping
     public ApiResponse<HealthPlanResponseDto> getAllHealthPlans(
             @AuthenticationPrincipal Member member,
-            @CheckPage @RequestParam(defaultValue = "1") Integer page) {
+            @CheckPage @RequestParam Integer page) {
 
         //정상적으로 HealthPlan 조회
-        Page<HealthPlan> healthPlans = healthPlanService.findAllByMember(member, page);
+        Page<HealthPlan> healthPlans = healthPlanService.find10PlansByMemberPage(member, page);
 
         return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanResponseDto(healthPlans));
     }

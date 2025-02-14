@@ -36,6 +36,6 @@ public class AppleAuthService {
                 AppleTokenResponse.class
         );
 
-        return response.getBody();
+        return response.getBody();  //여기서 `id_token`을 받음
     }
 }

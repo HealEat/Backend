@@ -1,7 +1,6 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
-import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
