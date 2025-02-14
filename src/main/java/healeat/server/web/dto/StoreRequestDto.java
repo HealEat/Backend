@@ -22,6 +22,25 @@ public class StoreRequestDto {
     }
 
     @Getter
+    public static class SearchOnMapDto {
+
+        String query; // 검색어
+
+        String rect;
+
+        Set<Long> categoryIdList;
+
+        Set<Long> featureIdList;
+
+        @Max(value = 5, message = "최소 별점은 5 이하여야 합니다")
+        @Min(value = 0, message = "최소 별점은 0 이상이어야 합니다")
+        Float minRating;
+
+        @Pattern(regexp = "^(NONE|TOTAL|SICK|VEGET|DIET)$", message = "정렬 기준이 올바르지 않습니다")
+        String sortBy;
+    }
+
+    @Getter
     public static class SearchKeywordDto {
 
         String query; // 검색어

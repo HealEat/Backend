@@ -14,6 +14,11 @@ public interface StoreCommandService {
                                                             Integer page,
                                                             StoreRequestDto.SearchKeywordDto request);
 
+    StoreResponseDto.StorePreviewDtoList searchAndMapStoresOnMap(Member member,
+                                                            Integer page,
+                                                            StoreRequestDto.SearchOnMapDto request);
+
+
     StoreResponseDto.StorePreviewDtoList recommendAndMapStores(
             Member member,
             Integer page,
