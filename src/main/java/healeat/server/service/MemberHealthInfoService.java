@@ -99,10 +99,9 @@ public class MemberHealthInfoService {
         List<String> healthGoals = determineHealthGoals(member);
 
         // 2. 비건 종류
-        String vegetarianType = Optional.of(member.getVegetarian())
-                .map(Vegetarian::getDescription)
-                .filter(description -> !description.isEmpty())
-                .orElse(null);
+        String vegetarianType = member.getVegetarian() != null ?
+                member.getVegetarian().getDescription() :
+                "";
 
         // 3. 회원의 건강 질문 응답 조회
         Map<Question, List<Answer>> questionAnswers = getMemberHealthAnswer(member);
