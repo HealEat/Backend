@@ -21,8 +21,19 @@ public class StoreRequestDto {
         Integer radius; // 조사할 반경
     }
 
+    public interface SearchFilterDto {
+        Set<Long> getCategoryIdList();
+        Set<Long> getFeatureIdList();
+
+        default int getTotalFilterSize() {
+            int categorySize = getCategoryIdList() == null ? 0 : getCategoryIdList().size();
+            int featureSize = getFeatureIdList() == null ? 0 : getFeatureIdList().size();
+            return categorySize + featureSize;
+        }
+    }
+
     @Getter
-    public static class SearchOnMapDto {
+    public static class SearchOnMapDto implements SearchFilterDto {
 
         String query; // 검색어
 
@@ -41,7 +52,7 @@ public class StoreRequestDto {
     }
 
     @Getter
-    public static class SearchKeywordDto {
+    public static class SearchKeywordDto implements SearchFilterDto {
 
         String query; // 검색어
 

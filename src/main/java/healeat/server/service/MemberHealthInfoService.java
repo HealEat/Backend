@@ -18,15 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class MemberHealthInfoService {
 
     private final MemberHealQuestionRepository memberHealQuestionRepository;
     private final DiseaseRepository diseaseRepository;
+    private final MemberDiseaseRepository memberDiseaseRepository;
 
+    @Transactional
     public Member chooseVegetarian(Member member, String choose) {
 
         Vegetarian vegetarian = Vegetarian.getByDescription(choose);
@@ -35,6 +38,7 @@ public class MemberHealthInfoService {
         return member;
     }
 
+    @Transactional
     public Member chooseDiet(Member member, String choose) {
 
         Diet diet = Diet.getByDescription(choose);
@@ -44,6 +48,7 @@ public class MemberHealthInfoService {
     }
 
     // Question에 대한 회원의 답변 저장
+    @Transactional
     public MemberHealQuestion createQuestion(Member member, Integer questionNum, AnswerRequestDto request) {
 
         // 1. HEALTH_ISSUE, 2. MEAL_NEEDED, 3. NUTRIENT_NEEDED, 4. FOOD_TO_AVOID
@@ -63,6 +68,7 @@ public class MemberHealthInfoService {
         return memberHealQuestionRepository.save(memberHealQuestion);
     }
 
+    @Transactional
     public HealInfoResponseDto makeHealEat(Member member) {
 
         List<Answer> answers = new ArrayList<>();
@@ -82,20 +88,21 @@ public class MemberHealthInfoService {
     }
 
     // 질병 검색 기능
-    @Transactional(readOnly = true)
     public List<Disease> searchDiseases(String keyword) {
         return diseaseRepository.findByNameContaining(keyword);
     }
 
     /// MyPage - 나의 건강 정보 조회 API
-    @Transactional(readOnly = true)
     public HealInfoResponseDto.MyHealthInfoDto getMyHealthInfo(Member member) {
 
         // 1. 나의 건강 목표 (질병 관리, 비건, 다이어트)
         List<String> healthGoals = determineHealthGoals(member);
 
         // 2. 비건 종류
-        String vegetarianType = Vegetarian.getByDescription(member.getVegetarian().getDescription()).getDescription();
+        String vegetarianType = Optional.of(member.getVegetarian())
+                .map(Vegetarian::getDescription)
+                .filter(description -> !description.isEmpty())
+                .orElse(null);
 
         // 3. 회원의 건강 질문 응답 조회
         Map<Question, List<Answer>> questionAnswers = getMemberHealthAnswer(member);
@@ -116,12 +123,19 @@ public class MemberHealthInfoService {
     }
 
     private List<String> determineHealthGoals(Member member) {
-        // 회원의 건강 목표 중 null 인 부분 필터링하여 리스트로 반환
-        return Arrays.asList(
-                member.getVegetarian() != Vegetarian.NONE ? "비건" : null,
-                member.getDiet() != Diet.NONE ? "다이어트" : null,
-                memberHealQuestionRepository.findByMember(member).isEmpty() ? null : "질병 관리"
-        ).stream().filter(Objects::nonNull).toList();
+        List<String> goals = new ArrayList<>();
+
+        if (!memberDiseaseRepository.findByMember(member).isEmpty()) {
+            goals.add("질병 관리");
+        }
+        if (member.getVegetarian() != Vegetarian.NONE) {
+            goals.add("베지테리언");
+        }
+        if (member.getDiet() != Diet.NONE) {
+            goals.add("다이어트");
+        }
+
+        return goals;
     }
 
     // 질문에 대한 회원의 응답 가져오기 메서드
@@ -129,10 +143,11 @@ public class MemberHealthInfoService {
         return memberHealQuestionRepository.findByMember(member).stream()
                 .collect(Collectors.toMap(
                         MemberHealQuestion::getQuestion,    // key: Question
-                        MemberHealQuestion::getAnswers,     // value: List<Answer>
-                        (existing, newValue) -> {       // 중복 키 문제 발생 시 값 병합
-                            existing.addAll(newValue);
-                            return existing;
+                        q -> new ArrayList<>(q.getAnswers()), // 기존 리스트를 새로 복사
+                        (existing, newValue) -> {
+                            List<Answer> mergedList = new ArrayList<>(existing);
+                            mergedList.addAll(newValue);
+                            return mergedList;
                         }
                 ));
     }

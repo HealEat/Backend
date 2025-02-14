@@ -119,6 +119,25 @@ public class StoreController {
         return ApiResponse.onSuccess(ReviewConverter.toReviewSetResultDto(newReview));
     }
 
+    @Operation(summary = "특정 가게의 리뷰 작성 API - 테스트용",
+    requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
+    @PostMapping(value = "/{placeId}/reviews/{memberId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<ReviewResponseDto.SetResultDto> createReviewTest(
+            @PathVariable Long placeId,
+            @PathVariable Long memberId,
+            @RequestPart(name = "files", required = false)
+            List<MultipartFile> files,
+            @Valid
+            @RequestPart(name = "request", required = true)
+            ReviewRequestDto request) {
+
+        Member testMember = memberRepository.findById(memberId).get();
+
+        //로그인 연결되면 testMember만 나중에 member로 수정
+        Review newReview = reviewService.createReview(placeId, testMember, files, request);
+        return ApiResponse.onSuccess(ReviewConverter.toReviewSetResultDto(newReview));
+    }
+
     /**
      * 가게 북마크
      */
