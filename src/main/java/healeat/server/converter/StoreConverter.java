@@ -24,6 +24,8 @@ public class StoreConverter {
                 .memberName(memberName)
                 .hasHealthInfo(hasHealthInfo)
 
+                .rect(searchResult.getRect())
+
                 .query(searchResult.getQuery())
                 .baseX(searchResult.getBaseX())
                 .baseY(searchResult.getBaseY())

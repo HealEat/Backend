@@ -13,7 +13,7 @@ import java.util.Set;
 public class StoreRequestDto {
 
     @Getter
-    public static class HealEatRequestDto {
+    public static class HealEatRequestDtoOld {
 
         String x; // 추천받을 위치 경도
         String y; // 추천받을 위치 위도

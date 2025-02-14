@@ -3,11 +3,8 @@ package healeat.server.service;
 import healeat.server.domain.Member;
 import healeat.server.domain.Store;
 import healeat.server.domain.search.SearchResultItem;
-import healeat.server.validation.annotation.CheckPage;
-import healeat.server.validation.annotation.CheckSizeSum;
 import healeat.server.web.dto.StoreRequestDto;
 import healeat.server.web.dto.StoreResponseDto;
-import org.springframework.validation.annotation.Validated;
 
 public interface StoreCommandService {
 
@@ -20,5 +17,10 @@ public interface StoreCommandService {
     StoreResponseDto.StorePreviewDtoList recommendAndMapStores(
             Member member,
             Integer page,
-            StoreRequestDto.HealEatRequestDto request);
+            String rect);
+
+    StoreResponseDto.StorePreviewDtoList recommendAndMapStoresOld(
+            Member member,
+            Integer page,
+            StoreRequestDto.HealEatRequestDtoOld request);
 }

@@ -105,14 +105,13 @@ public class MyPageController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        if (member == null) {
-            return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
-        }
-        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(member, pageable));
+        Member testMember = memberRepository.findById(999L).get();
+
+        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(testMember, page, size));
     }
 
     // 기획안 수정됨 : 건강 정보 각각에 대한 정보 수정 X -> 건강 정보 전체에 대한 정보 수정 O (프론트에서 Info 도메인 재사용한다고 함)
-
+    
 //
 //
 //    // 질환 정보 수정은 저장 API와 일치: 프론트에 알려주기

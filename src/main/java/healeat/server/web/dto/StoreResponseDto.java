@@ -108,6 +108,9 @@ public class StoreResponseDto {
         String memberName;
         Boolean hasHealthInfo;
 
+        // rect 기능
+        String rect;
+
         String query;
         // 현재 위치 또는 검색 지역명 위치
         String baseX;
