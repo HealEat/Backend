@@ -53,4 +53,13 @@ public class StoreConverter {
                 .searchInfoDto(searchInfoDto)
                 .build();
     }
+
+    public static StoreResponseDto.StorePreviewDto toStorePreviewDto(StoreResponseDto.StoreHomeDto storeHomeDto) {
+        return StoreResponseDto.StorePreviewDto.builder()
+                .storeInfoDto(storeHomeDto.getStoreInfoDto())
+                .bookmarkId(storeHomeDto.getBookmarkId())
+                .isInDBDto(storeHomeDto.getIsInDBDto())
+                .imageUrl(null)
+                .build();
+    }
 }

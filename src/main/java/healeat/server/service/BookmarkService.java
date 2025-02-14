@@ -11,7 +11,11 @@ import healeat.server.repository.BookmarkRepository;
 import healeat.server.repository.SearchResultItemRepository.SearchResultItemRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.web.dto.BookmarkResponseDto;
+import healeat.server.web.dto.StoreResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,5 +72,22 @@ public class BookmarkService {
         bookmarkRepository.delete(bookmark);
 
         return response;
+    }
+
+    public StoreResponseDto.StorePreviewDtoList getMemberBookmarks(Member member, Integer page, Integer size) {
+
+        int safePage = Math.max(0, page - 1);
+
+        Pageable pageable = PageRequest.of(safePage, size);
+
+        Page<Bookmark> bookmarkPage = bookmarkRepository.findByMember(member, pageable);
+
+        Page<StoreResponseDto.StorePreviewDto> storePreviewPage = bookmarkPage.map(bookmark -> {
+            StoreResponseDto.StoreHomeDto storeHomeDto = bookmark.getStore().getStoreHomeDto();
+            storeHomeDto.setBookmarkId(bookmark.getId());
+            return StoreConverter.toStorePreviewDto(storeHomeDto);
+        });
+
+        return StoreConverter.toStorePreviewListDto(storePreviewPage, null);
     }
 }
