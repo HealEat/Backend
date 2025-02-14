@@ -6,7 +6,7 @@ import healeat.server.web.dto.StoreRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class CheckSizeSumValidator implements ConstraintValidator<CheckSizeSum, StoreRequestDto.SearchKeywordDto> {
+public class CheckSizeSumValidator implements ConstraintValidator<CheckSizeSum, StoreRequestDto.SearchFilterDto> {
 
     @Override
     public void initialize(CheckSizeSum constraintAnnotation) {
@@ -14,16 +14,13 @@ public class CheckSizeSumValidator implements ConstraintValidator<CheckSizeSum, 
     }
 
     @Override
-    public boolean isValid(StoreRequestDto.SearchKeywordDto dto, ConstraintValidatorContext context) {
+    public boolean isValid(StoreRequestDto.SearchFilterDto dto, ConstraintValidatorContext context) {
 
         if (dto == null) {
             return true; // 기본적으로 null은 유효한 값으로 간주
         }
 
-        int categorySize = dto.getCategoryIdList() == null ? 0 : dto.getCategoryIdList().size();
-        int featureSize = dto.getFeatureIdList() == null ? 0 : dto.getFeatureIdList().size();
-
-        boolean isValid = (categorySize + featureSize) < 6;
+        boolean isValid = dto.getTotalFilterSize() < 6;
 
         if (!isValid) {
             context.disableDefaultConstraintViolation();
