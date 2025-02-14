@@ -17,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/plans")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")  // 로그인 안된 사용자가 접근하면 403 Forbidden 반환
 @Validated
 public class HealthPlanController {
 
@@ -42,10 +44,8 @@ public class HealthPlanController {
             @AuthenticationPrincipal Member member,
             @CheckPage @RequestParam Integer page) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
         //정상적으로 HealthPlan 조회
-        Page<HealthPlan> healthPlans = healthPlanService.find10PlansByMemberPage(testMember, page);
+        Page<HealthPlan> healthPlans = healthPlanService.find10PlansByMemberPage(member, page);
 
         return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanResponseDto(healthPlans));
     }
@@ -57,9 +57,7 @@ public class HealthPlanController {
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request,
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request, testMember);
+        HealthPlan createdHealthPlan = healthPlanService.createHealthPlan(request, member);
 
         return ApiResponse.onSuccess(HealthPlanConverter.toSetResultDto(createdHealthPlan));
     }

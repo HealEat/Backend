@@ -6,7 +6,6 @@ import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
 import healeat.server.domain.Member;
 import healeat.server.domain.mapping.RecentSearch;
-import healeat.server.repository.MemberRepository;
 import healeat.server.service.CategoryFeatureService;
 import healeat.server.service.RecentSearchService;
 import healeat.server.service.StoreCommandService;
@@ -33,7 +32,6 @@ public class SearchController {
 
     private final RecentSearchService recentSearchService;
     private final CategoryFeatureService categoryFeatureService;
-    private final MemberRepository memberRepository;
     private final StoreCommandService storeCommandService;
 
     @Operation(summary = "요청과 검색 결과 API", description =
@@ -52,12 +50,11 @@ public class SearchController {
             @CheckPage @RequestParam Integer page,
             @Valid @CheckSizeSum @RequestBody StoreRequestDto.SearchKeywordDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        recentSearchService.saveRecentQuery(testMember, request.getQuery());
-
+        if(member != null) {
+            recentSearchService.saveRecentQuery(member, request.getQuery());
+        }
         return ApiResponse.onSuccess(storeCommandService.searchAndMapStores(
-                testMember, page, request));
+                member, page, request));
     }
 
     @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
@@ -65,9 +62,11 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        if (member == null) {
+            return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
+        }
 
-        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(testMember.getId());
+        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(member.getId());
 
         return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }
@@ -78,10 +77,12 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto.SetResultDto> saveRecentStore(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        if (member == null) {
+            return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
+        }
 
         return ApiResponse.onSuccess(SearchPageConverter.toSetResultDto(
-                recentSearchService.saveRecentStore(testMember, placeId)));
+                recentSearchService.saveRecentStore(member, placeId)));
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")

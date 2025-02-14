@@ -3,7 +3,6 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.Disease;
 import healeat.server.domain.Member;
-import healeat.server.repository.MemberRepository;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
 import healeat.server.web.dto.*;
@@ -12,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,12 +21,12 @@ import static healeat.server.converter.MemberHealQuestionConverter.*;
 
 @RestController
 @RequestMapping("/info")
+@PreAuthorize("isAuthenticated()")  // 로그인 안된 사용자가 접근하면 403 Forbidden 반환
 @RequiredArgsConstructor
 public class InfoController {
 
     private final MemberService memberService;
     private final MemberHealthInfoService memberHealthInfoService;
-    private final MemberRepository memberRepository;
 
 
     @Operation(summary = "프로필 설정 API", description = "프로필 이미지와 닉네임을 설정합니다",
@@ -39,8 +39,7 @@ public class InfoController {
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-        Member profileMember = memberService.createProfile(testMember, file, request);
+        Member profileMember = memberService.createProfile(member, file, request);
 
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(profileMember));
     }
@@ -58,8 +57,7 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestBody MemberDiseaseRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(testMember, request.getDiseaseName());
+        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(member, request.getDiseaseName());
         return ApiResponse.onSuccess(responseDto);
     }
 
@@ -69,10 +67,8 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestParam String vegetarian) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
         return ApiResponse.onSuccess(toChooseVegetResult(
-                memberHealthInfoService.chooseVegetarian(testMember, vegetarian)));
+                memberHealthInfoService.chooseVegetarian(member, vegetarian)));
     }
 
     @Operation(summary = "다이어트 선택 API")
@@ -81,10 +77,8 @@ public class InfoController {
                 @AuthenticationPrincipal Member member,
                 @RequestParam String diet) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
         return ApiResponse.onSuccess(toChooseDietResult(
-                memberHealthInfoService.chooseDiet(testMember, diet)));
+                memberHealthInfoService.chooseDiet(member, diet)));
     }
 
     @Operation(summary = "기본 질문의 답변 저장 API", description =
@@ -99,10 +93,8 @@ public class InfoController {
             @PathVariable Integer questionNum,
             @RequestBody AnswerRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
         return ApiResponse.onSuccess(toBaseResult(
-                memberHealthInfoService.createQuestion(testMember, questionNum, request)));
+                memberHealthInfoService.createQuestion(member, questionNum, request)));
     }
 
     @Operation(summary = "알고리즘 계산 API", description = "알고리즘을 통해 healEatFoods(추천 음식 카테고리 리스트)를" +
@@ -110,8 +102,6 @@ public class InfoController {
     @PatchMapping("/loading")
     public ApiResponse<HealInfoResponseDto> calculateHealEat(@AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(testMember));
+        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(member));
     }
 }

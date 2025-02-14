@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/home")
 @RequiredArgsConstructor
@@ -31,8 +34,10 @@ public class HomeController {
             @RequestParam Integer page,
             @RequestBody StoreRequestDto.HealEatRequestDto request){
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(testMember, page, request));
+        if(member == null) {
+            // 로그인하지 않은 경우, 추천 리스트 없이 응답 반환
+            return ApiResponse.onSuccess(new StoreResponseDto.StorePreviewDtoList(List.of(),0, 0, 0L, true, true, null));
+        }
+        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(member, page, request));
     }
 }

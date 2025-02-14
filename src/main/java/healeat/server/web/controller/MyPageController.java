@@ -4,7 +4,6 @@ import healeat.server.apiPayload.ApiResponse;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.mapping.Review;
-import healeat.server.repository.MemberRepository;
 import healeat.server.service.BookmarkService;
 import healeat.server.service.MemberHealthInfoService;
 import healeat.server.service.MemberService;
@@ -16,20 +15,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/my-page")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")  // 로그인 안된 사용자가 접근하면 403 Forbidden 반환
 public class MyPageController {
 
     private final MemberService memberService;
     private final MemberHealthInfoService memberHealthInfoService;
-    private final MemberRepository memberRepository;
     private final ReviewService reviewService;
     private final BookmarkService bookmarkService;
 
@@ -37,9 +35,7 @@ public class MyPageController {
     @GetMapping("/profile")
     public ApiResponse<MemberProfileResponseDto> getProfileInfo(@AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        return ApiResponse.onSuccess(memberService.getProfileInfo(testMember));
+        return ApiResponse.onSuccess(memberService.getProfileInfo(member));
     }
 
     @Operation(summary = "프로필 수정 API",
@@ -52,9 +48,7 @@ public class MyPageController {
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        Member changedProfileMember = memberService.updateProfile(testMember, file, request);
+        Member changedProfileMember = memberService.updateProfile(member, file, request);
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(changedProfileMember));
     }
 
@@ -66,10 +60,8 @@ public class MyPageController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
         Pageable pageable = PageRequest.of(page - 1, size);
-        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(testMember, pageable);
+        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(member, pageable);
 
         return ApiResponse.onSuccess(responseDto);
     }
@@ -80,9 +72,7 @@ public class MyPageController {
             @AuthenticationPrincipal Member member,
             @PathVariable Long reviewId) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        Review deleteReview = reviewService.deleteReview(testMember, reviewId);
+        Review deleteReview = reviewService.deleteReview(member, reviewId);
         return ApiResponse.onSuccess(ReviewConverter.toReviewDeleteResultDto(deleteReview));
     }
 
@@ -92,9 +82,7 @@ public class MyPageController {
     public ApiResponse<HealInfoResponseDto.MyHealthInfoDto> getMyHealthInfo(
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-
-        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(testMember);
+        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(member);
         return ApiResponse.onSuccess(responseDto);
     }
 
@@ -108,7 +96,7 @@ public class MyPageController {
         if (member == null) {
             return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
         }
-        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(member, pageable));
+        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(member, page, size));
     }
 
     // 기획안 수정됨 : 건강 정보 각각에 대한 정보 수정 X -> 건강 정보 전체에 대한 정보 수정 O (프론트에서 Info 도메인 재사용한다고 함)

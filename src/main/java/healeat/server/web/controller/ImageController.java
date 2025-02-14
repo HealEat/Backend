@@ -23,8 +23,6 @@ public class ImageController {
 
     private final ImageService imageService;
     private final ProfileImageConverter profileImageConverter;
-    //테스트용 멤버
-    private final MemberRepository memberRepository;
 
     /***************************** 프로필 이미지 *****************************/
 
@@ -33,9 +31,8 @@ public class ImageController {
     @GetMapping("/profile-image")
     public ResponseEntity<Resource> getProfileImage(
             @AuthenticationPrincipal Member member) {
-        Member testMember = memberRepository.findById(999L).get();
 
-        return imageService.getProfileImage(testMember.getId());
+        return imageService.getProfileImage(member.getId());
     }
 
     @Operation(summary = "프로필 이미지 삭제", description = "해당 사용자의 프로필 이미지를 삭제합니다."
@@ -44,8 +41,7 @@ public class ImageController {
     public ApiResponse<ProfileImageResponseDto> deleteProfileImage(
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
-        Member deleteImageMember = imageService.deleteProfileImage(testMember.getId());
+        Member deleteImageMember = imageService.deleteProfileImage(member.getId());
         return ApiResponse.onSuccess(profileImageConverter.toResponseDto(deleteImageMember));
     }
 
