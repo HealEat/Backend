@@ -20,9 +20,9 @@ public class HomeController {
     private final StoreCommandService storeCommandService;
 
     @Operation(summary = "홈 화면에서 추천 가게 리스트를 조회합니다.", description =
-            """ 
-                    Request Body에
-                    사용자 x, y, 조사할 반경(radius)를 받아서 추천 가게 목록을 조회합니다.
+            """
+                    Request Param에
+                    rect를 받아서 추천 가게 목록을 조회합니다.
                     - 페이징이 적용됩니다.(페이지 당 10개)
                     - 동일한 위치(오차 범위 200m 이내) 및 반경(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
     @PostMapping
@@ -34,10 +34,9 @@ public class HomeController {
         Member testMember = memberRepository.findById(999L).get();
 
         return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(testMember, page, rect));
-
     }
 
-    @Operation(summary = "홈 화면에서 추천 가게 리스트를 조회합니다.", description =
+    @Operation(summary = "(구버전입니다.) 홈 화면에서 추천 가게 리스트를 조회합니다.", description =
             """ 
                     Request Body에
                     사용자 x, y, 조사할 반경(radius)를 받아서 추천 가게 목록을 조회합니다.
