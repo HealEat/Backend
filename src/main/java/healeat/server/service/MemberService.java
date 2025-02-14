@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,22 +78,28 @@ public class MemberService {
 
     // 회원이 선택한 질병들을 저장하는 API
     @Transactional
-    public MemberDiseaseResponseDto saveDiseasesToMember(Member member, List<Long> diseaseIds) {
+    public MemberDiseaseResponseDto saveDiseasesToMember(Member member, String diseaseName) {
 
-        List<Disease> diseases = diseaseRepository.findAllById(diseaseIds);
-        // 기존 질병 데이터 삭제
-        memberDiseaseRepository.deleteAllByMember(member);
-        // 새로운 질병 데이터 추가
-        List<MemberDisease> newMemberDiseases = diseases.stream()
-                .map(disease -> MemberDisease.builder()
-                        .member(member)
-                        .disease(disease)
-                        .build())
-                .toList();
-        // 새로운 데이터 저장
-        memberDiseaseRepository.saveAll(newMemberDiseases);
-        // 최신 질병 목록 가져오기
-        List<MemberDiseaseResponseDto.DiseaseInfo> diseaseInfoList = newMemberDiseases.stream()
+        // 질병명이 존재하는지 확인
+        Disease disease = diseaseRepository.findByName(diseaseName)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.DISEASE_NOT_FOUND));
+
+        // 중복 저장 방지
+        boolean exists = memberDiseaseRepository.existsByMemberAndDisease(member, disease);
+        if(exists) {
+            throw new MemberHandler(ErrorStatus.ALREADY_EXISTS);
+        }
+
+        // 질병 저장하기
+        MemberDisease memberDisease = MemberDisease.builder()
+                .member(member)
+                .disease(disease)
+                .build();
+        memberDiseaseRepository.save(memberDisease);
+
+        // 회원의 최신 질병 목록 반환
+        List<MemberDiseaseResponseDto.DiseaseInfo> diseaseInfoList = memberDiseaseRepository.findByMember(member)
+                .stream()
                 .map(md -> new MemberDiseaseResponseDto.DiseaseInfo(md.getDisease().getId(), md.getDisease().getName()))
                 .toList();
 

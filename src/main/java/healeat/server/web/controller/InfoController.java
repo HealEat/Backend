@@ -59,7 +59,7 @@ public class InfoController {
             @RequestBody MemberDiseaseRequestDto request) {
 
         Member testMember = memberRepository.findById(999L).get();
-        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(testMember, request.getDiseaseIds());
+        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(testMember, request.getDiseaseName());
         return ApiResponse.onSuccess(responseDto);
     }
 
