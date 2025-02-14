@@ -108,7 +108,6 @@ public class MyPageController {
         if (member == null) {
             return ApiResponse.onFailure("UNAUTHORIZED", "로그인이 필요합니다.");
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
         return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(member, pageable));
     }
 

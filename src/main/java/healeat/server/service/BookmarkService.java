@@ -14,6 +14,7 @@ import healeat.server.web.dto.BookmarkResponseDto;
 import healeat.server.web.dto.StoreResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +74,12 @@ public class BookmarkService {
         return response;
     }
 
-    public StoreResponseDto.StorePreviewDtoList getMemberBookmarks(Member member, Pageable pageable) {
+    public StoreResponseDto.StorePreviewDtoList getMemberBookmarks(Member member, Integer page, Integer size) {
+
+        int safePage = Math.max(0, page - 1);
+
+        Pageable pageable = PageRequest.of(safePage, size);
+
         Page<Bookmark> bookmarkPage = bookmarkRepository.findByMember(member, pageable);
 
         Page<StoreResponseDto.StorePreviewDto> storePreviewPage = bookmarkPage.map(bookmark -> {
