@@ -135,7 +135,34 @@ public class StoreSearchService {
             "(#request.radius != null ? " +            // 약 200m 오차 허용
                 "T(java.lang.Math).round(#request.radius / 200.0) : 0))")
     public SearchResult recommendAndSave(
-            StoreRequestDto.HealEatRequestDto request) {
+            String rect) {
+
+        SearchResult searchResult = SearchResult.builder()
+                .query("for-home-recommend")
+                .rect(rect)
+                .accuracy(true)
+                .build();
+
+        searchResultRepository.save(searchResult);
+
+        List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesForHome(rect);
+
+        return saveResultAndItemsForHome(searchResult, kakaoResponses);
+    }
+
+    /**
+     * 홈 추천
+     */
+    @Transactional
+    @Cacheable(value = "recommendResult", key = "T(java.lang.String).format('%s_%s_%s', " +
+            "(#request.x != null and #request.x != '' ? " +               // 약 200m 오차 허용 (/ 111320)
+            "T(java.lang.Math).round(T(java.lang.Double).parseDouble(#request.x) / 0.0018) : 0), " +
+            "(#request.y != null and #request.y != '' ? " +               // 약 200m 오차 허용 (/ 111320)
+            "T(java.lang.Math).round(T(java.lang.Double).parseDouble(#request.y) / 0.0018) : 0), " +
+            "(#request.radius != null ? " +            // 약 200m 오차 허용
+            "T(java.lang.Math).round(#request.radius / 200.0) : 0))")
+    public SearchResult recommendAndSaveOld(
+            StoreRequestDto.HealEatRequestDtoOld request) {
 
         String x = request.getX();
         String y = request.getY();
@@ -150,7 +177,7 @@ public class StoreSearchService {
 
         searchResultRepository.save(searchResult);
 
-        List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesForHome(x, y, radius);
+        List<KakaoPlaceResponseDto> kakaoResponses = get3ResponsesForHomeOld(x, y, radius);
 
         return saveResultAndItemsForHome(searchResult, kakaoResponses);
     }
@@ -222,13 +249,29 @@ public class StoreSearchService {
         return responses;
     }
 
-    private List<KakaoPlaceResponseDto> get3ResponsesForHome(String x, String y, Integer radius) {
+    private List<KakaoPlaceResponseDto> get3ResponsesForHome(String rect) {
         List<KakaoPlaceResponseDto> responses = new ArrayList<>();
         int pageIter = 1;
         while (pageIter <= 3) {
 
             KakaoPlaceResponseDto kakaoResponse = storeApiClient.getKakaoForHome(
-                    x, y, radius, pageIter++, "distance", "FD6");
+                    rect, pageIter++, "accuracy", "FD6");
+            apiCallCountService.incrementApiCallCount();
+
+            responses.add(kakaoResponse);
+            if (kakaoResponse.getMeta().getIs_end())
+                break;
+        }
+        return responses;
+    }
+
+    private List<KakaoPlaceResponseDto> get3ResponsesForHomeOld(String x, String y, Integer radius) {
+        List<KakaoPlaceResponseDto> responses = new ArrayList<>();
+        int pageIter = 1;
+        while (pageIter <= 3) {
+
+            KakaoPlaceResponseDto kakaoResponse = storeApiClient.getKakaoForHomeOld(
+                    x, y, radius, pageIter++, "accuracy", "FD6");
             apiCallCountService.incrementApiCallCount();
 
             responses.add(kakaoResponse);

@@ -29,10 +29,27 @@ public class HomeController {
     public ApiResponse<StoreResponseDto.StorePreviewDtoList> getHomeList(
             @AuthenticationPrincipal Member member,
             @RequestParam Integer page,
-            @RequestBody StoreRequestDto.HealEatRequestDto request){
+            @RequestParam String rect){
 
         Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(testMember, page, request));
+        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(testMember, page, rect));
+
+    }
+
+    @Operation(summary = "홈 화면에서 추천 가게 리스트를 조회합니다.", description =
+            """ 
+                    Request Body에
+                    사용자 x, y, 조사할 반경(radius)를 받아서 추천 가게 목록을 조회합니다.
+                    - 페이징이 적용됩니다.(페이지 당 10개)
+                    - 동일한 위치(오차 범위 200m 이내) 및 반경(오차 범위 200m 이내)에서 캐시된 결과가 반환됩니다.""")
+    @PostMapping("/old")
+    public ApiResponse<StoreResponseDto.StorePreviewDtoList> getHomeListOld(
+            @AuthenticationPrincipal Member member,
+            @RequestParam Integer page,
+            @RequestBody StoreRequestDto.HealEatRequestDtoOld request){
+
+        Member testMember = memberRepository.findById(999L).get();
+        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStoresOld(testMember, page, request));
     }
 }

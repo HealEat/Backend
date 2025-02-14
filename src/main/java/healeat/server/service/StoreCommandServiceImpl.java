@@ -113,6 +113,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
         }
     }
 
+
     /**
      * 핵심 로직 이후
      * 정렬 및 페이징 적용
@@ -121,10 +122,69 @@ public class StoreCommandServiceImpl implements StoreCommandService {
     public StoreResponseDto.StorePreviewDtoList recommendAndMapStores(
             Member member,
             Integer page,
-            StoreRequestDto.HealEatRequestDto request) {
+            String rect) {
 
         // 1. 검색 및 결과 저장
-        SearchResult searchResult = storeSearchService.recommendAndSave(request);
+        SearchResult searchResult = storeSearchService.recommendAndSave(rect);
+
+        int apiCallCount = apiCallCountService.getAndResetApiCallCount(); // API 호출 횟수 기록
+
+        StoreResponseDto.SearchInfoDto searchInfoDto = StoreConverter
+                .toSearchInfo(member, searchResult, apiCallCount);
+
+        if (searchResult.getItems().isEmpty()) {
+            return StoreConverter.toStorePreviewListDto(
+                    Page.empty(),
+                    searchInfoDto
+            );
+        }
+
+        // 2. 멤버의 healEatFoods(카테고리 이름 리스트) 로 필터링된 placeId 리스트
+        List<Long> filteredItemIds = searchFeatureService.getHealEatItemIds(
+                searchResult.getItems(),
+                member.getHealEatFoods()
+        );
+
+        if (filteredItemIds.isEmpty()) {
+            return StoreConverter.toStorePreviewListDto(
+                    Page.empty(),
+                    searchInfoDto
+            );
+
+        } else {
+            // 3. 페이지 요청 생성
+            int safePage = Math.max(0, page - 1);
+            Pageable pageable = PageRequest.of(safePage, 10);
+
+            // 4. 정렬된 검색 결과 조회
+            Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
+                    searchResult,
+                    filteredItemIds,
+                    "NONE",
+                    0.0f,
+                    pageable
+            );
+
+            // 5. DTO 변환 및 결과 반환
+            return StoreConverter.toStorePreviewListDto(
+                    items.map(item -> storeMappingService.mapToDto(member, item)),
+                    searchInfoDto
+            );
+        }
+    }
+
+    /**
+     * 핵심 로직 이후
+     * 정렬 및 페이징 적용
+     */
+    @Override
+    public StoreResponseDto.StorePreviewDtoList recommendAndMapStoresOld(
+            Member member,
+            Integer page,
+            StoreRequestDto.HealEatRequestDtoOld request) {
+
+        // 1. 검색 및 결과 저장
+        SearchResult searchResult = storeSearchService.recommendAndSaveOld(request);
 
         int apiCallCount = apiCallCountService.getAndResetApiCallCount(); // API 호출 횟수 기록
 

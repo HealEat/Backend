@@ -24,6 +24,13 @@ public interface StoreApiClient {
 
     @GetMapping("/v2/local/search/category.json")
     KakaoPlaceResponseDto getKakaoForHome(   /* 쿼리가 없다 */
+            @RequestParam(defaultValue = "") String rect,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "accuracy") String sort,
+            @RequestParam(defaultValue = "FD6") String category_group_code);
+
+    @GetMapping("/v2/local/search/category.json")
+    KakaoPlaceResponseDto getKakaoForHomeOld(   /* 쿼리가 없다 */
                                              @RequestParam(defaultValue = "") String x,
                                              @RequestParam(defaultValue = "") String y,
                                              @RequestParam(defaultValue = "") Integer radius,

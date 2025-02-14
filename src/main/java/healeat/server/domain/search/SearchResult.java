@@ -21,6 +21,8 @@ public class SearchResult extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String rect;
+
     private String query;
 
     private String baseX;

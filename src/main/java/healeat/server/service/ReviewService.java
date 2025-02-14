@@ -64,7 +64,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public Page<Review> getStoreReviews(Long placeId, Integer page, String sortBy, List<String> filters) {
 
-        if (filters.isEmpty())
+        if ((filters == null) || filters.isEmpty())
             return Page.empty();
 
         Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
