@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/naver", "/auth/kakao", "/auth/apple").permitAll()
                         .requestMatchers("/auth/naver/unlink", "/auth/kakao/unlink", "/auth/apple/unlink", "/auth/logout").authenticated()
                         .requestMatchers("/plans/**", "/home/**", "/info/**", "/my-page/**",
-                                "/search/**", "/stores/**", "/bookmarks/**","/terms/**", "image/**").permitAll()
+                                "/search/**", "/stores/**", "/bookmarks/**","/terms/**").permitAll()
                         .requestMatchers("/profile-image").permitAll()
                         .anyRequest().authenticated()
                 )

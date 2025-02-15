@@ -21,4 +21,8 @@ public class HealthPlanImage extends BaseEntity {
 
     @Column(nullable = false)
     private String imageUrl; // 이미지 파일 경로
+
+    public void setHealthPlan(HealthPlan healthPlan) {
+        this.healthPlan = healthPlan;
+    }
 }

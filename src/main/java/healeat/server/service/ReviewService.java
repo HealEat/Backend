@@ -34,9 +34,6 @@ public class ReviewService {
     private final ReviewImageRepository reviewImageRepository;
     private final StoreRepository storeRepository;
 
-    /// 리뷰 : 동적 정렬, 조회 서비스
-    /// 리뷰 이미지 : 최신순 조회 서비스 -> 객체 리스트 반환. 여러 곳에 쓰임
-
     // 내가 남긴 후기 목록 조회 API
     @Transactional(readOnly = true)
     public ReviewResponseDto.MyPageReviewListDto getMyReviews(Member member, Pageable pageable) {
@@ -114,11 +111,11 @@ public class ReviewService {
 
         reviewRepository.save(review);
 
-        if(!(files == null || files.isEmpty())){
+        if (!(files == null || files.isEmpty())) {
             if (files.size() > 10) {
                 throw new ReviewHandler(ErrorStatus.REVIEW_TOO_MANY_IMAGES);
             }
-            for(MultipartFile file : files) {
+            for (MultipartFile file : files) {
                 String keyName = amazonS3Manager.generateReviewKeyName();
                 String uploadFileUrl = amazonS3Manager.uploadFile(keyName, file);
 

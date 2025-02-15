@@ -63,13 +63,13 @@ public class HealthPlanConverter {
                 .build();
     }
 
-    public static List<HealthPlanResponseDto.HealthPlanImageResponseDto> toHealthPlanImageListResponseDto(
-            List<HealthPlanImage> healthPlanImages) {
-
-        return healthPlanImages.stream()
-                .map(HealthPlanConverter::toHealthPlanImageResponseDto)
-                .toList();
-    }
+//    public static List<HealthPlanResponseDto.HealthPlanImageResponseDto> toHealthPlanImageListResponseDto(
+//            List<HealthPlanImage> healthPlanImages) {
+//
+//        return healthPlanImages.stream()
+//                .map(HealthPlanConverter::toHealthPlanImageResponseDto)
+//                .toList();
+//    }
 
     public static HealthPlanResponseDto.HealthPlanImageResponseDto toHealthPlanImageResponseDto(HealthPlanImage healthPlanImage) {
         return HealthPlanResponseDto.HealthPlanImageResponseDto.builder()

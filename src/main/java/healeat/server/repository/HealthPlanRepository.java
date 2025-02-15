@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface HealthPlanRepository extends JpaRepository<HealthPlan, Long> {
-    Page<HealthPlan> findAllByMember(Member member, Pageable pageable);
     List<HealthPlan> findByMember(Member member);
+
+    Page<HealthPlan> findAllByMemberOrderByCreatedAtDesc(Member member, Pageable pageable);
 }
