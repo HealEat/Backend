@@ -82,8 +82,11 @@ public class HealthPlanController {
 
     @Operation(summary = "건강 관리 목표 수정 - 세부사항과 이미지",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")),
-            description = "건강 관리 목표 세부사항 업데이트와 이미지 업로드가 이루어집니다. 이미지는 10개까지 업로드할 수 있습니다." +
-                    " 삭제할 이미지 id들과 새롭게 업로드할 이미지 파일들을 주세요.")
+            description =
+                    """
+                        건강 관리 목표 세부사항 업데이트와 이미지 업로드가 이루어집니다. 이미지는 10개까지 업로드할 수 있습니다.
+                        삭제할 이미지 id들과 새롭게 업로드할 이미지 파일들을 주세요.
+                        duration: DAY, WEEK, DAY10, MONTH""")
     @PostMapping(value = "/{planId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlan(
             @PathVariable Long planId,
@@ -95,7 +98,8 @@ public class HealthPlanController {
                 healthPlanService.updateHealthPlan(planId, updateRequest, uploadImages)));
     }
 
-    @Operation(summary = "건강관리목표 수정 - 상태", description = "선택한 건강관리목표 상태를 수정합니다")
+    @Operation(summary = "건강관리목표 수정 - 상태", description = "선택한 건강관리목표 상태를 수정합니다. " +
+            "status: FAIL, PROGRESS, COMPLETE")
     @PatchMapping("/{planId}/status")
     public ApiResponse<HealthPlanResponseDto.StatusResponseDto> updateHealthPlanStatus(
             @PathVariable Long planId,
