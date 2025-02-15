@@ -28,7 +28,6 @@ public class InfoController {
     private final MemberHealthInfoService memberHealthInfoService;
     private final MemberRepository memberRepository;
 
-
     @Operation(summary = "프로필 설정 API", description = "프로필 이미지와 닉네임을 설정합니다",
     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
     @PostMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

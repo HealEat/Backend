@@ -31,6 +31,7 @@ public class HealthPlan extends BaseEntity {
     @Column(nullable = false)
     private Integer goalNumber; // 목표 횟수
 
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     private Status status = Status.PROGRESS;
 
@@ -43,6 +44,11 @@ public class HealthPlan extends BaseEntity {
     @OneToMany(mappedBy = "healthPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<HealthPlanImage> healthPlanImages = new ArrayList<>();
+
+    public void addImage(HealthPlanImage image) {
+        healthPlanImages.add(image);
+        image.setHealthPlan(this);
+    }
 
     public HealthPlan updateHealthPlan(Duration duration, Integer goalNumber, String goal) {
         this.duration = duration;
@@ -57,8 +63,8 @@ public class HealthPlan extends BaseEntity {
         return this;
     }
 
-    public HealthPlan updateStatus(Status status) {
-        this.status = status;
+    public HealthPlan updateStatus(String status) {
+        this.status = Status.valueOf(status);
         return this;
     }
 }
