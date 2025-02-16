@@ -3,6 +3,7 @@ package healeat.server.web.dto;
 import healeat.server.domain.enums.Duration;
 import healeat.server.domain.enums.Status;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -25,5 +26,12 @@ public class HealthPlanRequestDto {
 
         @Pattern(regexp = "^(FAIL|PROGRESS|COMPLETE)$", message = "상태가 올바르지 않습니다")
         String status;
+    }
+
+    @Getter
+    public static class HealthPlanMemoRequestDto {
+
+        @Size(max = 200)
+        String memo;
     }
 }

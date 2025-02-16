@@ -10,6 +10,7 @@ import healeat.server.web.dto.HealthPlanResponseDto;
 import healeat.server.web.dto.HealthPlanRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -74,10 +75,10 @@ public class HealthPlanController {
     @PatchMapping("/{planId}/memo")
     public ApiResponse<HealthPlanResponseDto.MemoResponseDto> uploadMemo(
             @PathVariable Long planId,
-            @RequestParam String memo) {
+            @Valid @RequestBody HealthPlanRequestDto.HealthPlanMemoRequestDto request) {
 
         return ApiResponse.onSuccess(HealthPlanConverter.toMemoResponseDto(
-                healthPlanService.updateHealthPlanMemo(planId, memo)));
+                healthPlanService.updateHealthPlanMemo(planId, request)));
     }
 
     @Operation(summary = "건강 관리 목표 수정 - 세부사항과 이미지",
@@ -90,7 +91,7 @@ public class HealthPlanController {
     @PostMapping(value = "/{planId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<HealthPlanResponseDto.HealthPlanOneDto> updateHealthPlan(
             @PathVariable Long planId,
-            @RequestPart HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest,
+            @Valid @RequestPart HealthPlanRequestDto.HealthPlanUpdateRequestDto updateRequest,
             @RequestPart(name = "files", required = false)
             List<MultipartFile> uploadImages) {
 
@@ -103,7 +104,7 @@ public class HealthPlanController {
     @PatchMapping("/{planId}/status")
     public ApiResponse<HealthPlanResponseDto.StatusResponseDto> updateHealthPlanStatus(
             @PathVariable Long planId,
-            @RequestBody HealthPlanRequestDto.HealthPlanStatusUpdateRequestDto request) {
+            @Valid @RequestBody HealthPlanRequestDto.HealthPlanStatusUpdateRequestDto request) {
 
         return ApiResponse.onSuccess(HealthPlanConverter.toStatusResponseDto(
                 healthPlanService.updateHealthPlanStatus(planId, request)));
