@@ -133,10 +133,10 @@ public class HealthPlanService {
 
     /***************************** 건강관리목표 메모를 위한 메서드 *****************************/
 
-    public HealthPlan updateHealthPlanMemo(Long id, String memo) {
+    public HealthPlan updateHealthPlanMemo(Long id, HealthPlanRequestDto.HealthPlanMemoRequestDto request) {
 
         HealthPlan existingHealthPlan = getHealthPlanById(id);
-        return existingHealthPlan.updateMemo(memo);
+        return existingHealthPlan.updateMemo(request.getMemo());
     }
 
     /***************************** 건강관리목표 상태를 위한 메서드 *****************************/

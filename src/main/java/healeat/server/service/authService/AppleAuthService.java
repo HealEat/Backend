@@ -1,6 +1,6 @@
 package healeat.server.service.authService;
 
-import healeat.server.web.dto.authResonse.AppleTokenResponse;
+import healeat.server.web.dto.authDto.AppleTokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;

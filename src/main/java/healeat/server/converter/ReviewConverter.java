@@ -2,13 +2,11 @@ package healeat.server.converter;
 
 import healeat.server.domain.ReviewImage;
 import healeat.server.domain.mapping.Review;
-import healeat.server.web.dto.ImageResponseDto;
 import healeat.server.web.dto.ReviewResponseDto;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ReviewConverter {
 
@@ -72,13 +70,13 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ImageResponseDto.publicUrlDto toReviewImage(ReviewImage reviewImage) {
-
-        return ImageResponseDto.publicUrlDto.builder()
-                .id(reviewImage.getId())
-                .imageUrl(reviewImage.getImageUrl())
-                .build();
-    }
+//    public static ImageResponseDto.publicUrlDto toReviewImage(ReviewImage reviewImage) {
+//
+//        return ImageResponseDto.publicUrlDto.builder()
+//                .id(reviewImage.getId())
+//                .imageUrl(reviewImage.getImageUrl())
+//                .build();
+//    }
 
     public static ReviewResponseDto.SetResultDto toReviewSetResultDto(Review review) {
 

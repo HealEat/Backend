@@ -7,7 +7,6 @@ import healeat.server.domain.Member;
 import healeat.server.domain.ReviewImage;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.ImageService;
-import healeat.server.web.dto.ImageResponseDto;
 import healeat.server.web.dto.ProfileImageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
