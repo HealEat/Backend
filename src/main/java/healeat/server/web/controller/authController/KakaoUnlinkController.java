@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 import org.springframework.http.MediaType;
 import healeat.server.service.authService.UnlinkService;
-import healeat.server.web.dto.authResonse.UnlinkResponseDto;
+import healeat.server.web.dto.authDto.UnlinkResponseDto;
 
 @RestController
 @RequestMapping("/auth/kakao")

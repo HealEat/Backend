@@ -1,4 +1,4 @@
-package healeat.server.web.dto.authResonse;
+package healeat.server.web.dto.authDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

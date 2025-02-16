@@ -32,31 +32,11 @@ public class HealInfoResponseDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ChangeChoiceResultDto {
-
-        ChooseResultDto choseResult;
-        List<String> healEatFoods;
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class BaseResultDto {
 
         Long memberId;
         Question question;
         List<Answer> savedAnswers;
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ChangeBaseResultDto {
-
-        BaseResultDto baseResultDto;
-        List<String> healEatFoods;
     }
 
     /// 마이페이지 - 나의 건강 정보 조회 dto
@@ -73,4 +53,23 @@ public class HealInfoResponseDto {
         List<String> requiredNutrients;     // 필요한 영양소
         List<String> avoidedFoods;  // 피해야 하는 음식
     }
+
+//    @Builder
+//    @Getter
+//    @AllArgsConstructor
+//    @NoArgsConstructor
+//    public static class ChangeChoiceResultDto {
+//
+//        ChooseResultDto choseResult;
+//        List<String> healEatFoods;
+//    }
+//    @Builder
+//    @Getter
+//    @AllArgsConstructor
+//    @NoArgsConstructor
+//    public static class ChangeBaseResultDto {
+//
+//        BaseResultDto baseResultDto;
+//        List<String> healEatFoods;
+//    }
 }

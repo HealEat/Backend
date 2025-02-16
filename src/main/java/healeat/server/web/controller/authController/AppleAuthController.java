@@ -1,12 +1,12 @@
 package healeat.server.web.controller.authController;
 
 import healeat.server.service.authService.AppleAuthService;
-import healeat.server.web.dto.authResonse.AppleTokenResponse;
+import healeat.server.web.dto.authDto.AppleTokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-import healeat.server.web.dto.authResonse.AppleAuthRequest;
+import healeat.server.web.dto.authDto.AppleAuthRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +20,7 @@ import healeat.server.user.CustomUserPrincipal;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import healeat.server.service.AppleUnlinkService;
-import healeat.server.web.dto.AppleUnlinkRequest;
+import healeat.server.web.dto.authDto.AppleUnlinkRequest;
 
 @RestController
 @RequestMapping("/auth")

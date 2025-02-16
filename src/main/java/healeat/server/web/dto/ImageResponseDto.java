@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-public class ImageResponseDto {
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class publicUrlDto {
-        private Long id;
-        private String imageUrl;    // Public URL
-    }
-
-}
+//public class ImageResponseDto {
+//
+//    @Getter
+//    @Builder
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class publicUrlDto {
+//        private Long id;
+//        private String imageUrl;    // Public URL
+//    }
+//
+//}
