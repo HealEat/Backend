@@ -1,6 +1,7 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.apiPayload.code.status.ErrorStatus;
 import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;

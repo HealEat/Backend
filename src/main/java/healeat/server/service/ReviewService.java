@@ -14,7 +14,6 @@ import healeat.server.repository.ReviewRepository.ReviewRepository;
 import healeat.server.repository.StoreRepository;
 import healeat.server.web.dto.ReviewRequestDto;
 import healeat.server.web.dto.ReviewResponseDto;
-import healeat.server.web.dto.StoreRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -60,9 +59,6 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public Page<Review> getStoreReviews(Long placeId, Integer page, String sortBy, List<String> filters) {
-
-        if ((filters == null) || filters.isEmpty())
-            return Page.empty();
 
         Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
                 new StoreHandler(ErrorStatus.STORE_NOT_FOUND));

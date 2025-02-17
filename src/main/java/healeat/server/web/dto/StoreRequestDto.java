@@ -1,5 +1,6 @@
 package healeat.server.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -25,6 +26,7 @@ public class StoreRequestDto {
         Set<Long> getCategoryIdList();
         Set<Long> getFeatureIdList();
 
+        @JsonIgnore
         default int getTotalFilterSize() {
             int categorySize = getCategoryIdList() == null ? 0 : getCategoryIdList().size();
             int featureSize = getFeatureIdList() == null ? 0 : getFeatureIdList().size();

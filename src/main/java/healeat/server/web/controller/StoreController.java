@@ -85,7 +85,8 @@ public class StoreController {
             """
                     Request Body에
                     1. 동적 정렬 기준 : LATEST(기본) / DESC(높은 순) / ASC(낮은 순)
-                    2. 필터 조건 : 리스트 - [SICK, VEGET, DIET] (기본은 전부) 를 받아서 리뷰 목록을 조회합니다.
+                    2. 필터 조건 : 리스트 - [SICK, VEGET, DIET] 를 받아서 리뷰 목록을 조회합니다.
+                    - 필터가 적용되지 않으면 전체 리뷰를 조회합니다.
                     
                     페이징이 적용됩니다.(페이지 당 10개)""")
     @GetMapping("/{placeId}/reviews")

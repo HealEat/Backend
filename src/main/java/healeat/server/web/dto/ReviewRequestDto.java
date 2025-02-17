@@ -24,7 +24,6 @@ public class ReviewRequestDto {
     Float nutrScore;
 
     @Size(max = 300, message = "리뷰는 최대 300자까지 쓸 수 있습니다.")
-    @Valid
     String body;
 
     @Getter

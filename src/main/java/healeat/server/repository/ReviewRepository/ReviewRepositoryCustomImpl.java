@@ -38,17 +38,19 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         // OR 조건을 묶을 BooleanBuilder 생성
         BooleanBuilder filterConditions = new BooleanBuilder();
 
-        if (filters.contains("SICK")) {
-            filterConditions.or(Expressions.booleanTemplate("json_length({0}) > 0", review.currentDiseases));
-        }
-        if (filters.contains("VEGET")) {
-            filterConditions.or(review.currentVeget.isNotNull().and(review.currentVeget.length().gt(0)));
-        }
-        if (filters.contains("DIET")) {
-            filterConditions.or(review.currentDiet.isNotNull().and(review.currentDiet.length().gt(0)));
+        if (filters != null && !filters.isEmpty()) {
+            if (filters.contains("SICK")) {
+                filterConditions.or(Expressions.booleanTemplate("json_length({0}) > 0", review.currentDiseases));
+            }
+            if (filters.contains("VEGET")) {
+                filterConditions.or(review.currentVeget.isNotNull().and(review.currentVeget.length().gt(0)));
+            }
+            if (filters.contains("DIET")) {
+                filterConditions.or(review.currentDiet.isNotNull().and(review.currentDiet.length().gt(0)));
+            }
         }
 
-        // 합집합(OR 조건)을 최종 WHERE 절에 추가
+        // 합집합(OR 조건)을 최종 WHERE 절에 OR로 추가
         if (filterConditions.hasValue()) {
             whereClause.and(filterConditions);
         }

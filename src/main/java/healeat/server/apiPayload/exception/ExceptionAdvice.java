@@ -38,7 +38,8 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
   }
 
   @Override
-  public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+  public ResponseEntity<Object> handleMethodArgumentNotValid(
+          MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
     Map<String, String> errors = new LinkedHashMap<>();
 
