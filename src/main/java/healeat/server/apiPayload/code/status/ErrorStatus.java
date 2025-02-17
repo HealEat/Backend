@@ -17,7 +17,7 @@ public enum ErrorStatus implements BaseErrorCode {
     _FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
 
     // 검색 관련 응답
-    FILTERS_LESS_EQUAL_THAN_5(HttpStatus.BAD_REQUEST, "SEARCH4001", "페이지 번호는 1 이상이어야 합니다."),
+    FILTERS_LESS_EQUAL_THAN_5(HttpStatus.BAD_REQUEST, "SEARCH4001", "키워드 필터는 5개까지만 가능합니다."),
 
     // 페이징 관련 응답
     PAGE_NUM_NOT_NATURAL(HttpStatus.BAD_REQUEST, "PAGE4001", "페이지 번호는 1 이상이어야 합니다."),
@@ -35,6 +35,7 @@ public enum ErrorStatus implements BaseErrorCode {
     REVIEW_NOT_FOUND(HttpStatus.BAD_REQUEST, "REVIEW4001", "리뷰가 없습니다."),
     REVIEW_TOO_MANY_IMAGES(HttpStatus.BAD_REQUEST, "REVIEW4002", "등록할 수 있는 리뷰 이미지 개수를 초과하였습니다."),
     IS_NOT_REVIEW_AUTHOR(HttpStatus.BAD_REQUEST, "REVIEW4003", "리뷰 작성자가 아니므로 삭제할 권한이 없습니다."),
+    FILTER_IS_NULL(HttpStatus.BAD_REQUEST, "REVIEW4004", "필터에 null 값이 들어왔습니다."),
 
 
     // 건강 목표 관련 응답
