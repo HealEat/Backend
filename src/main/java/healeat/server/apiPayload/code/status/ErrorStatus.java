@@ -69,6 +69,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 약관 관련 응답
     INVALID_TERM_ID(HttpStatus.BAD_REQUEST, "TERM4001", "유효하지 않은 약관입니다."),
+    REQUIRED_TERM_NOT_AGREED(HttpStatus.BAD_REQUEST, "TERM4002", "필수 약관에 동의하지 않았습니다."),
 
     // 질병 관련 응답
     DISEASE_NOT_FOUND(HttpStatus.BAD_REQUEST, "DISEASE4001", "질병을 찾을 수 없습니다."),

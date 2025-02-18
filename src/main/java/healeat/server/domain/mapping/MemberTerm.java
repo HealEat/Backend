@@ -27,4 +27,8 @@ public class MemberTerm extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean agree;
+
+    public void updateAgree(Boolean newAgree) {
+        this.agree = newAgree;
+    }
 }
