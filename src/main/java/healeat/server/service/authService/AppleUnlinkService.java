@@ -1,23 +1,21 @@
-package healeat.server.service;
+package healeat.server.service.authService;
 
-import healeat.server.repository.MemberRepository;
 import healeat.server.user.AppleClientSecretGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Service
 @RequiredArgsConstructor
 public class AppleUnlinkService {
     private final AppleClientSecretGenerator appleClientSecretGenerator;
     private final RestTemplate restTemplate;
-    private final MemberRepository memberRepository;
 
     private static final String APPLE_UNLINK_URL = "https://appleid.apple.com/auth/revoke";
 
@@ -28,20 +26,27 @@ public class AppleUnlinkService {
 
         String clientSecret = appleClientSecretGenerator.generateClientSecret();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("client_id", "sociallogin.healeat.com");  // 애플에 등록한 client_id
-        params.put("client_secret", clientSecret);
-        params.put("token", refreshToken);
-        params.put("token_type_hint", "refresh_token");
+        // 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        // 요청 바디를 URL-encoded 형식으로 변환
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", appleClientSecretGenerator.getClientId());
+        params.add("client_secret", clientSecret);
+        params.add("token", refreshToken);
+        params.add("token_type_hint", "refresh_token");
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(
                     APPLE_UNLINK_URL,
-                    new HttpEntity<>(params),
+                    requestEntity,
                     String.class
             );
 
-            return response.getStatusCode() == HttpStatus.OK;
+            return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
             throw new RuntimeException("애플 회원 탈퇴 실패: " + e.getMessage(), e);
         }

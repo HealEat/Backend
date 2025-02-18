@@ -9,10 +9,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import java.util.Optional;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.LinkedMultiValueMap;
 
 @Service
 @RequiredArgsConstructor
@@ -35,17 +36,28 @@ public class AppleTokenService {
         String refreshToken = memberOpt.get().getRefreshToken();
         String clientSecret = appleClientSecretGenerator.generateClientSecret();
 
-        Map<String, String> params = new HashMap<>();
-        params.put("client_id", "com.example.app");
-        params.put("client_secret", clientSecret);
-        params.put("refresh_token", refreshToken);
-        params.put("grant_type", "refresh_token");
+        // 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        // 요청 바디를 URL-encoded 형식으로 변환
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", appleClientSecretGenerator.getClientId());
+        params.add("client_secret", clientSecret);
+        params.add("refresh_token", refreshToken);
+        params.add("grant_type", "refresh_token");
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
 
         ResponseEntity<AppleTokenResponse> response = restTemplate.postForEntity(
                 APPLE_TOKEN_URL,
-                new HttpEntity<>(params),
+                requestEntity,
                 AppleTokenResponse.class
         );
+
+        if (response.getBody() == null) {
+            throw new RuntimeException("애플 액세스 토큰 갱신 실패: 응답이 null입니다.");
+        }
 
         return response.getBody().getAccessToken();
     }

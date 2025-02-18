@@ -15,11 +15,9 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ArrayList;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 //@Component
@@ -79,11 +77,19 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             String accessToken = authorizedClient.getAccessToken().getTokenValue();
             System.out.println("추출된 액세스 토큰: " + accessToken);
 
+            String refreshToken = authorizedClient.getRefreshToken() != null ? authorizedClient.getRefreshToken().getTokenValue() : null;
+
+            if (refreshToken != null && memberOpt.isPresent()) {
+                Member member = memberOpt.get();
+                member.updateRefreshToken(refreshToken);
+                memberRepository.save(member);
+                System.out.println("리프레시 토큰 저장 완료: " + refreshToken);
+            }
+
             // 클라이언트 앱으로 리다이렉트 (커스텀 스킴 사용)
             String redirectUrl = "com.umc7.healeat://?message=LoginSuccessful&accessToken=" + accessToken;
             System.out.println("리다이렉트 URL: " + redirectUrl);
             response.sendRedirect(redirectUrl);
-
         } else {
             System.out.println("액세스 토큰을 찾을 수 없음");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access token not found");

@@ -8,7 +8,7 @@ public class AppleJwtUtils {
     public static AppleUserInfo parseIdToken(String idToken) {
         try {
             String[] parts = idToken.split("\\.");
-            String payload = new String(Base64.getDecoder().decode(parts[1]));
+            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(payload);

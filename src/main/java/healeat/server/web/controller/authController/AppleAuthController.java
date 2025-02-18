@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpSession;
 import healeat.server.user.CustomUserPrincipal;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import healeat.server.service.AppleUnlinkService;
+import healeat.server.service.authService.AppleUnlinkService;
 import healeat.server.web.dto.authDto.AppleUnlinkRequest;
 
 @RestController
@@ -35,11 +35,11 @@ public class AppleAuthController {
 
     @Operation(
             summary = "애플 로그인 API",
-            description = "authorizationCode 보내면, accessToken과 refreshToken,  providerId을 발급",
+            description = "authorizationCode 보내면,  refreshToken과 providerId을 발급",
             responses = {
                     @ApiResponse(responseCode = "200", description = "로그인 성공",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(example = "{ \"accessToken\": \"string\", \"refreshToken\": \"string\", \"providerId\": \"string\" }")))
+                                    schema = @Schema(example = "{  \"refreshToken\": \"string\", \"providerId\": \"string\" }")))
             }
     )
 
@@ -66,7 +66,7 @@ public class AppleAuthController {
                     Member newMember = Member.builder()
                             .provider("apple")
                             .providerId(providerId)
-                            .name("AppleUser") // 기본 이름 설정 (애플은 이름 제공 안 함)
+                            .name("AppleUser") // 기본 이름 설정
                             .refreshToken(refreshToken)
                             .build();
                     return memberRepository.save(newMember);

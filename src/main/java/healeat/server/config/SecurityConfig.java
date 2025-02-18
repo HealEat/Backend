@@ -61,9 +61,6 @@ public class SecurityConfig {
                         .failureHandler(oAuth2LoginFailureHandler)
                 );
 
-        // CORS 및 헤더 관련 설정 추가 (헤더가 필터링되지 않도록)
-        //http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
-
         return http.build();
     }
 
@@ -79,22 +76,3 @@ public class SecurityConfig {
     }
 }
 
-
-
-/*
-    // SecurityFilterChain의 순서를 조정하기 위한 설정
-    @Bean
-    @Order(1)
-    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/plans/**", "/home/**", "/info/**", "/my-page/**", "/search/**", "/stores/**","/bookmarks/**",
-                        "/swagger-ui/**", "/v3/api-docs/**")
-                .authorizeHttpRequests(authz -> authz
-                        .anyRequest().permitAll()
-                )
-                .csrf(csrf -> csrf.disable());
-
-        return http.build();
-    }
-
-} */
