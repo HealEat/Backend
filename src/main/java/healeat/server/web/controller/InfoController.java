@@ -113,9 +113,8 @@ public class InfoController {
     @PatchMapping("/loading")
     public ApiResponse<HealInfoResponseDto> calculateHealEat(@AuthenticationPrincipal Member member) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(refreshedMember));
+        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(testMember));
     }
 }
