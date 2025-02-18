@@ -2,6 +2,7 @@ package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.converter.SearchPageConverter;
 import healeat.server.domain.FoodCategory;
 import healeat.server.domain.FoodFeature;
@@ -53,12 +54,13 @@ public class SearchController {
             @CheckPage @RequestParam Integer page,
             @Valid @CheckSizeSum @RequestBody StoreRequestDto.SearchOnMapDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        recentSearchService.saveRecentQuery(testMember, request.getQuery());
+        recentSearchService.saveRecentQuery(refreshedMember, request.getQuery());
 
         return ApiResponse.onSuccess(storeCommandService.searchAndMapStoresOnMap(
-                testMember, page, request));
+                refreshedMember, page, request));
     }
 
     @Operation(summary = "현재 위치 중심 - 요청과 검색 결과 API", description =
@@ -75,12 +77,13 @@ public class SearchController {
             @CheckPage @RequestParam Integer page,
             @Valid @CheckSizeSum @RequestBody StoreRequestDto.SearchKeywordDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        recentSearchService.saveRecentQuery(testMember, request.getQuery());
+        recentSearchService.saveRecentQuery(refreshedMember, request.getQuery());
 
         return ApiResponse.onSuccess(storeCommandService.searchAndMapStores(
-                testMember, page, request));
+                refreshedMember, page, request));
     }
 
     @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
@@ -88,9 +91,10 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(testMember.getId());
+        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(refreshedMember.getId());
 
         return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }
@@ -101,10 +105,11 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto.SetResultDto> saveRecentStore(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         return ApiResponse.onSuccess(SearchPageConverter.toSetResultDto(
-                recentSearchService.saveRecentStore(testMember, placeId)));
+                recentSearchService.saveRecentStore(refreshedMember, placeId)));
     }
 
     @Operation(summary = "음식 종류 조회", description = "음식 종류를 전체 조회합니다.")

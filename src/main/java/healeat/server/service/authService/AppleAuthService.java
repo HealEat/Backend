@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 public class AppleAuthService {
     private final AppleClientSecretGenerator appleClientSecretGenerator;
-    private final @Qualifier("restTemplate") RestTemplate restTemplate;  // 2.9 오류 때문에 추가
+    private final @Qualifier("restTemplate") RestTemplate restTemplate;
 
     private static final String APPLE_TOKEN_URL = "https://appleid.apple.com/auth/token";
 

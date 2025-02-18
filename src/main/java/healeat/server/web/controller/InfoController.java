@@ -1,6 +1,8 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.domain.Disease;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
@@ -38,8 +40,10 @@ public class InfoController {
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-        Member profileMember = memberService.createProfile(testMember, file, request);
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Member profileMember = memberService.createProfile(refreshedMember, file, request);
 
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(profileMember));
     }
@@ -57,8 +61,10 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestBody MemberDiseaseRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
-        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(testMember, request.getDiseaseName());
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(refreshedMember, request.getDiseaseName());
         return ApiResponse.onSuccess(responseDto);
     }
 
@@ -68,10 +74,11 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestParam String vegetarian) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         return ApiResponse.onSuccess(toChooseVegetResult(
-                memberHealthInfoService.chooseVegetarian(testMember, vegetarian)));
+                memberHealthInfoService.chooseVegetarian(refreshedMember, vegetarian)));
     }
 
     @Operation(summary = "다이어트 선택 API")
@@ -80,10 +87,11 @@ public class InfoController {
                 @AuthenticationPrincipal Member member,
                 @RequestParam String diet) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         return ApiResponse.onSuccess(toChooseDietResult(
-                memberHealthInfoService.chooseDiet(testMember, diet)));
+                memberHealthInfoService.chooseDiet(refreshedMember, diet)));
     }
 
     @Operation(summary = "기본 질문의 답변 저장 API", description =
@@ -98,10 +106,11 @@ public class InfoController {
             @PathVariable Integer questionNum,
             @RequestBody AnswerRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         return ApiResponse.onSuccess(toBaseResult(
-                memberHealthInfoService.createQuestion(testMember, questionNum, request)));
+                memberHealthInfoService.createQuestion(refreshedMember, questionNum, request)));
     }
 
     @Operation(summary = "알고리즘 계산 API", description = "알고리즘을 통해 healEatFoods(추천 음식 카테고리 리스트)를" +
@@ -109,8 +118,9 @@ public class InfoController {
     @PatchMapping("/loading")
     public ApiResponse<HealInfoResponseDto> calculateHealEat(@AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(testMember));
+        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(refreshedMember));
     }
 }
