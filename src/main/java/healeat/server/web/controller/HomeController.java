@@ -1,6 +1,8 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.StoreCommandService;
@@ -31,9 +33,10 @@ public class HomeController {
             @RequestParam Integer page,
             @RequestParam String rect){
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(testMember, page, rect));
+        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStores(refreshedMember, page, rect));
     }
 
     @Operation(summary = "(구버전입니다.) 홈 화면에서 추천 가게 리스트를 조회합니다.", description =
@@ -48,7 +51,9 @@ public class HomeController {
             @RequestParam Integer page,
             @RequestBody StoreRequestDto.HealEatRequestDtoOld request){
 
-        Member testMember = memberRepository.findById(999L).get();
-        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStoresOld(testMember, page, request));
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+
+        return ApiResponse.onSuccess(storeCommandService.recommendAndMapStoresOld(refreshedMember, page, request));
     }
 }

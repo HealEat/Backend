@@ -1,6 +1,8 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.converter.ReviewConverter;
 import healeat.server.domain.Member;
 import healeat.server.domain.mapping.Review;
@@ -37,9 +39,10 @@ public class MyPageController {
     @GetMapping("/profile")
     public ApiResponse<MemberProfileResponseDto> getProfileInfo(@AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return ApiResponse.onSuccess(memberService.getProfileInfo(testMember));
+        return ApiResponse.onSuccess(memberService.getProfileInfo(refreshedMember));
     }
 
     @Operation(summary = "프로필 수정 API",
@@ -52,9 +55,10 @@ public class MyPageController {
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        Member changedProfileMember = memberService.updateProfile(testMember, file, request);
+        Member changedProfileMember = memberService.updateProfile(refreshedMember, file, request);
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(changedProfileMember));
     }
 
@@ -66,10 +70,11 @@ public class MyPageController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(testMember, pageable);
+        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(refreshedMember, pageable);
 
         return ApiResponse.onSuccess(responseDto);
     }
@@ -80,9 +85,10 @@ public class MyPageController {
             @AuthenticationPrincipal Member member,
             @PathVariable Long reviewId) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        Review deleteReview = reviewService.deleteReview(testMember, reviewId);
+        Review deleteReview = reviewService.deleteReview(refreshedMember, reviewId);
         return ApiResponse.onSuccess(ReviewConverter.toReviewDeleteResultDto(deleteReview));
     }
 
@@ -92,9 +98,10 @@ public class MyPageController {
     public ApiResponse<HealInfoResponseDto.MyHealthInfoDto> getMyHealthInfo(
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(testMember);
+        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(refreshedMember);
         return ApiResponse.onSuccess(responseDto);
     }
 
@@ -105,9 +112,10 @@ public class MyPageController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(testMember, page, size));
+        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(refreshedMember, page, size));
     }
 
     // 기획안 수정됨 : 건강 정보 각각에 대한 정보 수정 X -> 건강 정보 전체에 대한 정보 수정 O (프론트에서 Info 도메인 재사용한다고 함)

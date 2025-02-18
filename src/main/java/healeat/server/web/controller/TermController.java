@@ -1,6 +1,8 @@
 package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
+import healeat.server.apiPayload.code.status.ErrorStatus;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
 import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.service.TermService;
@@ -36,9 +38,10 @@ public class TermController {
             @AuthenticationPrincipal Member member,
             @RequestBody @Valid TermsAgreeRequest request) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        termService.saveMemberAgreement(testMember, request);
+        termService.saveMemberAgreement(refreshedMember, request);
         return ApiResponse.onSuccess(null);
     }
 
@@ -47,8 +50,9 @@ public class TermController {
     public ApiResponse<List<MemberTermResponse>> getTermStatus(
             @AuthenticationPrincipal Member member
     ) {
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        return ApiResponse.onSuccess(termService.getMemberTermsStatus(testMember));
+        return ApiResponse.onSuccess(termService.getMemberTermsStatus(refreshedMember));
     }
 }

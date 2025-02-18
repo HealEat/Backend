@@ -17,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import healeat.server.apiPayload.exception.handler.MemberHandler;
+import healeat.server.apiPayload.code.status.ErrorStatus;
 
 import java.util.List;
 
@@ -40,10 +42,11 @@ public class HealthPlanController {
             @RequestBody HealthPlanRequestDto.HealthPlanUpdateRequestDto request,
             @AuthenticationPrincipal Member member) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         return ApiResponse.onSuccess(HealthPlanConverter.toSetResultDto(
-                healthPlanService.createHealthPlan(request, testMember)));
+                healthPlanService.createHealthPlan(request, refreshedMember)));
     }
 
     @Operation(summary = "건강 관리 목표 조회", description = "사용자의 건강 관리 목표를 전체 조회합니다.")
@@ -52,10 +55,11 @@ public class HealthPlanController {
             @AuthenticationPrincipal Member member,
             @CheckPage @RequestParam Integer page) {
 
-        Member testMember = memberRepository.findById(999L).get();
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
+                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         return ApiResponse.onSuccess(HealthPlanConverter.toHealthPlanResponseDto(
-                healthPlanService.find10PlansByMemberPage(testMember, page)));
+                healthPlanService.find10PlansByMemberPage(refreshedMember, page)));
     }
 
     @Operation(summary = "건강 관리 목표 삭제", description = "건강 관리 목표를 삭제합니다.")
