@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Getter
+@Builder
 public class ReviewRequestDto {
 
     @Max(value = 5, message = "건강 평점은 5 이하여야 합니다")

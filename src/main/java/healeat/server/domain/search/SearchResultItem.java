@@ -52,7 +52,7 @@ public class SearchResultItem extends BaseEntity {
         String[] categoryWords = categoryName.split(" > ");
 
         return StoreResponseDto.StoreInfoDto.builder()
-                .placeId(placeId)
+                .placeId(String.valueOf(placeId))
                 .placeName(placeName)
                 .categoryName(categoryWords[categoryWords.length - 1])
                 .phone(phone)
