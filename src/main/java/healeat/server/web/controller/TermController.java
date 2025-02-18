@@ -2,6 +2,7 @@ package healeat.server.web.controller;
 
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.Member;
+import healeat.server.repository.MemberRepository;
 import healeat.server.service.TermService;
 import healeat.server.web.dto.MemberTermResponse;
 import healeat.server.web.dto.TermResponse;
@@ -20,6 +21,7 @@ import java.util.List;
 public class TermController {
 
     private final TermService termService;
+    private final MemberRepository memberRepository;
 
     @Operation(summary = "약관 조회 API")
     @GetMapping
@@ -34,7 +36,9 @@ public class TermController {
             @AuthenticationPrincipal Member member,
             @RequestBody @Valid TermsAgreeRequest request) {
 
-        termService.saveUserAgreement(member, request);
+        Member testMember = memberRepository.findById(999L).get();
+
+        termService.saveMemberAgreement(testMember, request);
         return ApiResponse.onSuccess(null);
     }
 
@@ -43,6 +47,8 @@ public class TermController {
     public ApiResponse<List<MemberTermResponse>> getTermStatus(
             @AuthenticationPrincipal Member member
     ) {
-        return ApiResponse.onSuccess(termService.getMemberTermsStatus(member));
+        Member testMember = memberRepository.findById(999L).get();
+
+        return ApiResponse.onSuccess(termService.getMemberTermsStatus(testMember));
     }
 }
