@@ -3,6 +3,7 @@ package healeat.server.web.controller;
 import healeat.server.apiPayload.ApiResponse;
 import healeat.server.domain.Member;
 import healeat.server.service.TermService;
+import healeat.server.web.dto.MemberTermResponse;
 import healeat.server.web.dto.TermResponse;
 import healeat.server.web.dto.TermsAgreeRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,5 +36,13 @@ public class TermController {
 
         termService.saveUserAgreement(member, request);
         return ApiResponse.onSuccess(null);
+    }
+
+    @Operation(summary = "사용자의 약관 동의 상태 조회 API")
+    @GetMapping("/status")
+    public ApiResponse<List<MemberTermResponse>> getTermStatus(
+            @AuthenticationPrincipal Member member
+    ) {
+        return ApiResponse.onSuccess(termService.getMemberTermsStatus(member));
     }
 }

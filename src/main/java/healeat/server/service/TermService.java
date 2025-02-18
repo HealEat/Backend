@@ -7,6 +7,7 @@ import healeat.server.domain.Term;
 import healeat.server.domain.mapping.MemberTerm;
 import healeat.server.repository.MemberTermRepository;
 import healeat.server.repository.TermRepository;
+import healeat.server.web.dto.MemberTermResponse;
 import healeat.server.web.dto.TermResponse;
 import healeat.server.web.dto.TermsAgreeRequest;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +47,14 @@ public class TermService {
                             .build()
             );
         }
+    }
+
+    // 회원의 약관 동의 상태 조회 API
+    @Transactional(readOnly = true)
+    public List<MemberTermResponse> getMemberTermsStatus(Member member) {
+        return memberTermRepository.findByMember(member)
+                .stream()
+                .map(MemberTermResponse::from)
+                .toList();
     }
 }
