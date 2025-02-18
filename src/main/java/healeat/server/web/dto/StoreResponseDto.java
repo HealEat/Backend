@@ -133,7 +133,7 @@ public class StoreResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StoreInfoDto {
-        Long placeId;
+        String placeId;
         String placeName;
         String categoryName;
         String phone;
