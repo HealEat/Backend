@@ -1,15 +1,16 @@
 package healeat.server.service.authService;
 
 import healeat.server.web.dto.authDto.AppleTokenResponse;
+import healeat.server.user.AppleClientSecretGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import java.util.HashMap;
-import java.util.Map;
-import healeat.server.user.AppleClientSecretGenerator;
-
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service
@@ -24,15 +25,21 @@ public class AppleAuthService {
     public AppleTokenResponse getAppleAccessToken(String authorizationCode) {
         String clientSecret = appleClientSecretGenerator.generateClientSecret();
 
-        Map<String, String> requestParams = new HashMap<>();
-        requestParams.put("client_id", "com.example.app");
-        requestParams.put("client_secret", clientSecret);
-        requestParams.put("code", authorizationCode);
-        requestParams.put("grant_type", "authorization_code");
+        // 요청 바디를 URL-encoded 형식으로 변환
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("client_id", appleClientSecretGenerator.getClientId());
+        requestParams.add("client_secret", clientSecret);
+        requestParams.add("code", authorizationCode);
+        requestParams.add("grant_type", "authorization_code");
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestParams, headers);
 
         ResponseEntity<AppleTokenResponse> response = restTemplate.postForEntity(
                 APPLE_TOKEN_URL,
-                new HttpEntity<>(requestParams),
+                requestEntity,
                 AppleTokenResponse.class
         );
 
