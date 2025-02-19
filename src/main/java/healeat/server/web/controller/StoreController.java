@@ -50,8 +50,10 @@ public class StoreController {
             @PathVariable Long placeId,
             @AuthenticationPrincipal Member member) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member refreshedMember = (member != null) ?
+                memberRepository.findById(member.getId())
+                        .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND)) :
+                null;
 
         return ApiResponse.onSuccess(storeQueryServiceImpl.getStoreHome(placeId, refreshedMember));
     }

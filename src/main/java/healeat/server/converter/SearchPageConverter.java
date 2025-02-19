@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -26,9 +27,18 @@ public class SearchPageConverter {
     }
 
     public static RecentSearchResponseDto.SetResultDto toSetResultDto(RecentSearch recentSearch) {
+
+        Long id = null;
+        LocalDateTime updatedAt = null;
+
+        if (recentSearch != null) {
+            updatedAt = recentSearch.getUpdatedAt();
+            id = recentSearch.getId();
+        }
+
         return RecentSearchResponseDto.SetResultDto.builder()
-                .recentSearchId(recentSearch.getId())
-                .updatedAt(recentSearch.getUpdatedAt())
+                .recentSearchId(id)
+                .updatedAt(updatedAt)
                 .build();
     }
 
@@ -74,10 +84,13 @@ public class SearchPageConverter {
 
     public static RecentSearchResponseDto toRecentSearchResponseDto(List<RecentSearch> recentSearches) {
 
-        List<RecentSearchResponseDto.RecentSearchDto> recentSearchList = recentSearches.stream()
-                .map(SearchPageConverter::toRecentSearchDto)
-                .toList();
+        List<RecentSearchResponseDto.RecentSearchDto> recentSearchList = new ArrayList<>();
 
+        if (recentSearches != null && !recentSearches.isEmpty()) {
+            recentSearchList = recentSearches.stream()
+                    .map(SearchPageConverter::toRecentSearchDto)
+                    .toList();
+        }
 
         return RecentSearchResponseDto.builder()
                 .recentSearchList(recentSearchList)

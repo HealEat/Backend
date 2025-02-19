@@ -47,9 +47,12 @@ public class StoreQueryServiceImpl {
             store = optionalStore.get();
         }
 
-        Optional<Bookmark> optionalBookmark = bookmarkRepository.findByMemberAndStore(member, store);
-        // NPE 발생 가능성 없는 코드!
-        Long bookmarkId = optionalBookmark.map(Bookmark::getId).orElse(null);
+        Long bookmarkId = null;
+        if (member != null) {
+            Optional<Bookmark> optionalBookmark = bookmarkRepository.findByMemberAndStore(member, store);
+            // NPE 발생 가능성 없는 코드!
+            bookmarkId = optionalBookmark.map(Bookmark::getId).orElse(null);
+        }
 
         StoreHomeDto storeHomeDto = store.getStoreHomeDto();
         storeHomeDto.setBookmarkId(bookmarkId);
