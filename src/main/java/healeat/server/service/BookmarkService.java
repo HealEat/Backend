@@ -80,7 +80,7 @@ public class BookmarkService {
 
         Pageable pageable = PageRequest.of(safePage, size);
 
-        Page<Bookmark> bookmarkPage = bookmarkRepository.findByMember(member, pageable);
+        Page<Bookmark> bookmarkPage = bookmarkRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
 
         Page<StoreResponseDto.StorePreviewDto> storePreviewPage = bookmarkPage.map(bookmark -> {
             StoreResponseDto.StoreHomeDto storeHomeDto = bookmark.getStore().getStoreHomeDto();

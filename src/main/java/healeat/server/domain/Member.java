@@ -19,6 +19,9 @@ import java.util.*;
 @Builder
 public class Member extends BaseEntity {
 
+    // 익명 회원 ID : -1
+    public static final Long ANONYMOUS_MEMBER_ID = -1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,10 +41,6 @@ public class Member extends BaseEntity {
     @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<MemberDisease> memberDiseases = new ArrayList<>();
-
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Vegetarian vegetarian = Vegetarian.NONE;
@@ -57,19 +56,11 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    private List<MemberDisease> memberDiseases = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MemberHealQuestion> memberHealQuestions = new ArrayList<>();  // 건강 정보 설정
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<MemberTerm> memberTerms = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<RecentSearch> recentSearches = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<HealthPlan> healthPlans = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

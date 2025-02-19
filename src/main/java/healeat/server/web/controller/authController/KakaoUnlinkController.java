@@ -49,7 +49,7 @@ public class KakaoUnlinkController {
         }
 
         // DB에서 사용자 삭제
-        unlinkService.deleteKakaoMember("kakao", kakaoUserId);
+        unlinkService.deleteSocialMember("kakao", kakaoUserId);
         System.out.println("DB에서 사용자 삭제 완료: " + kakaoUserId);
 
         // 5️⃣ 성공 응답 반환

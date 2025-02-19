@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
     Optional<Bookmark> findByMemberAndStore(Member member, Store store);
-    Page<Bookmark> findByMember(Member member, Pageable pageable);
     Bookmark getBookmarkById(Long id);
+
+    Page<Bookmark> findByMemberOrderByCreatedAtDesc(Member member, Pageable pageable);
 }

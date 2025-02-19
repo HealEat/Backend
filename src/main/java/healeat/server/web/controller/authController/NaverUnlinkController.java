@@ -54,7 +54,7 @@ public class NaverUnlinkController {
         }
 
         // DB에서 사용자 삭제
-        unlinkService.deleteKakaoMember("naver", naverUserId);
+        unlinkService.deleteSocialMember("naver", naverUserId);
 
         // 성공 응답 반환
         return ResponseEntity.ok(
