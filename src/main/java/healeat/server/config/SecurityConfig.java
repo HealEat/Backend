@@ -21,6 +21,7 @@ import healeat.server.repository.MemberRepository;
 import healeat.server.user.JwtTokenProvider;
 import healeat.server.user.JwtAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import healeat.server.service.authService.LogoutService;
 
 @Configuration
 @EnableWebSecurity
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final LogoutService logoutService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
@@ -39,7 +41,7 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 //JWT 인증 필터 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, memberRepository),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, memberRepository, logoutService),
                         UsernamePasswordAuthenticationFilter.class)
                 // 인증 필터 순서 조정 - 권한 검사를 먼저 실행
                 .authorizeHttpRequests(authz -> authz

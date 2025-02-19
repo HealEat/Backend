@@ -207,7 +207,7 @@ public class Store extends BaseEntity {
                 categoryName;
 
         return StoreResponseDto.StoreInfoDto.builder()
-                .placeId(String.valueOf(kakaoPlaceId))
+                .placeId(kakaoPlaceId)
                 .placeName(placeName)
                 .categoryName(singleCategory)
                 .phone(phone)
