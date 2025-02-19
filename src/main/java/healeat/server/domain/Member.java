@@ -35,7 +35,10 @@ public class Member extends BaseEntity {
     @Column(nullable = true, unique = true)
     private String providerId; // 소셜 로그인 제공자로부터 받은 사용자 ID
 
-    @Column(nullable = true)  // 애플 로그인 리프레시 토큰
+    @Column(nullable = true, length = 500) //소셜 액세스 토큰 저장
+    private String socialAccessToken;
+
+    @Column(nullable = true)  //서버 자체 발급 리프레시 토큰
     private String refreshToken;
 
     @Column(name = "profile_image_url", nullable = true)
@@ -69,6 +72,10 @@ public class Member extends BaseEntity {
     // 애플 로그인 리프레시 토큰 업데이트 메서드
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateSocialAccessToken(String socialAccessToken) {
+        this.socialAccessToken = socialAccessToken;
     }
 
     public boolean setVegetAndCheckChanged(Vegetarian vegetarian) {

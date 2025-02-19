@@ -18,6 +18,9 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import healeat.server.repository.MemberRepository;
+import healeat.server.user.JwtTokenProvider;
+import healeat.server.user.JwtAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +29,8 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final MemberRepository memberRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
@@ -33,6 +38,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
+                //JWT 인증 필터 추가
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, memberRepository),
+                        UsernamePasswordAuthenticationFilter.class)
                 // 인증 필터 순서 조정 - 권한 검사를 먼저 실행
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
@@ -51,7 +59,7 @@ public class SecurityConfig {
                         })
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) //세션 유지
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //JWT 인증을 사용하기 때문에 세션 정책을 STATELESS로 변경
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
@@ -71,8 +79,8 @@ public class SecurityConfig {
 
     //순환 의존성 방지로 OAuth2LoginSuccessHandler는 SecurityConfig에서 직접 빈으로 관리
     @Bean
-    public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, MemberRepository memberRepository) {
-        return new OAuth2LoginSuccessHandler(authorizedClientService, memberRepository);
+    public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider) {
+        return new OAuth2LoginSuccessHandler(authorizedClientService, memberRepository, jwtTokenProvider);
     }
 }
 
