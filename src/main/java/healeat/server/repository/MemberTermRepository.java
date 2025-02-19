@@ -11,4 +11,5 @@ public interface MemberTermRepository extends JpaRepository<MemberTerm, Long> {
     // 특정 회원이 동의한 약관 리스트 조회
     List<MemberTerm> findByMember(Member member);
     MemberTerm findByMemberAndTerm(Member member, Term term);
+    void deleteByMember(Member member);
 }

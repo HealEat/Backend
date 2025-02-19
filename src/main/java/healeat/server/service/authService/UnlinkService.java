@@ -13,6 +13,7 @@ import healeat.server.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import healeat.server.repository.MemberTermRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class UnlinkService {
     private final HealthPlanService healthPlanService;
     private final ImageService imageService;
     private final ReviewRepository reviewRepository;
+    private final MemberTermRepository memberTermRepository;
 
     @Transactional
     public void deleteSocialMember(String provider, String providerId) {
@@ -48,6 +50,9 @@ public class UnlinkService {
         // 회원의 모든 리뷰 데이터 익명화
         List<Review> reviews = reviewRepository.findByMember(member.get());
         reviews.forEach(this::setReviewToAnonymous);
+
+        // 🔹 4. 회원의 약관 동의 기록 삭제 ✅
+        memberTermRepository.deleteByMember(member.get());
 
         System.out.println(" DB에서 삭제: provider=" + provider + ", providerId=" + providerId);
         memberRepository.deleteByProviderAndProviderId(provider, providerId);
