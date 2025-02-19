@@ -12,8 +12,8 @@ import java.nio.charset.StandardCharsets;
 public class JwtTokenProvider {
 
     private final Key secretKey;
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60; // 1시간 (고정)
-    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7일 (고정)
+    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60 * 12; // 12시간 (고정)
+    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 30; // 30일 (고정)
 
     // application.yml에서 `jwt.secret` 불러오기
     public JwtTokenProvider(@Value("${jwt.secret}") String secret) {
