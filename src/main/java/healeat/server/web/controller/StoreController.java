@@ -116,10 +116,9 @@ public class StoreController {
             @RequestPart(name = "request", required = true)
             ReviewRequestDto request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        Review newReview = reviewService.createReview(placeId, refreshedMember, files, request);
+        Review newReview = reviewService.createReview(placeId, testMember, files, request);
         return ApiResponse.onSuccess(ReviewConverter.toReviewSetResultDto(newReview));
     }
 
@@ -149,11 +148,10 @@ public class StoreController {
     public ApiResponse<BookmarkResponseDto> saveBookmark(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
         return ApiResponse.onSuccess(toSetResponseDto(
-                bookmarkService.saveBookmark(refreshedMember, placeId)));
+                bookmarkService.saveBookmark(testMember, placeId)));
     }
 
     @Operation(summary = "가게 북마크 삭제 API", description = "회원의 가게 북마크에서 삭제합니다.")

@@ -38,10 +38,9 @@ public class TermController {
             @AuthenticationPrincipal Member member,
             @RequestBody @Valid TermsAgreeRequest request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        termService.saveMemberAgreement(refreshedMember, request);
+        termService.saveMemberAgreement(testMember, request);
         return ApiResponse.onSuccess(null);
     }
 
@@ -50,9 +49,8 @@ public class TermController {
     public ApiResponse<List<MemberTermResponse>> getTermStatus(
             @AuthenticationPrincipal Member member
     ) {
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(termService.getMemberTermsStatus(refreshedMember));
+        return ApiResponse.onSuccess(termService.getMemberTermsStatus(testMember));
     }
 }

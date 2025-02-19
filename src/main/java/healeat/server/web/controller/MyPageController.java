@@ -39,10 +39,9 @@ public class MyPageController {
     @GetMapping("/profile")
     public ApiResponse<MemberProfileResponseDto> getProfileInfo(@AuthenticationPrincipal Member member) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(memberService.getProfileInfo(refreshedMember));
+        return ApiResponse.onSuccess(memberService.getProfileInfo(testMember));
     }
 
     @Operation(summary = "프로필 수정 API",
@@ -55,10 +54,9 @@ public class MyPageController {
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        Member changedProfileMember = memberService.updateProfile(refreshedMember, file, request);
+        Member changedProfileMember = memberService.updateProfile(testMember, file, request);
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(changedProfileMember));
     }
 
@@ -70,11 +68,10 @@ public class MyPageController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
         Pageable pageable = PageRequest.of(page - 1, size);
-        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(refreshedMember, pageable);
+        ReviewResponseDto.MyPageReviewListDto responseDto = reviewService.getMyReviews(testMember, pageable);
 
         return ApiResponse.onSuccess(responseDto);
     }
@@ -85,10 +82,9 @@ public class MyPageController {
             @AuthenticationPrincipal Member member,
             @PathVariable Long reviewId) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        Review deleteReview = reviewService.deleteReview(refreshedMember, reviewId);
+        Review deleteReview = reviewService.deleteReview(testMember, reviewId);
         return ApiResponse.onSuccess(ReviewConverter.toReviewDeleteResultDto(deleteReview));
     }
 
@@ -98,10 +94,9 @@ public class MyPageController {
     public ApiResponse<HealInfoResponseDto.MyHealthInfoDto> getMyHealthInfo(
             @AuthenticationPrincipal Member member) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(refreshedMember);
+        HealInfoResponseDto.MyHealthInfoDto responseDto = memberHealthInfoService.getMyHealthInfo(testMember);
         return ApiResponse.onSuccess(responseDto);
     }
 
@@ -112,10 +107,9 @@ public class MyPageController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(refreshedMember, page, size));
+        return ApiResponse.onSuccess(bookmarkService.getMemberBookmarks(testMember, page, size));
     }
 
     // 기획안 수정됨 : 건강 정보 각각에 대한 정보 수정 X -> 건강 정보 전체에 대한 정보 수정 O (프론트에서 Info 도메인 재사용한다고 함)

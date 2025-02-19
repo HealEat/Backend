@@ -40,10 +40,9 @@ public class InfoController {
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        Member profileMember = memberService.createProfile(refreshedMember, file, request);
+        Member profileMember = memberService.createProfile(testMember, file, request);
 
         return ApiResponse.onSuccess(MemberProfileResponseDto.from(profileMember));
     }
@@ -61,10 +60,9 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestBody MemberDiseaseRequestDto request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(refreshedMember, request.getDiseaseName());
+        MemberDiseaseResponseDto responseDto = memberService.saveDiseasesToMember(testMember, request.getDiseaseName());
         return ApiResponse.onSuccess(responseDto);
     }
 
@@ -74,11 +72,10 @@ public class InfoController {
             @AuthenticationPrincipal Member member,
             @RequestParam String vegetarian) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
         return ApiResponse.onSuccess(toChooseVegetResult(
-                memberHealthInfoService.chooseVegetarian(refreshedMember, vegetarian)));
+                memberHealthInfoService.chooseVegetarian(testMember, vegetarian)));
     }
 
     @Operation(summary = "다이어트 선택 API")
@@ -87,11 +84,10 @@ public class InfoController {
                 @AuthenticationPrincipal Member member,
                 @RequestParam String diet) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
         return ApiResponse.onSuccess(toChooseDietResult(
-                memberHealthInfoService.chooseDiet(refreshedMember, diet)));
+                memberHealthInfoService.chooseDiet(testMember, diet)));
     }
 
     @Operation(summary = "기본 질문의 답변 저장 API", description =
@@ -106,11 +102,10 @@ public class InfoController {
             @PathVariable Integer questionNum,
             @RequestBody AnswerRequestDto request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
         return ApiResponse.onSuccess(toBaseResult(
-                memberHealthInfoService.createQuestion(refreshedMember, questionNum, request)));
+                memberHealthInfoService.createQuestion(testMember, questionNum, request)));
     }
 
     @Operation(summary = "알고리즘 계산 API", description = "알고리즘을 통해 healEatFoods(추천 음식 카테고리 리스트)를" +
@@ -118,9 +113,8 @@ public class InfoController {
     @PatchMapping("/loading")
     public ApiResponse<HealInfoResponseDto> calculateHealEat(@AuthenticationPrincipal Member member) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member testMember = memberRepository.findById(999L).get();
 
-        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(refreshedMember));
+        return ApiResponse.onSuccess(memberHealthInfoService.makeHealEat(testMember));
     }
 }
