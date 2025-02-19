@@ -51,7 +51,7 @@ public class UnlinkService {
         List<Review> reviews = reviewRepository.findByMember(member.get());
         reviews.forEach(this::setReviewToAnonymous);
 
-        // 🔹 4. 회원의 약관 동의 기록 삭제 ✅
+        //  회원의 약관 동의 기록 삭제
         memberTermRepository.deleteByMember(member.get());
 
         System.out.println(" DB에서 삭제: provider=" + provider + ", providerId=" + providerId);
