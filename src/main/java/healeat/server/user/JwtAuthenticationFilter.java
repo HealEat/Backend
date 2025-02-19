@@ -15,19 +15,21 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
+import healeat.server.service.authService.LogoutService;
 
-//JWT를 이용한 인증 필터
+// JWT를 이용한 인증 필터
 /*
 클라이언트가 API 요청 시, Authorization: Bearer <JWT> 헤더를 포함하면 해당 토큰을 검증하여 SecurityContextHolder에 사용자 정보를 저장하는 필터를 추가
  */
-public class
-JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final LogoutService logoutService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository, LogoutService logoutService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.memberRepository = memberRepository;
+        this.logoutService = logoutService;
     }
 
     @Override
@@ -35,6 +37,13 @@ JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = resolveToken(request);
         if (token != null && jwtTokenProvider.validateToken(token)) {
+            // 로그아웃된 토큰인지 확인
+            if (logoutService.isLoggedOut(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"This token has been logged out\"}");
+                return;
+            }
+
             Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
             Optional<Member> member = memberRepository.findById(memberId);
 
