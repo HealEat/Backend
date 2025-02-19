@@ -31,15 +31,11 @@ public class QMember extends EntityPathBase<Member> {
 
     public final ListPath<String, StringPath> healEatFoods = this.<String, StringPath>createList("healEatFoods", String.class, StringPath.class, PathInits.DIRECT2);
 
-    public final ListPath<HealthPlan, QHealthPlan> healthPlans = this.<HealthPlan, QHealthPlan>createList("healthPlans", HealthPlan.class, QHealthPlan.class, PathInits.DIRECT2);
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final ListPath<healeat.server.domain.mapping.MemberDisease, healeat.server.domain.mapping.QMemberDisease> memberDiseases = this.<healeat.server.domain.mapping.MemberDisease, healeat.server.domain.mapping.QMemberDisease>createList("memberDiseases", healeat.server.domain.mapping.MemberDisease.class, healeat.server.domain.mapping.QMemberDisease.class, PathInits.DIRECT2);
 
     public final ListPath<MemberHealQuestion, QMemberHealQuestion> memberHealQuestions = this.<MemberHealQuestion, QMemberHealQuestion>createList("memberHealQuestions", MemberHealQuestion.class, QMemberHealQuestion.class, PathInits.DIRECT2);
-
-    public final ListPath<healeat.server.domain.mapping.MemberTerm, healeat.server.domain.mapping.QMemberTerm> memberTerms = this.<healeat.server.domain.mapping.MemberTerm, healeat.server.domain.mapping.QMemberTerm>createList("memberTerms", healeat.server.domain.mapping.MemberTerm.class, healeat.server.domain.mapping.QMemberTerm.class, PathInits.DIRECT2);
 
     public final StringPath name = createString("name");
 
@@ -48,8 +44,6 @@ public class QMember extends EntityPathBase<Member> {
     public final StringPath provider = createString("provider");
 
     public final StringPath providerId = createString("providerId");
-
-    public final ListPath<healeat.server.domain.mapping.RecentSearch, healeat.server.domain.mapping.QRecentSearch> recentSearches = this.<healeat.server.domain.mapping.RecentSearch, healeat.server.domain.mapping.QRecentSearch>createList("recentSearches", healeat.server.domain.mapping.RecentSearch.class, healeat.server.domain.mapping.QRecentSearch.class, PathInits.DIRECT2);
 
     public final StringPath refreshToken = createString("refreshToken");
 

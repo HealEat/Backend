@@ -11,4 +11,6 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCustom {
 
     Page<Review> findByMemberOrderByCreatedAtDesc(Member member, Pageable pageable);
+
+    List<Review> findByMember(Member member);
 }

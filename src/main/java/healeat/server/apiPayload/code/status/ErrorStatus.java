@@ -49,6 +49,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 회원 관련 응답
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다."),
+    ANONYMOUS_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4002", "익명 사용자가 테이블에 없습니다."),
 
     // 회원 건강 정보 설정 관련 응답
     QUESTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "HEALTH_INFO4001", "해당 질문이 없습니다."),

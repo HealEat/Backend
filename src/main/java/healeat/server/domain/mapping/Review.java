@@ -75,6 +75,10 @@ public class Review extends BaseEntity {
         store.addScoresByReview(this);
     }
 
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
     //==연관관계 편의 메서드==//
 
     public void addImage(ReviewImage reviewImage) {
