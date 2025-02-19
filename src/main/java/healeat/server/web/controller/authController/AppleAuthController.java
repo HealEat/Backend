@@ -16,11 +16,11 @@ import healeat.server.user.AppleJwtUtils;
 import healeat.server.repository.MemberRepository;
 import healeat.server.domain.Member;
 import jakarta.servlet.http.HttpSession;
-import healeat.server.user.CustomUserPrincipal;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import healeat.server.service.authService.AppleUnlinkService;
-import healeat.server.web.dto.authDto.AppleUnlinkRequest;
+import healeat.server.user.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -32,14 +32,15 @@ public class AppleAuthController {
     private final MemberRepository memberRepository;
     private final HttpSession httpSession;
     private final AppleUnlinkService appleUnlinkService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Operation(
             summary = "애플 로그인 API",
-            description = "authorizationCode 보내면,  refreshToken과 providerId을 발급",
+            description = "authorizationCode 보내면,   accessToken과 providerId을 발급",
             responses = {
                     @ApiResponse(responseCode = "200", description = "로그인 성공",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(example = "{  \"refreshToken\": \"string\", \"providerId\": \"string\" }")))
+                                    schema = @Schema(example = "{  \"accessToken\": \"string\", \"providerId\": \"string\" }")))
             }
     )
 
@@ -50,6 +51,7 @@ public class AppleAuthController {
 
         // 애플 OAuth 서버에서 액세스 토큰 요청
         AppleTokenResponse tokenResponse = appleAuthService.getAppleAccessToken(authorizationCode);
+        String appleAccessToken = tokenResponse.getAccessToken();
         String refreshToken = tokenResponse.getRefreshToken();
         String idToken = tokenResponse.getIdToken();
 
@@ -68,62 +70,72 @@ public class AppleAuthController {
                             .providerId(providerId)
                             .name("AppleUser") // 기본 이름 설정
                             .refreshToken(refreshToken)
+                            .socialAccessToken(appleAccessToken)
                             .build();
                     return memberRepository.save(newMember);
                 });
 
-        // SecurityContextHolder에 사용자 정보 저장 (애플 로그인도 Spring Security 인증 처리 하도록)
-        CustomUserPrincipal userPrincipal = new CustomUserPrincipal(member, Map.of());
-        UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        // 자체 JWT 발급
+        String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(member.getId());
 
-        // 세션에 사용자 저장
-        httpSession.setAttribute("user", member);
+        // 기존 리프레시 토큰을 갱신하여 저장
+        member.updateRefreshToken(newRefreshToken);
+        memberRepository.save(member);
 
-        System.out.println(" 애플 로그인 성공 - SecurityContextHolder & 세션 저장 완료");
-
+        // JWT 반환 (애플의 액세스 토큰 대신 서버 JWT 사용)
         return ResponseEntity.ok(Map.of(
-                "refreshToken", tokenResponse.getRefreshToken(),
+                "accessToken", accessToken,   // 서버 JWT 반환
+                //"refreshToken", newRefreshToken,  // 서버에서 발급한 리프레시 토큰 반환
                 "providerId", providerId
         ));
     }
 
-    @Operation(summary = "애플 회원 탈퇴", description = " ")
+    @Operation(summary = "애플 회원 탈퇴", description = " 액세스 토큰 헤더로 보내면, 애플 계정을 해제하고 서버에서 삭제")
     @PostMapping("/apple/unlink")
-    public ResponseEntity<?> unlinkAppleAccount(@RequestBody AppleUnlinkRequest request) {
-        String providerId = request.getProviderId();
+    public ResponseEntity<?> unlinkAppleAccount(HttpServletRequest request) {
+        String token = resolveToken(request); //서버 자체 JWT 토큰 확인
+
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid token"));
+        }
+
+        // JWT에서 사용자 ID 추출
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
 
         // DB에서 사용자 조회
-        Member member = memberRepository.findByProviderAndProviderId("apple", providerId)
-                .orElseThrow(() -> new IllegalArgumentException("애플 계정을 찾을 수 없습니다."));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        if (!"apple".equals(member.getProvider())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "애플 계정이 아닙니다."));
+        }
 
         String refreshToken = member.getRefreshToken();
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "애플 리프레시 토큰이 없음"));
+        }
 
-        // 애플 서버에 회원 탈퇴 요청
-        boolean isUnlinked = appleUnlinkService.unlinkAppleAccount(providerId, refreshToken);
+        // 애플 API를 통해 탈퇴 요청
+        boolean isUnlinked = appleUnlinkService.unlinkAppleAccount(member.getProviderId(), refreshToken);
 
         if (isUnlinked) {
-            // DB에서 사용자 삭제
-            memberRepository.deleteByProviderAndProviderId("apple", providerId);
-
-            // 회원 탈퇴 성공 응답
-            Map<String, Object> response = Map.of(
-                    "code", "200",
-                    "message", "회원 탈퇴 성공",
-                    "success", true
-            );
-            return ResponseEntity.ok(response);
+            // DB에서 회원 정보 삭제
+            memberRepository.deleteById(memberId);
+            return ResponseEntity.ok(Map.of("message", "회원 탈퇴 성공"));
         } else {
-            // 회원 탈퇴 실패 응답
-            Map<String, Object> response = Map.of(
-                    "code", "500",
-                    "message", "회원 탈퇴 실패",
-                    "success", false
-            );
-            return ResponseEntity.status(500).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "애플 회원 탈퇴 실패"));
         }
     }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
 
     /*
     @PostMapping("/apple/refresh")
