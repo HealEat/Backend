@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import healeat.server.user.JwtTokenProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizationContext;
 
 
 //@Component
@@ -23,11 +26,16 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final OAuth2AuthorizedClientService authorizedClientService;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final OAuth2AuthorizedClientManager authorizedClientManager;
 
-    public OAuth2LoginSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider) {
+    public OAuth2LoginSuccessHandler(OAuth2AuthorizedClientService authorizedClientService,
+                                     MemberRepository memberRepository,
+                                     JwtTokenProvider jwtTokenProvider,
+                                     OAuth2AuthorizedClientManager authorizedClientManager) {
         this.authorizedClientService = authorizedClientService;
         this.memberRepository = memberRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.authorizedClientManager = authorizedClientManager;
     }
 
     @Override
@@ -61,19 +69,28 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             Member member = memberOpt.get();
             //System.out.println(" 현재 로그인한 사용자: " + member.getName());
 
-            // 기존 소셜 로그인 액세스 토큰 가져오기
-            OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(provider, oauthToken.getName());
+            OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
+                    .withClientRegistrationId(provider)
+                    .principal(authentication)
+                    .attributes(attrs -> attrs.put(HttpServletRequest.class.getName(), request))
+                    .build();
+
+            OAuth2AuthorizedClient authorizedClient = authorizedClientManager.authorize(authorizeRequest);
+
+
+
             if (authorizedClient != null) {
                 String socialAccessToken = authorizedClient.getAccessToken().getTokenValue();
-                System.out.println("[소셜 로그인 액세스 토큰] : " + socialAccessToken);
+                System.out.println("[새로운 소셜 로그인 액세스 토큰] : " + socialAccessToken);
 
-                // 소셜 액세스 토큰 DB에 저장
+                // 소셜 액세스 토큰 DB 업데이트
                 member.updateSocialAccessToken(socialAccessToken);
                 memberRepository.save(member);
                 System.out.println("소셜 로그인 액세스 토큰 저장 완료");
             } else {
                 System.out.println("소셜 액세스 토큰을 찾을 수 없음.");
             }
+
 
             // 자체 JWT 발급 (새로운 액세스 토큰 및 리프레시 토큰 생성)
             String accessToken = jwtTokenProvider.generateAccessToken(member.getId());
