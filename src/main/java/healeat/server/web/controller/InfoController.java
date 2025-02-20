@@ -32,15 +32,15 @@ public class InfoController {
 
     @Operation(summary = "프로필 설정 API", description = "프로필 이미지와 닉네임을 설정합니다",
     requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "multipart/form-data")))
-    @PostMapping(value = "/profile/{memberId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<MemberProfileResponseDto> createProfile(
-            @PathVariable Long memberId,
+            @AuthenticationPrincipal Member member,
             @RequestPart(name = "file", required = false)
             MultipartFile file,
             @RequestPart(name = "request", required = true)
             MemberProfileRequestDto request) {
 
-        Member refreshedMember = memberRepository.findById(memberId).orElseThrow(() ->
+        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
                 new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
         Member profileMember = memberService.createProfile(refreshedMember, file, request);
