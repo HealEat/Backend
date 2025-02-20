@@ -23,6 +23,14 @@ import healeat.server.user.JwtAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import healeat.server.service.authService.LogoutService;
 
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
+
+import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -32,17 +40,18 @@ public class SecurityConfig {
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
-    private final LogoutService logoutService;
+
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
                 //JWT 인증 필터 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, memberRepository, logoutService),
-                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 // 인증 필터 순서 조정 - 권한 검사를 먼저 실행
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
@@ -79,10 +88,41 @@ public class SecurityConfig {
         return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
     }
 
-    //순환 의존성 방지로 OAuth2LoginSuccessHandler는 SecurityConfig에서 직접 빈으로 관리
     @Bean
-    public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler(OAuth2AuthorizedClientService authorizedClientService, MemberRepository memberRepository, JwtTokenProvider jwtTokenProvider) {
-        return new OAuth2LoginSuccessHandler(authorizedClientService, memberRepository, jwtTokenProvider);
+    public OAuth2AuthorizedClientRepository authorizedClientRepository(OAuth2AuthorizedClientService authorizedClientService) {
+        return new AuthenticatedPrincipalOAuth2AuthorizedClientRepository(authorizedClientService);
+    }
+
+    @Bean
+    public OAuth2AuthorizedClientManager authorizedClientManager(
+            ClientRegistrationRepository clientRegistrationRepository,
+            OAuth2AuthorizedClientRepository authorizedClientRepository) {
+
+        OAuth2AuthorizedClientProvider authorizedClientProvider =
+                OAuth2AuthorizedClientProviderBuilder.builder()
+                        .authorizationCode()
+                        .refreshToken()
+                        .build();
+
+        DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+                new DefaultOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientRepository);
+        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+        return authorizedClientManager;
+    }
+
+    @Bean
+    public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler(OAuth2AuthorizedClientService authorizedClientService,
+                                                               MemberRepository memberRepository,
+                                                               JwtTokenProvider jwtTokenProvider,
+                                                               OAuth2AuthorizedClientManager authorizedClientManager) {
+        return new OAuth2LoginSuccessHandler(authorizedClientService, memberRepository, jwtTokenProvider, authorizedClientManager);
+    }
+
+
+    // LogoutService를 직접 사용하지 않고, JWT 필터를 Bean으로 등록하여 순환 참조 해결
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(LogoutService logoutService) {
+        return new JwtAuthenticationFilter(jwtTokenProvider, memberRepository, logoutService);
     }
 }
 

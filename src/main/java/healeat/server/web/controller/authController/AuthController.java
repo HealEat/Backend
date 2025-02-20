@@ -15,6 +15,8 @@ import healeat.server.domain.Member;
 import healeat.server.repository.MemberRepository;
 import healeat.server.user.JwtTokenProvider;
 
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+
 import java.io.IOException;
 import java.util.Optional;
 
@@ -26,6 +28,7 @@ public class AuthController {
     private final LogoutService logoutService;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final OAuth2AuthorizedClientService authorizedClientService;
 
     @Operation(summary = "카카오 로그인 리다이렉션", description = "카카오 로그인 경로(/oauth2/authorization/kakao)로 리다이렉션(스웨거 테스트 X)")
     @GetMapping("/kakao")
@@ -39,27 +42,28 @@ public class AuthController {
         response.sendRedirect("/oauth2/authorization/naver");
     }
 
-    @Operation(summary = "로그아웃", description = "사용자를 로그아웃하고 세션을 무효화")
+
+
+    @Operation(summary = "로그아웃", description = "사용자 로그아웃 (기존 소셜 액세스 토큰 삭제)")
     @ApiResponse(responseCode = "200",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = LogoutResponse.class)))
+
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
         String token = resolveToken(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            // JWT 블랙리스트에 추가 (로그아웃 처리)
-            logoutService.logout(token);
-
-            //  토큰에서 사용자 ID 추출
             Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
-
-            //  DB에서 사용자 조회 후 리프레시 토큰 삭제
             Optional<Member> memberOpt = memberRepository.findById(memberId);
+
             if (memberOpt.isPresent()) {
                 Member member = memberOpt.get();
-                member.updateRefreshToken(null); // 리프레시 토큰 무효화
-                memberRepository.save(member); // 변경사항 저장
+
+                // OAuth2AuthorizedClientService 전달하여 강제 삭제
+                logoutService.logout(token, member.getProvider(), member.getProviderId(), authorizedClientService, memberRepository);
+                member.updateSocialAccessToken(null); // DB에서도 삭제
+                memberRepository.save(member);
             }
         }
 
@@ -68,6 +72,7 @@ public class AuthController {
 
         return ResponseEntity.ok(new LogoutResponse(true, "COMMON200", "로그아웃 성공"));
     }
+
 
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
@@ -79,3 +84,4 @@ public class AuthController {
 
     public record LogoutResponse(boolean isSuccess, String code, String message) {}
 }
+
