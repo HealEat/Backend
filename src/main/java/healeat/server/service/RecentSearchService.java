@@ -30,15 +30,15 @@ import java.util.Optional;
 public class RecentSearchService {
 
     private final RecentSearchRepository recentSearchRepository;
-    private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
 
-    public List<RecentSearch> getRecentSearchesByMember(Long memberId) {
+    public List<RecentSearch> getRecentSearchesByMember(Member member) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
-
-        return recentSearchRepository.findTop20RecentSearchesByMember(member.getId());
+        if (member == null) {
+            return null;
+        } else {
+            return recentSearchRepository.findTop20RecentSearchesByMember(member.getId());
+        }
     }
 
     //혹시나 필요하면 쓸 getById
@@ -51,48 +51,54 @@ public class RecentSearchService {
     @Transactional
     public void saveRecentQuery(Member member, String query) {
 
-        if (query == null || query.isBlank()) {
-            return;
-        }
+        if (member != null) {
+            if (query == null || query.isBlank()) {
+                return;
+            }
 
-        Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndQuery(member, query);
-        if (optionalRecentSearch.isPresent()) {
+            Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndQuery(member, query);
+            if (optionalRecentSearch.isPresent()) {
                 optionalRecentSearch.get().setUpdatedAt(LocalDateTime.now()); // 필드 수정 없이 updatedAt만 갱신
-        } else {
+            } else {
 
-            RecentSearch recentSearch = RecentSearch.builder()
-                    .member(member)
-                    .searchType(SearchType.QUERY)
-                    .store(null)
-                    .query(query)
-                    .build();
+                RecentSearch recentSearch = RecentSearch.builder()
+                        .member(member)
+                        .searchType(SearchType.QUERY)
+                        .store(null)
+                        .query(query)
+                        .build();
 
-            recentSearchRepository.save(recentSearch);
+                recentSearchRepository.save(recentSearch);
+            }
         }
     }
 
     @Transactional
     public RecentSearch saveRecentStore(Member member, Long placeId) {
 
-        Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndId(member, placeId);
-        if (optionalRecentSearch.isPresent()) {
+        if (member != null) {
+            Optional<RecentSearch> optionalRecentSearch = recentSearchRepository.findByMemberAndId(member, placeId);
+            if (optionalRecentSearch.isPresent()) {
 
-            RecentSearch recentSearch = optionalRecentSearch.get();
-            recentSearch.setUpdatedAt(LocalDateTime.now()); // 필드 수정 없이 updatedAt만 갱신
-            return recentSearch;
+                RecentSearch recentSearch = optionalRecentSearch.get();
+                recentSearch.setUpdatedAt(LocalDateTime.now()); // 필드 수정 없이 updatedAt만 갱신
+                return recentSearch;
+            } else {
+
+                Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
+                        new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
+
+                RecentSearch recentStore = RecentSearch.builder()
+                        .searchType(SearchType.STORE)
+                        .member(member)
+                        .store(store)
+                        .placeId(placeId)
+                        .build();
+
+                return recentSearchRepository.save(recentStore);
+            }
         } else {
-
-            Store store = storeRepository.findByKakaoPlaceId(placeId).orElseThrow(() ->
-                    new StoreHandler(ErrorStatus.STORE_NOT_FOUND));
-
-            RecentSearch recentStore = RecentSearch.builder()
-                    .searchType(SearchType.STORE)
-                    .member(member)
-                    .store(store)
-                    .placeId(placeId)
-                    .build();
-
-            return recentSearchRepository.save(recentStore);
+            return null;
         }
     }
 

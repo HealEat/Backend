@@ -22,6 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,13 +55,15 @@ public class SearchController {
             @CheckPage @RequestParam Integer page,
             @Valid @CheckSizeSum @RequestBody StoreRequestDto.SearchOnMapDto request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member refreshedMember = (member != null) ?
+                memberRepository.findById(member.getId())
+                        .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND)) :
+                null;
 
         recentSearchService.saveRecentQuery(refreshedMember, request.getQuery());
 
-        return ApiResponse.onSuccess(storeCommandService.searchAndMapStoresOnMap(
-                refreshedMember, page, request));
+        return ApiResponse.onSuccess(
+                storeCommandService.searchAndMapStoresOnMap(refreshedMember, page, request));
     }
 
     @Operation(summary = "현재 위치 중심 - 요청과 검색 결과 API", description =
@@ -77,13 +80,15 @@ public class SearchController {
             @CheckPage @RequestParam Integer page,
             @Valid @CheckSizeSum @RequestBody StoreRequestDto.SearchKeywordDto request) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member refreshedMember = (member != null) ?
+                memberRepository.findById(member.getId())
+                        .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND)) :
+                null;
 
         recentSearchService.saveRecentQuery(refreshedMember, request.getQuery());
 
-        return ApiResponse.onSuccess(storeCommandService.searchAndMapStores(
-                refreshedMember, page, request));
+        return ApiResponse.onSuccess(
+                storeCommandService.searchAndMapStores(refreshedMember, page, request));
     }
 
     @Operation(summary = "최근 검색 기록 조회", description = "최근 검색 기록을 조회합니다")
@@ -91,12 +96,15 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto> getAllRecentSearches(
             @AuthenticationPrincipal Member member) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member refreshedMember = (member != null) ?
+                memberRepository.findById(member.getId())
+                        .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND)) :
+                null;
 
-        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(refreshedMember.getId());
+        List<RecentSearch> recentSearches = recentSearchService.getRecentSearchesByMember(refreshedMember);
 
-        return ApiResponse.onSuccess(SearchPageConverter.toRecentSearchResponseDto(recentSearches));
+        return ApiResponse.onSuccess(
+                SearchPageConverter.toRecentSearchResponseDto(recentSearches));
     }
 
     @Operation(summary = "가게 타입 검색 기록 저장 API", description = "'검색 결과 목록에서 가게에 접근'할 때에만 해당 API를" +
@@ -105,8 +113,10 @@ public class SearchController {
     public ApiResponse<RecentSearchResponseDto.SetResultDto> saveRecentStore(
             @AuthenticationPrincipal Member member, @PathVariable Long placeId) {
 
-        Member refreshedMember = memberRepository.findById(member.getId()).orElseThrow(() ->
-                new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member refreshedMember = (member != null) ?
+                memberRepository.findById(member.getId())
+                        .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND)) :
+                null;
 
         return ApiResponse.onSuccess(SearchPageConverter.toSetResultDto(
                 recentSearchService.saveRecentStore(refreshedMember, placeId)));
