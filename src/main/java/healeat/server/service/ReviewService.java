@@ -83,7 +83,8 @@ public class ReviewService {
 
         Pageable pageable = PageRequest.of(safePage, 10);
 
-        return reviewImageRepository.findAllByReview_StoreOrderByCreatedAtDesc(store, pageable);
+                                                                // 리뷰 최신순    &&    리뷰 이미지 등록순
+        return reviewImageRepository.findAllByReview_StoreOrderByReview_CreatedAtDescCreatedAtAsc(store, pageable);
     }
 
     // 리뷰 생성 API
