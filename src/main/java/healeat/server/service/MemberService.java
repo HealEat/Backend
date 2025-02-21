@@ -86,7 +86,7 @@ public class MemberService {
 
         // 중복 저장 방지
         boolean exists = memberDiseaseRepository.existsByMemberAndDisease(member, disease);
-        if(exists) {
+        if (exists) {
             throw new MemberHandler(ErrorStatus.ALREADY_EXISTS);
         }
 
