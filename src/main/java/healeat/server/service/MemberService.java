@@ -86,16 +86,14 @@ public class MemberService {
 
         // 중복 저장 방지
         boolean exists = memberDiseaseRepository.existsByMemberAndDisease(member, disease);
-        if (exists) {
-            throw new MemberHandler(ErrorStatus.ALREADY_EXISTS);
+        if (!exists) {
+            // 질병 저장하기
+            MemberDisease memberDisease = MemberDisease.builder()
+                    .member(member)
+                    .disease(disease)
+                    .build();
+            memberDiseaseRepository.save(memberDisease);
         }
-
-        // 질병 저장하기
-        MemberDisease memberDisease = MemberDisease.builder()
-                .member(member)
-                .disease(disease)
-                .build();
-        memberDiseaseRepository.save(memberDisease);
 
         // 회원의 최신 질병 목록 반환
         List<MemberDiseaseResponseDto.DiseaseInfo> diseaseInfoList = memberDiseaseRepository.findByMember(member)
