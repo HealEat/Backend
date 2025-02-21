@@ -49,7 +49,7 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
         // Query 실행
         List<SearchResultItem> items = queryFactory
                 .selectFrom(searchResultItem)
-                .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
+                .leftJoin(store).on(store.kakaoPlaceId.eq(searchResultItem.placeId))
                 .where(whereClause)
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier<?>[0]))
                 .offset(pageable.getOffset())
@@ -60,7 +60,7 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
         Long totalCount = Optional.ofNullable(
                 queryFactory.select(searchResultItem.count())
                         .from(searchResultItem)
-                        .leftJoin(store).on(store.id.eq(searchResultItem.placeId))
+                        .leftJoin(store).on(store.kakaoPlaceId.eq(searchResultItem.placeId))
                         .where(whereClause)
                         .fetchOne())
                 .orElse(0L);
@@ -73,9 +73,9 @@ public class SearchResultItemRepositoryCustomImpl implements SearchResultItemRep
     private List<OrderSpecifier<?>> getOrderSpecifiers(String sortBy, QSearchResultItem searchResultItem) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
 
-        // 1. searchResultItem의 placeId와 같은 id를 가지는 Store가 존재하고, reviewCount가 0보다 큰지 확인
+        // 1. searchResultItem의 placeId와 같은 kakaoPlaceId를 가지는 Store가 존재하고, reviewCount가 0보다 큰지 확인
         orderSpecifiers.add(new CaseBuilder()
-                .when(store.id.eq(searchResultItem.placeId).and(store.reviewCount.gt(0)))
+                .when(store.kakaoPlaceId.eq(searchResultItem.placeId).and(store.reviewCount.gt(0)))
                 .then(1)
                 .otherwise(0)
                 .desc());
