@@ -284,7 +284,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
             Page<SearchResultItem> items = searchResultItemRepository.findSortedStores(
                     searchResult,
                     filteredItemIds,
-                    "NONE",
+                    "TOTAL",    // 임시로 전체 별점 순
                     0.0f,
                     pageable
             );
